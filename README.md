@@ -3,7 +3,9 @@
 A multi-format RAG system (PDF / DOCX / images) built from scratch on Gemini, with
 a **two-tier evaluation harness** and a **judge validated against hand labels**.
 
-**Live demo:** _(URL added on deploy — read-only; see [Running it](#running-it))_
+**Live demo:** _(URL added on deploy)_ — read-only, and **the first request after
+idle takes 30–60 seconds** while the free-tier container wakes. Subsequent
+requests are normal. See [Running it](#running-it) for why it is read-only.
 
 The pipeline is the easy half. What this repo is actually about is the part that is
 usually missing: knowing whether the thing works, being able to say how you know,

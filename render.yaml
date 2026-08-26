@@ -1,0 +1,46 @@
+# Render blueprint — deploy with "New > Blueprint" pointed at this repo.
+#
+# Everything here is configuration Render would otherwise ask for in a form. The
+# one thing it MUST ask for is the API key, and that is deliberate (see below).
+services:
+  - type: web
+    name: ragkit
+    runtime: docker
+    plan: free
+    # The free tier's always-free regions. Also where the Gemini endpoints are
+    # closest, which matters more than it sounds: every answer is several
+    # sequential API round trips (embed, then generate), so added latency is
+    # multiplied rather than paid once.
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+
+    # Render restarts a service that fails this, so it must be a route that
+    # answers without touching Gemini -- otherwise a quota exhaustion would look
+    # like an unhealthy container and trigger a restart loop that solves nothing.
+    healthCheckPath: /api/health
+
+    envVars:
+      # sync: false means Render PROMPTS for this on first deploy and stores it
+      # in its own encrypted config. The value never enters this file, the git
+      # history, or a build log. Committing it here instead would publish it to
+      # anyone who can read the repo.
+      - key: GEMINI_API_KEY
+        sync: false
+
+      # Read-only deployment. Also baked into the Dockerfile as the default, so
+      # this is belt-and-braces rather than the only thing standing between a
+      # public URL and DELETE /api/documents.
+      - key: RAGKIT_DEMO_MODE
+        value: "1"
+      - key: RAGKIT_DEMO_RATE_LIMIT
+        value: "20"
+      - key: RAGKIT_DEMO_RATE_WINDOW
+        value: "3600"
+
+      # Same-origin, so CORS is not actually exercised -- FastAPI serves the
+      # built frontend itself. Set anyway because the failure mode of an empty
+      # value here is an opaque browser error with a healthy backend behind it,
+      # and that is a bad thing to debug against a sleeping free-tier service.
+      - key: RAGKIT_CORS_ORIGINS
+        value: "https://ragkit.onrender.com"

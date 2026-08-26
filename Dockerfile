@@ -68,6 +68,16 @@ COPY data/ ./data/
 
 COPY --from=web /web/dist ./app/web/dist
 
+# The app writes conversations to data/index/conversations/ and feedback to
+# data/eval/feedback.jsonl at runtime. Hugging Face Spaces does not guarantee the
+# container runs as root, and a non-root UID against a root-owned directory turns
+# every conversation into a 500 -- so widen it rather than assume the UID.
+#
+# These writes are EPHEMERAL on any scale-to-zero host: conversations and
+# feedback reset when the container restarts. Acceptable for a demo, and stated
+# here so nobody later reads a lost conversation as data loss.
+RUN chmod -R 0777 /app/data
+
 # Railway injects PORT. Default 8000 so the image also runs locally unchanged.
 ENV PORT=8000
 EXPOSE 8000
