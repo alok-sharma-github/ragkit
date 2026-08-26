@@ -32,12 +32,13 @@ LIMITS, stated because a tool that overstates its certainty is the same mistake
 it hunts: AST name/attribute references traversed from the roots. It cannot
 follow getattr, registries, or names assembled from strings.
 
-KNOWN BLIND SPOT -- ALIASED IMPORTS. This audit follows NAMES, so
-`from x import explain as explain_fusion` breaks the trail: `explain` is wired
-into /api/ask and still reports unreachable. That is how a live function hides
-here, and it is the one false-positive shape to expect. Written down because the
-next person to alias an import will silently drop a function out of coverage,
-and a blind spot nobody has recorded is indistinguishable from a clean result. "Unreachable" means
+FIXED BLIND SPOT -- ALIASED IMPORTS. This used to follow bare NAMES only, so
+`from x import explain as explain_fusion` broke the trail and `explain` reported
+unreachable while being live on /api/ask. Per-file alias maps now resolve it. Kept
+in the record because the shape is worth recognising: the audit was accurate about
+its own limitation for weeks, and being accurate about a hole is not the same as
+not having one -- it also kept this script permanently non-zero, which is how a
+gate stops being read. "Unreachable" means
 "name the caller or delete it", never "provably dead". It errs toward FALSE
 ALARMS on purpose -- v1 briefly had the opposite bias (it skipped same-file
 calls) and the resulting noise is what got it fixed. A check that errs toward
@@ -88,10 +89,28 @@ def _names_used(node: ast.AST) -> set[str]:
 
 
 def _is_route(node: ast.AST) -> bool:
-    """A FastAPI handler: @app.get / @app.post / ..."""
+    """A FastAPI entry point: @app.get / @app.post / ... or @app.middleware.
+
+    MIDDLEWARE IS A ROOT, and omitting it was a real hole rather than a nicety.
+    `demo_guard` runs on EVERY request -- it is the most reachable function in the
+    web layer -- and it reported as unreachable because this predicate only knew
+    about verb decorators. So the audit was calling the demo's entire write
+    protection dead code.
+
+    That is this tool's own bug class turned on itself: a check whose predicate
+    covers most of the thing it names. Verb handlers were the only entry shape
+    when it was written, and middleware became one later without the predicate
+    being widened -- the same "correct when written, narrow afterwards" failure as
+    the ceiling wired to one of three paid routes.
+    """
     for dec in getattr(node, "decorator_list", []) or []:
         f = dec.func if isinstance(dec, ast.Call) else dec
-        if isinstance(f, ast.Attribute) and f.attr in {"get", "post", "put", "delete", "patch"}:
+        if isinstance(f, ast.Attribute) and f.attr in {
+            "get", "post", "put", "delete", "patch",
+            "middleware",          # @app.middleware("http") -- runs on every request
+            "exception_handler",   # error paths are reachable too
+            "on_event",            # startup/shutdown hooks
+        }:
             return True
     return False
 
@@ -109,16 +128,41 @@ def collect() -> tuple[dict[str, Defn], dict[str, set[str]]]:
         except SyntaxError:
             continue
 
+        # ALIASED IMPORTS, per file. This audit resolves references by SHORT NAME,
+        # so `from ragkit.index.fusion import explain as explain_fusion` broke the
+        # trail: /api/ask calls `explain_fusion`, no definition is named that, and
+        # `explain` reported unreachable while being live on the request path.
+        #
+        # The docstring called this a known blind spot and warned that "the next
+        # person to alias an import will silently drop a function out of coverage".
+        # A recorded blind spot is better than an unrecorded one and still lets
+        # real dead code hide behind a false positive nobody re-reads -- and it
+        # kept this audit permanently non-zero, which is how a gate becomes noise.
+        #
+        # Built per FILE rather than as one global map. A global map would mark a
+        # genuinely dead `foo` reachable because some unrelated module aliased
+        # something else to `foo` -- weakening the check to close a blind spot,
+        # which is the wrong trade.
+        aliases: dict[str, str] = {}
+        for node in tree.body:
+            if isinstance(node, (ast.Import, ast.ImportFrom)):
+                for a in node.names:
+                    if a.asname and a.asname != a.name:
+                        aliases[a.asname] = a.name.split(".")[-1]
+
+        def _expand(refs: set[str]) -> set[str]:
+            return refs | {aliases[r] for r in refs if r in aliases}
+
         # Module-level statements execute on import, so their references are live.
         mod_level: set[str] = set()
         for node in tree.body:
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 mod_level |= _names_used(node)
-        module_refs[rel] = mod_level
+        module_refs[rel] = _expand(mod_level)
 
         def add(qual: str, short: str, line: int, kind: str, body: ast.AST, root: bool) -> None:
             d = Defn(qual, short, rel, line, kind)
-            d.refs = _names_used(body)
+            d.refs = _expand(_names_used(body))
             d.is_root = root
             defs[qual] = d
 

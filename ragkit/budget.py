@@ -89,15 +89,28 @@ def _remedy(layer: str) -> str:
     # OPERATOR ADVICE ONLY REACHES OPERATORS. Naming an env var to someone who
     # cannot set one is the same defect as naming the wrong cause: the sentence is
     # true and useless. Only `internal` is read by whoever owns the config.
+    # ROUTE-NEUTRAL WORDING, enforced by scripts/audit_guards.py.
+    #
+    # These said "split the upload" and "...to ingest documents". Both were true
+    # when the ceiling guarded only embedding, and both became false the moment it
+    # was widened to generation: a refused ANSWER told the reader to split an
+    # upload they never made. Widening a guard invalidates every string written
+    # while it was narrow, which is why the audit greps these for words that name
+    # a single route rather than trusting them to be reviewed.
     if kind == "customer":
+        if layer == "daily":
+            return (
+                "wait for the daily limit to reset, or contact us to raise the "
+                "limit on your account"
+            )
         return (
-            "split the upload into smaller batches, or contact us to raise the "
-            "limit on your account"
+            "send fewer documents at a time, or contact us to raise the limit on "
+            "your account"
         )
     if kind == "demo":
         return (
-            "this public demo is read-only -- clone the repo and run it against "
-            "your own key to ingest documents"
+            "this public demo has a shared daily budget -- try again later, or "
+            "clone the repo and run it against your own key"
         )
     knob = (
         "RAGKIT_MAX_OPERATION_TOKENS" if layer == "per-operation"

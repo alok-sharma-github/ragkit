@@ -234,11 +234,27 @@ def cmd_feedback(args: argparse.Namespace) -> int:
 
 
 def cmd_audit(args: argparse.Namespace) -> int:
-    """Reachability from entry points -- 'name the caller' for every definition."""
+    """Static audits: is every definition reached, and is every guard complete?
+
+    Two scripts, one command, because they answer different questions and nobody
+    should have to remember the second one exists:
+
+      reachability  is this called from an entry point at all?
+      guards        is this guard on EVERY route that needs it?
+
+    The second exists because the first cannot ask it, and the gap between them
+    cost ~2,500 tokens of unmetered spend: the ceiling was wired to one of three
+    paid routes and reported itself as protection.
+    """
     import subprocess
-    return subprocess.call(
-        [__import__("sys").executable, str(config.ROOT / "scripts" / "audit_reachability.py")]
-    )
+    import sys as _sys
+
+    worst = 0
+    for script in ("audit_reachability.py", "audit_guards.py"):
+        print(f"\n===== {script} =====")
+        rc = subprocess.call([_sys.executable, str(config.ROOT / "scripts" / script)])
+        worst = max(worst, rc)
+    return worst
 
 
 def cmd_capabilities(args: argparse.Namespace) -> int:
