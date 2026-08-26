@@ -43,6 +43,21 @@ ENV PYTHONUNBUFFERED=1 \
     # the image is safe by DEFAULT -- a deploy that forgets to set it is still
     # protected, which is the direction this has to fail in.
     RAGKIT_DEMO_MODE=1 \
+    # Same safe-by-default argument, applied to the WORDING. config defaults this
+    # to `internal`, which is right for a developer on a laptop and wrong in an
+    # image: a deployment that forgets to set it would hand a public visitor
+    # "raise RAGKIT_MAX_OPERATION_TOKENS" -- operator advice to someone who
+    # cannot act on it, which is the defect just fixed reappearing as a config
+    # default. Customer and internal deployments override this explicitly.
+    #
+    # Failing toward the over-cautious reading is cheap; failing toward leaking
+    # env var names to strangers is not.
+    RAGKIT_DEPLOYMENT_KIND=demo \
+    # A public demo spends OUR key. The per-operation cap bounds any single
+    # answer; this bounds the day. ~500k tokens is roughly 50 answers, which is
+    # generous for a demo and about a dollar at flash rates -- versus the 5M
+    # default, which could run to three figures a month if fully consumed.
+    RAGKIT_DAILY_TOKEN_CAP=500000 \
     RAGKIT_WEB_DIST=/app/app/web/dist \
     # The venv is on PATH so `uvicorn` resolves without `uv run`, and /app is on
     # PYTHONPATH so `ragkit` and `app` import as top-level packages. Set

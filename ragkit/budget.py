@@ -70,13 +70,18 @@ class BudgetExceeded(RuntimeError):
 
 
 def _whose_limit() -> str:
+    # "spending limit", not "ingest limit". This cap guards THREE routes -- embed,
+    # generate and caption -- so calling it an ingest limit was accurate only on
+    # one of them, and a refusal on an answer told the reader their ingest was too
+    # large. A small slip, and the same species as everything else in this file:
+    # a message describing a neighbouring thing rather than the actual one.
     kind = config.DEPLOYMENT_KIND
     if kind == "customer":
         label = config.DEPLOYMENT_LABEL
-        return f"the ingest limit configured for your account{f' ({label})' if label else ''}"
+        return f"the spending limit configured for your account{f' ({label})' if label else ''}"
     if kind == "demo":
-        return "the ingest limit on this shared public demo"
-    return "the ingest limit configured for this deployment"
+        return "the spending limit on this shared public demo"
+    return "the spending limit configured for this deployment"
 
 
 def _remedy(layer: str) -> str:
