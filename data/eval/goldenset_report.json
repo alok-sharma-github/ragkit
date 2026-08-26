@@ -1,0 +1,63 @@
+{
+  "n_windows": 142,
+  "n_windows_selected": 60,
+  "generated": 120,
+  "verify": {
+    "kept": 96,
+    "dropped_unlocatable": 8,
+    "dropped_short": 18,
+    "dropped_no_needle": 24,
+    "ambiguous_kept": 6,
+    "quarantined": 4,
+    "reasons": [
+      "graphrag-local-to-global.pdf: needle not found: 'Public figures who are repeatedly mentioned acro'",
+      "hyde.pdf: needle not found: 'DPR, ANCE and ContrieverFT are in-domain supervi'",
+      "ragas.pdf: needle not found: 'It will be launched from the Satish Dhawan Space'",
+      "ragas.pdf: needle not found: 'The clock tower was erected at the cost\\nof 25,00'",
+      "graphrag-local-to-global.pdf: needle not found: 'Newman Cheng2 Joshua Bradley2 Alex Chao3'",
+      "hnsw.pdf: needle not found: '3. Annoy6 , 02.02.2016 build. A popular algorith'",
+      "hyde.pdf: needle not found: 'pivot through Hypothetical Document Embeddings ('",
+      "self-rag.pdf: needle not found: 'Table 12: Instructions and demonstrations for IS'"
+    ]
+  },
+  "out_of_scope_kept": 5,
+  "out_of_scope_rejected": [],
+  "summary": {
+    "total": 101,
+    "evaluable": 97,
+    "quarantined": 4,
+    "by_stratum": {
+      "simple_factual": 33,
+      "exact_identifier": 19,
+      "table_or_image": 38,
+      "multi_hop": 2,
+      "out_of_scope": 5
+    },
+    "by_anchor": {
+      "asset": 3,
+      "needle": 89,
+      "none": 5
+    },
+    "by_source": {
+      "assets/hnsw_p2.png": 2,
+      "assets/lost-in-the-middle_p1.png": 2,
+      "assets/lost-in-the-middle_p5.png": 2,
+      "assets/raptor_p2.png": 2,
+      "graphrag-local-to-global.pdf": 19,
+      "hnsw.pdf": 6,
+      "hyde.pdf": 7,
+      "lost-in-the-middle.pdf": 15,
+      "manual.docx": 2,
+      "ragas.pdf": 3,
+      "raptor.pdf": 18,
+      "self-rag.pdf": 14,
+      "": 5
+    },
+    "multi_needle": 32,
+    "ambiguous_needles": 6,
+    "with_distractor": 74,
+    "human_verified": 0
+  },
+  "degradations": [],
+  "saved_to": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\eval\\golden.jsonl"
+}

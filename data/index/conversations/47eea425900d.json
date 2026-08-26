@@ -1,0 +1,417 @@
+{
+ "id": "47eea425900d",
+ "title": "drift test",
+ "created_at": "2026-08-25T20:44:07+00:00",
+ "updated_at": "2026-08-25T20:44:27+00:00",
+ "n_turns": 4,
+ "drift": {
+  "turns": 4,
+  "conversation_only": 2,
+  "conversation_only_share": 0.5,
+  "first_half_share": 0.0,
+  "second_half_share": 1.0,
+  "sufficient": false,
+  "drifting": false,
+  "note": "a turn routed conversation_only is unverifiable against documents: every citation check is inert on that path"
+ },
+ "turns": [
+  {
+   "question": "What was HYBRID_RRF Recall@10?",
+   "answer_markdown": "The Recall@10 for HYBRID_RRF was 0.831 [1][3].",
+   "route": "documents",
+   "header": "FROM YOUR DOCUMENTS",
+   "read_as": "a direct question about your documents",
+   "search_query": "What was HYBRID_RRF Recall@10?",
+   "was_rewritten": false,
+   "retrieval_ran": true,
+   "abstained": false,
+   "grounded": true,
+   "claims": [
+    {
+     "text": "The Recall@10 for HYBRID_RRF was 0.831.",
+     "source": "documents",
+     "evidence_kind": null,
+     "citations": [
+      {
+       "label": 1,
+       "quote": "HYBRID_RRF\n0.831\n0.604\n58",
+       "chunk_id": "33c2acf777e52c3442b0f4fa",
+       "evidence_kind": "structure_inferred",
+       "evidence_label": "Document text, structure inferred by the assistant",
+       "quote_status": "verified",
+       "fabricated": false,
+       "overlap": 1.0,
+       "detail": "",
+       "locator": "benchmark-report.pdf  p2"
+      },
+      {
+       "label": 3,
+       "quote": "|Method|Recall@10|Precision@5|Latency_ms|",
+       "chunk_id": "a9f7d4ecfc17da7a21e0b34d",
+       "evidence_kind": "quoted",
+       "evidence_label": "Quoted exactly from your documents",
+       "quote_status": "verified",
+       "fabricated": false,
+       "overlap": 1.0,
+       "detail": "",
+       "locator": "benchmark-report.pdf  p1"
+      }
+     ]
+    }
+   ],
+   "sources": [
+    {
+     "label": 1,
+     "chunk_id": "33c2acf777e52c3442b0f4fa",
+     "source_id": "benchmark-report.pdf",
+     "uri": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\raw\\benchmark-report.pdf",
+     "page": 2,
+     "page_end": null,
+     "page_label": "p. 2",
+     "bbox": null,
+     "kind": "parent",
+     "section": null,
+     "asset_path": null,
+     "highlightable": true,
+     "quote": "HYBRID_RRF\n0.831\n0.604\n58\nHYBRID_RRF_RR\n0.889\n0.702\n318\nCOLBERT_LATE\n0.874\n0.681\n141",
+     "provenance": "verbatim",
+     "text_source": "page_text_clip",
+     "heading_path": []
+    },
+    {
+     "label": 2,
+     "chunk_id": "3b0d02613e83d6b655f6f7dd",
+     "source_id": "benchmark-report.pdf",
+     "uri": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\raw\\benchmark-report.pdf",
+     "page": 2,
+     "page_end": null,
+     "page_label": "p. 2",
+     "bbox": null,
+     "kind": "parent",
+     "section": null,
+     "asset_path": null,
+     "highlightable": true,
+     "quote": "```\nHYBRID_RRF fuses the dense and sparse legs with reciprocal rank\nfusion at k=60. HYBRID_RRF_RR adds a cross-encoder reranker over\nthe top 50 candidates, which is where the latency comes from.\n```\n\n```\nTable 4: Configuration parameters.\n```",
+     "provenance": "verbatim",
+     "text_source": "markdown",
+     "heading_path": []
+    },
+    {
+     "label": 3,
+     "chunk_id": "a9f7d4ecfc17da7a21e0b34d",
+     "source_id": "benchmark-report.pdf",
+     "uri": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\raw\\benchmark-report.pdf",
+     "page": 1,
+     "page_end": null,
+     "page_label": "p. 1",
+     "bbox": null,
+     "kind": "parent",
+     "section": "3. Results",
+     "asset_path": null,
+     "highlightable": true,
+     "quote": "|Method|Recall@10|Precision@5|Latency_ms|\n|---|---|---|---|\n|DENSE_ONLY|0.684|0.512|46|\n|BM25_ONLY|0.601|0.549|11|\n|HYBRID_ALPHA|0.712|0.573|52|",
+     "provenance": "verbatim",
+     "text_source": "markdown",
+     "heading_path": [
+      "3. Results"
+     ]
+    },
+    {
+     "label": 4,
+     "chunk_id": "162f4bf477355ca94f64a7d7",
+     "source_id": "hyde.pdf",
+     "uri": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\raw\\hyde.pdf",
+     "page": 5,
+     "page_end": null,
+     "page_label": "p. 5",
+     "bbox": null,
+     "kind": "parent",
+     "section": null,
+     "asset_path": null,
+     "highlightable": true,
+     "quote": "|_w/o relevance_<br>|Scifact<br>_judgement_<br>|Arguana<br>|Trec-Covid<br>_nDCG@10_<br>|FiQA<br>|DBPedia<br>|TREC-NEWS<br>|\n|---|---|---|---|---|---|---|\n|BM25|67.9|39.7|**59.5**|23.6|31.8|39.5|\n|Contriever|64.9|37.9|27.3|24.5|29.2|34.8|\n|HyDE|**69.1**|**46.6**|59.3|**27.3**|**36.8**|**44.0**|\n|_w/ relevance ju_|_dgement_||||||\n|DPR|31.8|17.5|33.2|29.5|26.3|16.1|\n|ANCE|50.7|41.5|**65.4**|30.0|28.1|38.2|\n|Contriever<sup>FT</sup>|67.7|44.6|59.6|**32.9**|**41.3**|42.8|\n|_w/o relevance_<br>|_judgement_<br>||_Recall@100_<br>||||\n|BM25|92.5|93.2|**49.8**|54.0|46.8|44.7|\n|Contriever|92.6|90.1|17.2|56.2|45.3|42.3|\n|HyDE|**96.4**|**97.9**|41.4|**62.1**|**47.2**|**50.9**|\n|_w/ relevance ju_|_dgement_||||||\n|DPR|72.7|75.1|21.2|34.2|34.9|21.5|\n|ANCE|81.6|93.7|45.7|58.1|31.9|39.8|\n|Contriever<sup>FT</sup>|94.7|97.7|40.7|**65.6**|**54.1**|49.2|",
+     "provenance": "verbatim",
+     "text_source": "markdown",
+     "heading_path": []
+    }
+   ],
+   "reconciliation": {
+    "chunks_sent": 4,
+    "chunks_cited": 2,
+    "citations_emitted": 2,
+    "citations_verified": 2,
+    "citations_absent": 0,
+    "absent_mean_overlap_pct": 0,
+    "citations_fabricated": 0,
+    "citations_unquotable": 0,
+    "claims": 1,
+    "claims_from_documents": 1,
+    "claims_from_conversation": 0,
+    "claims_uncited": 0,
+    "claims_mislabelled": 0
+   },
+   "evidence_mix": {
+    "quoted": 1,
+    "structure_inferred": 1,
+    "assistant_reading": 0,
+    "found_not_quoted": 0,
+    "conversation": 0
+   },
+   "timings_ms": {
+    "condense": 0,
+    "embed": 1998,
+    "retrieve": 4,
+    "generate": 3028
+   },
+   "pipeline_fingerprint": "",
+   "created_at": "2026-08-25T20:44:13+00:00"
+  },
+  {
+   "question": "And HYBRID_ALPHA?",
+   "answer_markdown": "The Recall@10 for HYBRID_ALPHA was 0.712 [1].",
+   "route": "documents",
+   "header": "FROM YOUR DOCUMENTS",
+   "read_as": "Looking for the Recall@10 metric for HYBRID_ALPHA",
+   "search_query": "What was HYBRID_ALPHA Recall@10?",
+   "was_rewritten": true,
+   "retrieval_ran": true,
+   "abstained": false,
+   "grounded": true,
+   "claims": [
+    {
+     "text": "The Recall@10 for HYBRID_ALPHA was 0.712.",
+     "source": "documents",
+     "evidence_kind": null,
+     "citations": [
+      {
+       "label": 1,
+       "quote": "|HYBRID_ALPHA|0.712|0.573|52|",
+       "chunk_id": "a9f7d4ecfc17da7a21e0b34d",
+       "evidence_kind": "quoted",
+       "evidence_label": "Quoted exactly from your documents",
+       "quote_status": "verified",
+       "fabricated": false,
+       "overlap": 1.0,
+       "detail": "",
+       "locator": "benchmark-report.pdf  p1"
+      }
+     ]
+    }
+   ],
+   "sources": [
+    {
+     "label": 1,
+     "chunk_id": "a9f7d4ecfc17da7a21e0b34d",
+     "source_id": "benchmark-report.pdf",
+     "uri": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\raw\\benchmark-report.pdf",
+     "page": 1,
+     "page_end": null,
+     "page_label": "p. 1",
+     "bbox": null,
+     "kind": "parent",
+     "section": "3. Results",
+     "asset_path": null,
+     "highlightable": true,
+     "quote": "|Method|Recall@10|Precision@5|Latency_ms|\n|---|---|---|---|\n|DENSE_ONLY|0.684|0.512|46|\n|BM25_ONLY|0.601|0.549|11|\n|HYBRID_ALPHA|0.712|0.573|52|",
+     "provenance": "verbatim",
+     "text_source": "markdown",
+     "heading_path": [
+      "3. Results"
+     ]
+    },
+    {
+     "label": 2,
+     "chunk_id": "162f4bf477355ca94f64a7d7",
+     "source_id": "hyde.pdf",
+     "uri": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\raw\\hyde.pdf",
+     "page": 5,
+     "page_end": null,
+     "page_label": "p. 5",
+     "bbox": null,
+     "kind": "parent",
+     "section": null,
+     "asset_path": null,
+     "highlightable": true,
+     "quote": "|_w/o relevance_<br>|Scifact<br>_judgement_<br>|Arguana<br>|Trec-Covid<br>_nDCG@10_<br>|FiQA<br>|DBPedia<br>|TREC-NEWS<br>|\n|---|---|---|---|---|---|---|\n|BM25|67.9|39.7|**59.5**|23.6|31.8|39.5|\n|Contriever|64.9|37.9|27.3|24.5|29.2|34.8|\n|HyDE|**69.1**|**46.6**|59.3|**27.3**|**36.8**|**44.0**|\n|_w/ relevance ju_|_dgement_||||||\n|DPR|31.8|17.5|33.2|29.5|26.3|16.1|\n|ANCE|50.7|41.5|**65.4**|30.0|28.1|38.2|\n|Contriever<sup>FT</sup>|67.7|44.6|59.6|**32.9**|**41.3**|42.8|\n|_w/o relevance_<br>|_judgement_<br>||_Recall@100_<br>||||\n|BM25|92.5|93.2|**49.8**|54.0|46.8|44.7|\n|Contriever|92.6|90.1|17.2|56.2|45.3|42.3|\n|HyDE|**96.4**|**97.9**|41.4|**62.1**|**47.2**|**50.9**|\n|_w/ relevance ju_|_dgement_||||||\n|DPR|72.7|75.1|21.2|34.2|34.9|21.5|\n|ANCE|81.6|93.7|45.7|58.1|31.9|39.8|\n|Contriever<sup>FT</sup>|94.7|97.7|40.7|**65.6**|**54.1**|49.2|",
+     "provenance": "verbatim",
+     "text_source": "markdown",
+     "heading_path": []
+    },
+    {
+     "label": 3,
+     "chunk_id": "8c3c6e1b5da70714a7d9e0f5",
+     "source_id": "hyde.pdf",
+     "uri": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\raw\\hyde.pdf",
+     "page": 5,
+     "page_end": null,
+     "page_label": "p. 5",
+     "bbox": null,
+     "kind": "parent",
+     "section": null,
+     "asset_path": null,
+     "highlightable": true,
+     "quote": "||map|DL19<br>ndcg@10|recall@1k|map|DL20<br>ndcg@10|recall@1k|\n|---|---|---|---|---|---|---|\n|_w/o relevance_|_judgeme_|_nt_|||||\n|BM25|30.1|50.6|75.0|28.6|48.0|78.6|\n|Contriever|24.0|44.5|74.6|24.0|42.1|75.4|\n|HyDE|**41.8**|**61.3**|**88.0**|**38.2**|**57.9**|**84.4**|\n|_w/ relevance ju_|_dgemen_|_t_|||||\n|DPR|36.5|62.2|76.9|41.8|**65.3**|81.4|\n|ANCE|37.1|**64.5**|75.5|40.8|64.6|77.6|\n|Contriever<sup>FT</sup>|41.7|62.1|83.6|**43.6**|63.2|**85.8**|",
+     "provenance": "verbatim",
+     "text_source": "markdown",
+     "heading_path": []
+    },
+    {
+     "label": 4,
+     "chunk_id": "33c2acf777e52c3442b0f4fa",
+     "source_id": "benchmark-report.pdf",
+     "uri": "C:\\Users\\Inzint1\\Projects\\learning-rag\\data\\raw\\benchmark-report.pdf",
+     "page": 2,
+     "page_end": null,
+     "page_label": "p. 2",
+     "bbox": null,
+     "kind": "parent",
+     "section": null,
+     "asset_path": null,
+     "highlightable": true,
+     "quote": "HYBRID_RRF\n0.831\n0.604\n58\nHYBRID_RRF_RR\n0.889\n0.702\n318\nCOLBERT_LATE\n0.874\n0.681\n141",
+     "provenance": "verbatim",
+     "text_source": "page_text_clip",
+     "heading_path": []
+    }
+   ],
+   "reconciliation": {
+    "chunks_sent": 4,
+    "chunks_cited": 1,
+    "citations_emitted": 1,
+    "citations_verified": 1,
+    "citations_absent": 0,
+    "absent_mean_overlap_pct": 0,
+    "citations_fabricated": 0,
+    "citations_unquotable": 0,
+    "claims": 1,
+    "claims_from_documents": 1,
+    "claims_from_conversation": 0,
+    "claims_uncited": 0,
+    "claims_mislabelled": 0
+   },
+   "evidence_mix": {
+    "quoted": 1,
+    "structure_inferred": 0,
+    "assistant_reading": 0,
+    "found_not_quoted": 0,
+    "conversation": 0
+   },
+   "timings_ms": {
+    "condense": 1489,
+    "embed": 521,
+    "retrieve": 2,
+    "generate": 1612
+   },
+   "pipeline_fingerprint": "",
+   "created_at": "2026-08-25T20:44:16+00:00"
+  },
+  {
+   "question": "So which would you choose?",
+   "answer_markdown": "Based solely on the figures provided in our conversation, I would choose **HYBRID_RRF** if the goal is to maximize Recall@10, as its score of 0.831 is higher than HYBRID_ALPHA's score of 0.712. Please note that this is my reading and comparison of the metrics mentioned in this conversation, not a recommendation derived directly from external documents or broader criteria.",
+   "route": "conversation_only",
+   "header": "THIS CONVERSATION",
+   "read_as": "comparing HYBRID_RRF and HYBRID_ALPHA to choose the better option based on previous turns",
+   "search_query": "So which would you choose?",
+   "was_rewritten": false,
+   "retrieval_ran": false,
+   "abstained": false,
+   "grounded": true,
+   "claims": [
+    {
+     "text": "In our conversation, HYBRID_RRF had a Recall@10 of 0.831.",
+     "source": "conversation",
+     "evidence_kind": "conversation",
+     "citations": []
+    },
+    {
+     "text": "In our conversation, HYBRID_ALPHA had a Recall@10 of 0.712.",
+     "source": "conversation",
+     "evidence_kind": "conversation",
+     "citations": []
+    },
+    {
+     "text": "HYBRID_RRF has a higher Recall@10 than HYBRID_ALPHA based on the numbers discussed in the conversation.",
+     "source": "conversation",
+     "evidence_kind": "conversation",
+     "citations": []
+    }
+   ],
+   "sources": [],
+   "reconciliation": {
+    "chunks_sent": 0,
+    "citations_emitted": 0,
+    "citations_verified": 0,
+    "citations_fabricated": 0,
+    "claims": 3,
+    "claims_from_documents": 0,
+    "claims_from_conversation": 3,
+    "claims_uncited": 0,
+    "verification": "not_applicable_no_sources"
+   },
+   "evidence_mix": {
+    "quoted": 0,
+    "structure_inferred": 0,
+    "assistant_reading": 0,
+    "found_not_quoted": 0,
+    "conversation": 3
+   },
+   "timings_ms": {
+    "condense": 1001,
+    "generate": 4536
+   },
+   "pipeline_fingerprint": "",
+   "created_at": "2026-08-25T20:44:22+00:00"
+  },
+  {
+   "question": "Why do you say that?",
+   "answer_markdown": "Based plainly on my reading of our conversation, I said that because HYBRID_RRF has a Recall@10 score of 0.831, which is higher than HYBRID_ALPHA's score of 0.712. This reasoning reflects only the comparison of the metrics mentioned in this conversation, not an external document or broader evaluation criteria.",
+   "route": "conversation_only",
+   "header": "THIS CONVERSATION",
+   "read_as": "Asking for the reasoning behind the previous choice between HYBRID_RRF and HYBRID_ALPHA based on the conversation.",
+   "search_query": "Why do you say that?",
+   "was_rewritten": false,
+   "retrieval_ran": false,
+   "abstained": false,
+   "grounded": true,
+   "claims": [
+    {
+     "text": "HYBRID_RRF has a Recall@10 score of 0.831, which is higher than HYBRID_ALPHA's score of 0.712.",
+     "source": "conversation",
+     "evidence_kind": "conversation",
+     "citations": []
+    },
+    {
+     "text": "This reasoning is based strictly on the comparison of the values stated previously in this conversation.",
+     "source": "conversation",
+     "evidence_kind": "conversation",
+     "citations": []
+    }
+   ],
+   "sources": [],
+   "reconciliation": {
+    "chunks_sent": 0,
+    "citations_emitted": 0,
+    "citations_verified": 0,
+    "citations_fabricated": 0,
+    "claims": 2,
+    "claims_from_documents": 0,
+    "claims_from_conversation": 2,
+    "claims_uncited": 0,
+    "verification": "not_applicable_no_sources"
+   },
+   "evidence_mix": {
+    "quoted": 0,
+    "structure_inferred": 0,
+    "assistant_reading": 0,
+    "found_not_quoted": 0,
+    "conversation": 2
+   },
+   "timings_ms": {
+    "condense": 989,
+    "generate": 3363
+   },
+   "pipeline_fingerprint": "",
+   "created_at": "2026-08-25T20:44:27+00:00"
+  }
+ ]
+}

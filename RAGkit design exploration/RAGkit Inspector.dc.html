@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#0c0e11;color:#dde2e8;font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#9db4c8;text-decoration:none}
+a:hover{color:#dde2e8;text-decoration:underline}
+::selection{background:rgba(157,180,200,.25)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0c0e11">
+  <div style="display:flex;align-items:center;gap:16px;height:46px;padding:0 20px;border-bottom:1px solid #232a33">
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;letter-spacing:1.5px"><span style="font-weight:600">RAGKIT</span> <span style="color:#8a929d">INSPECTOR</span></div>
+    <div style="width:1px;height:18px;background:#232a33"></div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;padding:3px 9px;border:1px solid #2a323c;border-radius:3px;color:#c9d0d8">run_7f3c92e <span style="color:#59616c">▾</span></div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#59616c">2026-08-25 09:41 UTC · 128 items</div>
+    <div style="flex:1"></div>
+    <div style="display:flex;gap:2px;align-items:center">
+      <div onClick="{{ goRecon }}" style="{{ tabReconSt }}" style-hover="color:#dde2e8">Reconciliation</div>
+      <div onClick="{{ goChunks }}" style="{{ tabChunkSt }}" style-hover="color:#dde2e8">Chunk inspector</div>
+      <div style="padding:6px 12px;font-size:12.5px;color:#454d57;cursor:default">Recall vs budget</div>
+      <div style="padding:6px 12px;font-size:12.5px;color:#454d57;cursor:default">Run comparison</div>
+      <div style="padding:6px 12px;font-size:12.5px;color:#454d57;cursor:default">Failure triage</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;padding:7px 20px;border-bottom:1px solid #1b2129;background:#0e1115;flex-wrap:wrap">
+    <div style="font-size:10px;letter-spacing:1.2px;color:#59616c;font-weight:600">PIPELINE FINGERPRINT</div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#8a929d;padding:2px 8px;border:1px solid #232a33;border-radius:3px">parse tika@2.9.1</div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#8a929d;padding:2px 8px;border:1px solid #232a33;border-radius:3px">chunk rc-split@0.9.4</div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#8a929d;padding:2px 8px;border:1px solid #232a33;border-radius:3px">embed voyage-3 / 1024d</div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#c9a468;padding:2px 8px;border:1px solid #4a3d28;border-radius:3px;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:50%;background:#e0a458;display:inline-block"></span>viewer llm-clean@0.3 · new</div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#8a929d;padding:2px 8px;border:1px solid #232a33;border-radius:3px">judge gpt-4.1 · rubric-v6</div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">fp_a41c9e02</div>
+    <div style="flex:1"></div>
+    <div style="font-size:10.5px;color:#59616c">every figure on this page inherits this fingerprint unless chipped otherwise</div>
+  </div>
+
+  <sc-if value="{{ onRecon }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Reconciliation" style="max-width:1480px;margin:0 auto;padding:22px 28px 48px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <div style="font-size:17px;font-weight:600">Reconciliation</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#8a929d">
+        <sc-if value="{{ showFail }}" hint-placeholder-val="{{ true }}"><span style="color:#f4574d;font-weight:600">1 failing</span><span> · 4 passing · </span></sc-if>
+        <sc-if value="{{ allPass }}"><span>0 failing · 5 passing · </span></sc-if>
+        <span style="border-bottom:1px dashed #59616c">1 not measured</span>
+      </div>
+      <div style="flex:1"></div>
+      <div style="font-size:11px;color:#59616c">counts must reconcile before any score on this run is trusted</div>
+    </div>
+
+    <sc-if value="{{ showFail }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:290px 1fr 360px;gap:36px;border:1px solid rgba(244,87,77,.55);background:rgba(244,87,77,.06);padding:24px 28px;margin:18px 0 26px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><span style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:1px;background:#f4574d;color:#0c0e11;padding:3px 8px">FAIL</span></div>
+        <div style="font-size:15px;font-weight:600">Citation integrity</div>
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:#8a929d">rule: fabricated = 0</div>
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">llm-clean@0.3 · tika@2.9.1 · cite-check@1.4</div>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:26px;justify-content:center">
+        <div style="text-align:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:38px;line-height:1;color:#c9d0d8">12</div><div style="font-size:10.5px;letter-spacing:1px;color:#8a929d;margin-top:8px">EMITTED</div></div>
+        <div style="font-size:20px;color:#59616c;padding-bottom:22px">→</div>
+        <div style="text-align:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:38px;line-height:1;color:#c9d0d8">9</div><div style="font-size:10.5px;letter-spacing:1px;color:#8a929d;margin-top:8px">VERIFIED</div></div>
+        <div style="font-size:20px;color:#59616c;padding-bottom:22px">→</div>
+        <div style="text-align:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:46px;line-height:1;color:#f4574d;font-weight:600">3</div><div style="font-size:10.5px;letter-spacing:1px;color:#f4574d;margin-top:8px">FABRICATED · EXPECTED 0</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;justify-content:center">
+        <div style="font-size:12.5px;color:#aab2bc;line-height:1.55">3 emitted citations point at byte ranges that do not exist in the quotable store. All 3 cite chunks whose displayed text was rewritten by <span style="font-family:'Spline Sans Mono',monospace;color:#c9a468">llm-clean@0.3</span>.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div onClick="{{ goChunks }}" style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#9db4c8;border:1px solid #2a323c;padding:3px 8px;border-radius:3px;cursor:pointer" style-hover="border-color:#9db4c8">itm_0043 →</div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d;border:1px solid #2a323c;padding:3px 8px;border-radius:3px">itm_0107</div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d;border:1px solid #2a323c;padding:3px 8px;border-radius:3px">itm_0121</div>
+        </div>
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">held in run_7e11a02 (−1d) · first failure since viewer = llm-clean@0.3</div>
+      </div>
+    </div>
+    </sc-if>
+    <sc-if value="{{ allPass }}">
+    <div style="font-size:12px;color:#8a929d;margin:14px 0 22px">All reconciliations hold on this run. Nothing here certifies answer quality — it certifies that the counts below agree with each other.</div>
+    </sc-if>
+
+    <div style="display:grid;grid-template-columns:1.05fr 1.7fr 0.9fr 90px 150px 1.25fr;gap:16px;padding:8px 14px;font-size:10px;letter-spacing:1.2px;color:#59616c;font-weight:600">
+      <div>CHECK</div><div>OBSERVED</div><div>RULE</div><div>N</div><div>STATE</div><div>FINGERPRINT</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.05fr 1.7fr 0.9fr 90px 150px 1.25fr;gap:16px;align-items:center;padding:13px 14px;border-top:1px solid #1b2129">
+      <div style="font-size:13px">Citation integrity</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:13px"><span style="color:#8a929d">emitted</span> {{ cit.emitted }} <span style="color:#59616c">→</span> <span style="color:#8a929d">verified</span> {{ cit.verified }} <span style="color:#59616c">→</span> <span style="color:#8a929d">fabricated</span> <sc-if value="{{ showFail }}" hint-placeholder-val="{{ true }}"><span style="color:#f4574d;font-weight:600">{{ cit.fabricated }}</span></sc-if><sc-if value="{{ allPass }}"><span>{{ cit.fabricated }}</span></sc-if></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">fabricated = 0</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">n=12</div>
+      <div><sc-if value="{{ showFail }}" hint-placeholder-val="{{ true }}"><span style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:1px;background:#f4574d;color:#0c0e11;padding:3px 8px">FAIL</span></sc-if><sc-if value="{{ allPass }}"><span style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;letter-spacing:1px;border:1px solid #2a323c;color:#8a929d;padding:3px 8px;border-radius:3px">HOLDS</span></sc-if></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">llm-clean@0.3 · cite-check@1.4</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.05fr 1.7fr 0.9fr 90px 150px 1.25fr;gap:16px;align-items:center;padding:13px 14px;border-top:1px solid #1b2129">
+      <div style="font-size:13px">Context budget</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:13px"><span style="color:#8a929d">delivered</span> 1,314 <span style="color:#59616c">≤</span> <span style="color:#8a929d">budget</span> 1,500</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">delivered ≤ budget</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">n=128</div>
+      <div><span style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;letter-spacing:1px;border:1px solid #2a323c;color:#8a929d;padding:3px 8px;border-radius:3px">HOLDS</span></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">packer@1.1 · tok cl100k</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.05fr 1.7fr 0.9fr 90px 150px 1.25fr;gap:16px;align-items:center;padding:13px 14px;border-top:1px solid #1b2129">
+      <div style="font-size:13px">Scoring sanity</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:13px"><span style="color:#8a929d">partial</span> 84 <span style="color:#59616c">≥</span> <span style="color:#8a929d">strict</span> 78</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">partial ≥ strict</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">n=128</div>
+      <div><span style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;letter-spacing:1px;border:1px solid #2a323c;color:#8a929d;padding:3px 8px;border-radius:3px">HOLDS</span></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">judge gpt-4.1 · rubric-v6</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.05fr 1.7fr 0.9fr 90px 150px 1.25fr;gap:16px;align-items:center;padding:13px 14px;border-top:1px solid #1b2129">
+      <div style="font-size:13px">Index parity</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:13px"><span style="color:#8a929d">indexed</span> 4,112 <span style="color:#59616c">=</span> <span style="color:#8a929d">embedded</span> 4,112</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">indexed = embedded</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">n=4,112</div>
+      <div><span style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;letter-spacing:1px;border:1px solid #2a323c;color:#8a929d;padding:3px 8px;border-radius:3px">HOLDS</span></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">rc-split@0.9.4 · voyage-3/1024</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.05fr 1.7fr 0.9fr 90px 150px 1.25fr;gap:16px;align-items:center;padding:13px 14px;border-top:1px solid #1b2129">
+      <div>
+        <div style="font-size:13px">Grounding audit</div>
+        <div style="font-size:11px;color:#59616c;margin-top:3px">sample too small to rate — queue 7 more audits</div>
+      </div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:13px"><span style="letter-spacing:3px"><span style="color:#dde2e8">●●</span><span style="color:#454d57">○</span></span>&nbsp;&nbsp;<span style="font-weight:600">2 of 3</span> <span style="color:#8a929d">grounded</span></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">counts, never rates</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a929d">n=3</div>
+      <div><span style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;letter-spacing:1px;border:1px solid #2a323c;color:#8a929d;padding:3px 8px;border-radius:3px">n&lt;10 · COUNTS</span></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">human audit · 2026-08-24</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.05fr 1.7fr 0.9fr 90px 150px 1.25fr;gap:16px;align-items:center;padding:13px 14px;border-top:1px solid #1b2129;border-bottom:1px solid #1b2129">
+      <div>
+        <div style="font-size:13px;color:#8a929d">Dedup collisions</div>
+        <div style="font-size:11px;color:#59616c;margin-top:3px">counter not emitted by rc-split@0.9.4 — probe ships in 0.9.5</div>
+      </div>
+      <div><span style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:#8a929d;border:1px dashed #3a424c;padding:4px 10px;border-radius:3px">not measured</span></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#59616c">collisions = 0</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#59616c">—</div>
+      <div><span style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;letter-spacing:1px;border:1px dashed #3a424c;color:#8a929d;padding:3px 8px;border-radius:3px">NOT MEASURED</span></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">rc-split@0.9.4</div>
+    </div>
+    <div style="font-size:10.5px;color:#454d57;margin-top:14px">not measured ≠ 0 — absent counters render as absent, never as zero</div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ onChunks }}">
+  <div data-screen-label="Chunk inspector" style="max-width:1480px;margin:0 auto;padding:22px 28px 48px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap">
+      <div style="font-size:17px;font-weight:600">Chunk inspector</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:#8a929d">itm_0043</div>
+      <div style="font-size:13.5px;color:#c9d0d8">“What dose reduction is recommended for moderate renal impairment?”</div>
+      <div style="flex:1"></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#59616c">retrieve k=3 · cosine · voyage-3/1024 · idx_9c2 (2026-08-24)</div>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center;margin-top:16px">
+      <sc-for list="{{ chunks }}" as="ch" hint-placeholder-count="3">
+        <div onClick="{{ ch.pick }}" style="{{ ch.st }}" style-hover="border-color:#59616c">
+          <span style="color:#59616c">#{{ ch.rank }}</span>&nbsp; {{ ch.id }} &nbsp;<span style="color:#8a929d">{{ ch.score }}</span>
+          <sc-if value="{{ ch.warn }}" hint-placeholder-val="{{ false }}">&nbsp;<span style="color:#e0a458">●</span></sc-if>
+        </div>
+      </sc-for>
+      <div style="flex:1"></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#454d57">keys 1–3 select chunk · r / c switch screens</div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap">
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:14px;font-weight:600">{{ sel.id }}</div>
+      <div style="font-size:12px;color:#8a929d">{{ sel.doc }}</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#8a929d;border:1px solid #232a33;padding:2px 8px;border-radius:3px">cosine {{ sel.score }} · voyage-3/1024</div>
+      <div style="flex:1"></div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#8a929d;border:1px solid #232a33;padding:3px 8px;border-radius:3px">EXTRACTOR&nbsp; {{ sel.extractor }}</div>
+      <sc-if value="{{ sel.originDoc }}" hint-placeholder-val="{{ true }}"><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#8a929d;border:1px solid #232a33;padding:3px 8px;border-radius:3px">ORIGIN&nbsp; document</div></sc-if>
+      <sc-if value="{{ sel.originModel }}"><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#e0a458;border:1px solid #4a3d28;background:rgba(224,164,88,.08);padding:3px 8px;border-radius:3px">ORIGIN&nbsp; model-written</div></sc-if>
+      <sc-if value="{{ sel.quotable }}" hint-placeholder-val="{{ true }}"><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#8a929d;border:1px solid #232a33;padding:3px 8px;border-radius:3px">QUOTABLE&nbsp; yes</div></sc-if>
+      <sc-if value="{{ sel.notQuotable }}"><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#f4574d;border:1px solid rgba(244,87,77,.45);background:rgba(244,87,77,.07);padding:3px 8px;border-radius:3px">QUOTABLE&nbsp; no</div></sc-if>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:12px">
+      <div style="border:1px solid #232a33;background:#101318;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #1b2129">
+          <div style="width:22px;height:22px;border:1px solid #3a424c;display:flex;align-items:center;justify-content:center;font-family:'Spline Sans Mono',monospace;font-size:11px;font-weight:600">S</div>
+          <div><div style="font-size:11px;font-weight:600;letter-spacing:1px">SEARCHED</div><div style="font-size:10.5px;color:#59616c">what the embedder saw</div></div>
+        </div>
+        <div style="padding:16px;font-family:'Spline Sans Mono',monospace;font-size:12.5px;line-height:1.7;color:#c9d0d8;flex:1;min-height:150px"><sc-for list="{{ sel.sSegs }}" as="g" hint-placeholder-count="1"><sc-if value="{{ g.plain }}" hint-placeholder-val="{{ true }}"><span>{{ g.t }}</span></sc-if><sc-if value="{{ g.norm }}"><span style="background:rgba(224,164,88,.16);box-shadow:inset 0 -1px 0 #e0a458">{{ g.t }}</span></sc-if><sc-if value="{{ g.sem }}"><span style="background:rgba(244,87,77,.18);box-shadow:inset 0 -1px 0 #f4574d">{{ g.t }}</span></sc-if></sc-for></div>
+        <div style="border-top:1px solid #1b2129;padding:9px 14px;display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ sel.sNotes }}" as="n" hint-placeholder-count="1"><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px"><sc-if value="{{ n.sem }}" hint-placeholder-val="{{ false }}"><span style="color:#f4574d">▲ {{ n.t }}</span></sc-if><sc-if value="{{ n.warn }}"><span style="color:#c9a468">△ {{ n.t }}</span></sc-if><sc-if value="{{ n.dim }}"><span style="color:#59616c">· {{ n.t }}</span></sc-if></div></sc-for>
+        </div>
+        <div style="border-top:1px solid #1b2129;padding:8px 14px;font-family:'Spline Sans Mono',monospace;font-size:10px;color:#59616c">{{ sel.sFoot }}</div>
+      </div>
+
+      <div style="border:1px solid #232a33;background:#101318;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #1b2129">
+          <div style="width:22px;height:22px;border:1px solid #3a424c;display:flex;align-items:center;justify-content:center;font-family:'Spline Sans Mono',monospace;font-size:11px;font-weight:600">D</div>
+          <div><div style="font-size:11px;font-weight:600;letter-spacing:1px">DISPLAYED</div><div style="font-size:10.5px;color:#59616c">what the user saw</div></div>
+        </div>
+        <div style="padding:16px;font-size:13.5px;line-height:1.7;color:#dde2e8;flex:1;min-height:150px"><sc-for list="{{ sel.dSegs }}" as="g" hint-placeholder-count="1"><sc-if value="{{ g.plain }}" hint-placeholder-val="{{ true }}"><span>{{ g.t }}</span></sc-if><sc-if value="{{ g.norm }}"><span style="background:rgba(224,164,88,.16);box-shadow:inset 0 -1px 0 #e0a458">{{ g.t }}</span></sc-if><sc-if value="{{ g.sem }}"><span style="background:rgba(244,87,77,.18);box-shadow:inset 0 -1px 0 #f4574d">{{ g.t }}</span></sc-if></sc-for></div>
+        <div style="border-top:1px solid #1b2129;padding:9px 14px;display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ sel.dNotes }}" as="n" hint-placeholder-count="1"><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px"><sc-if value="{{ n.sem }}" hint-placeholder-val="{{ false }}"><span style="color:#f4574d">▲ {{ n.t }}</span></sc-if><sc-if value="{{ n.warn }}"><span style="color:#c9a468">△ {{ n.t }}</span></sc-if><sc-if value="{{ n.dim }}"><span style="color:#59616c">· {{ n.t }}</span></sc-if></div></sc-for>
+        </div>
+        <div style="border-top:1px solid #1b2129;padding:8px 14px;font-family:'Spline Sans Mono',monospace;font-size:10px;color:#59616c">{{ sel.dFoot }}</div>
+      </div>
+
+      <div style="border:1px solid #232a33;background:#101318;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #1b2129">
+          <div style="width:22px;height:22px;border:1px solid #3a424c;display:flex;align-items:center;justify-content:center;font-family:'Spline Sans Mono',monospace;font-size:11px;font-weight:600">Q</div>
+          <div><div style="font-size:11px;font-weight:600;letter-spacing:1px">QUOTABLE</div><div style="font-size:10.5px;color:#59616c">verbatim source — the only text a citation may point at</div></div>
+        </div>
+        <sc-if value="{{ sel.quotable }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:16px;font-family:'Spline Sans Mono',monospace;font-size:12.5px;line-height:1.7;color:#c9d0d8;white-space:pre-wrap;flex:1;min-height:150px"><sc-for list="{{ sel.qSegs }}" as="g" hint-placeholder-count="1"><sc-if value="{{ g.plain }}" hint-placeholder-val="{{ true }}"><span>{{ g.t }}</span></sc-if><sc-if value="{{ g.norm }}"><span style="background:rgba(224,164,88,.16);box-shadow:inset 0 -1px 0 #e0a458">{{ g.t }}</span></sc-if><sc-if value="{{ g.sem }}"><span style="background:rgba(244,87,77,.18);box-shadow:inset 0 -1px 0 #f4574d">{{ g.t }}</span></sc-if></sc-for></div>
+        </sc-if>
+        <sc-if value="{{ sel.notQuotable }}">
+        <div style="margin:16px;border:1px dashed #3a424c;padding:20px;flex:1;min-height:118px;display:flex;flex-direction:column;gap:8px;justify-content:center">
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;letter-spacing:1px;color:#8a929d">NO VERBATIM SOURCE</div>
+          <div style="font-size:12px;color:#8a929d;line-height:1.55">{{ sel.qReason }}</div>
+        </div>
+        </sc-if>
+        <div style="border-top:1px solid #1b2129;padding:9px 14px;display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ sel.qNotes }}" as="n" hint-placeholder-count="1"><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px"><sc-if value="{{ n.sem }}" hint-placeholder-val="{{ false }}"><span style="color:#f4574d">▲ {{ n.t }}</span></sc-if><sc-if value="{{ n.warn }}"><span style="color:#c9a468">△ {{ n.t }}</span></sc-if><sc-if value="{{ n.dim }}"><span style="color:#59616c">· {{ n.t }}</span></sc-if></div></sc-for>
+        </div>
+        <div style="border-top:1px solid #1b2129;padding:8px 14px;font-family:'Spline Sans Mono',monospace;font-size:10px;color:#59616c">{{ sel.qFoot }}</div>
+      </div>
+    </div>
+    <div style="font-size:10.5px;color:#454d57;margin-top:14px">three texts, one chunk — S is what retrieval matched, D is what the model read, Q is the only text a citation may point at. They are not interchangeable.</div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;allPassing&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Reconciliation&quot;},&quot;highlightDiffs&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Chunk inspector&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'recon', selIdx: 0 };
+
+  componentDidMount() {
+    this._key = (e) => {
+      if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
+      if (e.key === 'r') this.setState({ screen: 'recon' });
+      if (e.key === 'c') this.setState({ screen: 'chunks' });
+      if (this.state.screen === 'chunks' && ['1','2','3'].includes(e.key)) this.setState({ selIdx: Number(e.key) - 1 });
+    };
+    window.addEventListener('keydown', this._key);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._key); }
+
+  data() {
+    const S = (t) => t, N = 'norm', X = 'sem';
+    return [
+      {
+        id: 'chk_00d41f', rank: 1, doc: 'renagliptin-pi_2024.pdf · p.14', score: '0.834',
+        extractor: 'tika@2.9.1', origin: 'doc', quotable: true, warn: false,
+        sSegs: [
+          { t: 'in patients with moderate renal ' }, { t: 'impairment', m: N }, { t: ' (crcl ' }, { t: '30-59', m: N },
+          { t: ' ml/min), the recommended maintenance dose is 5 mg once daily. dose adjustment is not required for mild impairment.' }
+        ],
+        dSegs: [
+          { t: 'In patients with moderate renal impairment (CrCl ' }, { t: '30-59', m: N },
+          { t: ' mL/min), the recommended maintenance dose is 5 mg once daily. Dose adjustment ' },
+          { t: 'is required', m: X }, { t: ' for mild impairment.' }
+        ],
+        qSegs: [
+          { t: 'In patients with moderate renal ' }, { t: 'im-\npairment', m: N }, { t: ' (CrCl ' }, { t: '30\u201359', m: N },
+          { t: ' mL/min), the\nrecommended maintenance dose is\n5 mg once daily. Dose adjustment\n' },
+          { t: 'is not required', m: X }, { t: ' for mild impairment.' }
+        ],
+        sNotes: [ { t: 'case-folded · line breaks collapsed (global)', dim: 1 }, { t: 'de-hyphenated: impairment', warn: 1 }, { t: '\u2013 \u2192 - in 30-59', warn: 1 } ],
+        dNotes: [ { t: '\u2013 \u2192 - in 30-59', warn: 1 }, { t: 'negation dropped: \u201cis not required\u201d \u2192 \u201cis required\u201d', sem: 1 } ],
+        qNotes: [ { t: 'marked spans were altered downstream', dim: 1 } ],
+        sFoot: 'normalize@1.2 \u2192 voyage-3/1024 · sha1 9b41f2c8 · 168 ch · 38 tok',
+        dFoot: 'llm-clean@0.3 (gpt-4.1-mini, t=0.2) · sha1 4de07a11 · 163 ch · 36 tok',
+        qFoot: 'tika@2.9.1 · bytes 8,412\u20138,655 · sha1 c1a99e02 · 171 ch'
+      },
+      {
+        id: 'chk_01a2c7', rank: 2, doc: 'renagliptin-pi_2024.pdf · p.2 (table 1)', score: '0.811',
+        extractor: 'table-llm@0.3', origin: 'model', quotable: false, warn: true,
+        sSegs: [ { t: 'renal dosing summary: mild no change; moderate reduce to 5 mg once daily; severe not studied.' } ],
+        dSegs: [ { t: 'Renal dosing summary \u2014 mild: no change; moderate: reduce to 5 mg once daily; severe: not studied.' } ],
+        qSegs: [],
+        qReason: 'This chunk was written by table-llm@0.3 as a prose rendering of Table 1. There is no source span to quote; citations against this chunk are rejected by cite-check@1.4.',
+        sNotes: [ { t: 'case-folded (global)', dim: 1 } ],
+        dNotes: [ { t: 'model-written text \u2014 no source to diff against', warn: 1 } ],
+        qNotes: [ { t: 'absent \u2260 empty \u2014 there is nothing to quote', dim: 1 } ],
+        sFoot: 'normalize@1.2 \u2192 voyage-3/1024 · sha1 77c30e19 · 95 ch · 24 tok',
+        dFoot: 'table-llm@0.3 (gpt-4.1-mini) · sha1 e02b6c44 · 99 ch · 25 tok',
+        qFoot: 'no source bytes'
+      },
+      {
+        id: 'chk_00f3b9', rank: 3, doc: 'renagliptin-pi_2024.pdf · p.31', score: '0.790',
+        extractor: 'tika@2.9.1', origin: 'doc', quotable: true, warn: false,
+        sSegs: [ { t: 'no dose adjustment is necessary in patients with hepatic impairment. renagliptin is not dialyzable.' } ],
+        dSegs: [ { t: 'No dose adjustment is necessary in patients with hepatic impairment. Renagliptin is not dialyzable.' } ],
+        qSegs: [ { t: 'No dose adjustment is necessary in\npatients with hepatic impairment.\nRenagliptin is not dialyzable.' } ],
+        sNotes: [ { t: 'case-folded (global) \u2014 otherwise identical to Q', dim: 1 } ],
+        dNotes: [ { t: 'byte-identical to Q', dim: 1 } ],
+        qNotes: [ { t: 'no downstream alterations', dim: 1 } ],
+        sFoot: 'normalize@1.2 \u2192 voyage-3/1024 · sha1 51a8d0be · 101 ch · 23 tok',
+        dFoot: 'passthrough (llm-clean skipped: no table) · sha1 b3f7e921 · 101 ch',
+        qFoot: 'tika@2.9.1 · bytes 41,208\u201341,309 · sha1 b3f7e921 · 101 ch'
+      }
+    ];
+  }
+
+  renderVals() {
+    const hl = this.props.highlightDiffs ?? true;
+    const allPass = this.props.allPassing ?? false;
+    const { screen, selIdx } = this.state;
+    const segs = (arr) => arr.map(g => hl
+      ? { t: g.t, plain: !g.m, norm: g.m === 'norm', sem: g.m === 'sem' }
+      : { t: g.t, plain: true, norm: false, sem: false });
+    const raw = this.data();
+    const c = raw[Math.min(selIdx, raw.length - 1)];
+    const sel = {
+      id: c.id, doc: c.doc, score: c.score, extractor: c.extractor,
+      originDoc: c.origin === 'doc', originModel: c.origin === 'model',
+      quotable: c.quotable, notQuotable: !c.quotable, qReason: c.qReason || '',
+      sSegs: segs(c.sSegs), dSegs: segs(c.dSegs), qSegs: segs(c.qSegs),
+      sNotes: c.sNotes, dNotes: c.dNotes, qNotes: c.qNotes,
+      sFoot: c.sFoot, dFoot: c.dFoot, qFoot: c.qFoot
+    };
+    const chipBase = "font-family:'Spline Sans Mono',monospace;font-size:11px;padding:5px 10px;border-radius:3px;cursor:pointer;";
+    const chunks = raw.map((r, i) => ({
+      rank: r.rank, id: r.id, score: r.score, warn: r.warn,
+      pick: () => this.setState({ selIdx: i }),
+      st: chipBase + (i === selIdx
+        ? 'border:1px solid #8a929d;background:#1a1f26;color:#dde2e8'
+        : 'border:1px solid #232a33;background:transparent;color:#8a929d')
+    }));
+    const tab = (on) => 'padding:6px 12px;font-size:12.5px;cursor:pointer;border-radius:3px;' +
+      (on ? 'color:#dde2e8;background:#1a1f26' : 'color:#8a929d');
+    return {
+      onRecon: screen === 'recon', onChunks: screen === 'chunks',
+      goRecon: () => this.setState({ screen: 'recon' }),
+      goChunks: () => this.setState({ screen: 'chunks' }),
+      tabReconSt: tab(screen === 'recon'), tabChunkSt: tab(screen === 'chunks'),
+      allPass, showFail: !allPass,
+      cit: allPass ? { emitted: '12', verified: '12', fabricated: '0' } : { emitted: '12', verified: '9', fabricated: '3' },
+      chunks, sel
+    };
+  }
+}
+</script>
+</body>
+</html>

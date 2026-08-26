@@ -1,0 +1,50 @@
+# Secrets. Never relax this line.
+.env
+
+# Environments and bytecode
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+node_modules/
+app/web/dist/
+
+# Regenerable derived data.
+#
+# .cache is ~70MB of embedding cache keyed on content_hash + PARSER_VERSION. It
+# is a speed optimisation, not an input: deleting it costs API calls, not
+# correctness.
+.cache/
+data/eval/judged_partial.json
+experiments/out/
+.qdrant/
+
+# --------------------------------------------------------------------------
+# DELIBERATELY TRACKED, against the usual instinct: data/raw/ and data/index/
+#
+# Both were ignored, and the consequence was that a fresh clone had no corpus and
+# no embeddings -- so the first thing a reader had to do was supply their own
+# Gemini key and wait ~20 minutes for an ingest before anything worked at all.
+# For a repository whose whole purpose is to be read and run by someone else,
+# that is a defect, not tidiness.
+#
+#   data/raw/    17MB, public arXiv papers plus the DOCX/image test files.
+#                Redistribution is fine, and the eval numbers are meaningless
+#                without the exact corpus they were measured on.
+#   data/index/  6.5MB of vectors and chunk metadata. This is what lets the
+#                container answer a question on first boot.
+#   data/eval/   the golden set and judged results -- the evidence for every
+#                number in the README. Was already tracked; correctly so.
+#
+# 24MB total, well inside GitHub's limits. The alternative -- a fetch script --
+# exists (scripts/fetch_corpus.py) but cannot reproduce the index without a key,
+# and cannot guarantee the papers are still at the same URLs.
+# --------------------------------------------------------------------------
+
+# Editor and tooling noise
+.idea/
+.vscode/
+.claude/
+
+# Scratch API response dumps from manual testing
+/t[0-9]*.json

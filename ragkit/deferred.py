@@ -1,0 +1,199 @@
+"""
+Deferred decisions, with the condition that expires them.
+
+WHY THIS FILE EXISTS. "Reranking deferred -- not much to gain" and "reranking
+deferred until multi-hop questions exist" read the same in a document and behave
+completely differently over time. The first sounds settled and never gets
+revisited. The second expires on its own the moment the precondition changes.
+
+So a deferral is stored as a PREDICATE over the current artifacts, not as prose.
+`review()` re-evaluates every one against the eval results on disk and reports
+which ones have expired. The ADR then quotes a live check rather than a claim
+that was true once.
+
+The specific case that prompted this: reranking was deferred because the eval
+showed `source_hit = 100%` at every budget, so the right document always
+surfaced and the remaining headroom looked small. True -- and measured on a
+golden set with ZERO aggregative questions, ZERO ambiguous ones, and TWO
+multi-hop. It is a strong result on the easy questions and silent on the hard
+ones. The deferral is therefore conditional on that silence, and says so.
+"""
+
+from __future__ import annotations
+
+import json
+from dataclasses import asdict, dataclass, field
+from typing import Any, Callable
+
+from . import config
+from .eval import metrics as M
+
+
+@dataclass
+class Deferral:
+    name: str
+    guide_module: str
+    decision: str
+    because: str
+    # The condition under which this deferral STOPS being valid, in words and as
+    # a predicate over the artifacts. Both, because the words go in the ADR and
+    # the predicate is what actually gets checked.
+    revisit_when: str
+    cost_if_wrong: str
+    # Symbols this deferral legitimately leaves unreachable, BY NAME.
+    #
+    # Was fuzzy text matching, and the trap fired on the first run: `Chunk.citation`
+    # was excused as "explained by a deferral" because the word "citation" appears
+    # in the entailment deferral's prose. A forgotten orphan waved through on a
+    # keyword is exactly the failure mode of eyeballing a list where most entries
+    # are legitimate. An explicit name cannot match by accident.
+    orphans: tuple[str, ...] = ()
+    expired: bool = False
+    evidence: str = ""
+
+    def to_json(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+def _eval() -> dict[str, Any] | None:
+    p = config.DATA_EVAL / "eval_results.json"
+    return json.loads(p.read_text("utf-8")) if p.exists() else None
+
+
+def review() -> dict[str, Any]:
+    ev = _eval()
+    cov = (ev or {}).get("metrics", {}).get("stratum_coverage", {})
+    by_stratum = (ev or {}).get("metrics", {}).get("by_stratum", {})
+    head = (ev or {}).get("metrics", {}).get("headline", {})
+    n_children = None
+    ip = config.DATA_EVAL / "index_report.json"
+    if ip.exists():
+        n_children = json.loads(ip.read_text("utf-8")).get("n_children_indexed")
+
+    def stratum_n(name: str) -> int:
+        b = by_stratum.get(name)
+        return int(b["child_strict"]["n"]) if b else 0
+
+    hard_strata_measured = (
+        not cov.get("missing")
+        and stratum_n("multi_hop") >= M.MIN_N_FOR_RATE
+    )
+
+    items: list[Deferral] = [
+        Deferral(
+            name="reranking",
+            guide_module="M3",
+            decision="No cross-encoder or LLM reranker.",
+            because=(
+                "the eval reports source_hit = 100% at every budget, so the correct "
+                "document always surfaces and every failure is ranking WITHIN a "
+                "document; dense at 3000 tokens is already 96%"
+            ),
+            revisit_when=(
+                "the golden set contains aggregative and ambiguous strata and at "
+                f"least {M.MIN_N_FOR_RATE} multi-hop items -- reranking is exactly "
+                "what reorders candidates for multi-facet questions, and the current "
+                "measurement is silent on them"
+            ),
+            cost_if_wrong="~200-400ms per query inside TTFT, plus a model to host",
+            orphans=(),
+            expired=hard_strata_measured,
+            evidence=(
+                f"missing strata: {cov.get('missing') or 'none'}; "
+                f"multi_hop n={stratum_n('multi_hop')}"
+            ),
+        ),
+        Deferral(
+            name="qdrant",
+            guide_module="M6",
+            decision="numpy exact cosine, no ANN index.",
+            because=(
+                "at this corpus size exact search IS the right answer: it is faster "
+                "to operate, has no recall/latency dial to mistune, and it is the "
+                "oracle any future ANN recall must be measured against"
+            ),
+            revisit_when=(
+                "the corpus exceeds ~100k children, or p95 retrieval latency exceeds "
+                "100ms -- currently retrieval is 5-20ms"
+            ),
+            cost_if_wrong="a second index to keep in sync, and an unmeasured recall dial",
+            # The exact-search oracle and its metric exist only to measure an ANN
+            # index that does not exist yet. Dead by design, named so.
+            orphans=("NumpyIndex.ground_truth", "recall_at_k", "verify_truncation"),
+            expired=bool(n_children and n_children > 100_000),
+            evidence=f"n_children={n_children}",
+        ),
+        Deferral(
+            name="entailment_verification",
+            guide_module="M7",
+            decision="Two deterministic citation checks only; no NLI pass.",
+            because=(
+                "entailment needs a judge, and an unvalidated judge is not a weaker "
+                "signal but an unknown one. Character overlap provably cannot "
+                "separate an honest rewording from an invented quote (measured: the "
+                "fabrication scored 0.53, the rewording 0.48)"
+            ),
+            revisit_when="the LLM judge passes its kappa gate against hand labels",
+            cost_if_wrong="unsupported-but-real-looking claims pass the free checks",
+            orphans=("judge_unvalidated",),
+            expired=bool((ev or {}).get("golden_set", {}).get("human_verified")),
+            evidence=f"human_verified={(ev or {}).get('golden_set', {}).get('human_verified', 0)}",
+        ),
+        Deferral(
+            name="contextual_retrieval_llm_prefix",
+            guide_module="M5",
+            decision="Heading breadcrumbs only; no LLM-written chunk prefixes.",
+            because=(
+                "the free version has not been beaten yet. Breadcrumbs cost zero API "
+                "calls and are already in embed_text; the paid version must beat that "
+                "baseline rather than an empty one"
+            ),
+            revisit_when=(
+                "a chunking experiment shows header-aware + breadcrumb recall is the "
+                "binding constraint, i.e. child_strict plateaus below ~0.90 at a "
+                "realistic budget with source_hit already at 1.0"
+            ),
+            cost_if_wrong="one LLM call per chunk at ingest, and a mixed-provenance risk",
+            orphans=("contextualize_skipped",),
+            expired=bool(
+                head.get("child_strict", {}).get("rate") is not None
+                and head["child_strict"]["rate"] < 0.90
+                and head.get("source_hit", {}).get("rate") == 1.0
+            ),
+            evidence=(
+                f"child_strict={head.get('child_strict', {}).get('label')}, "
+                f"source_hit={head.get('source_hit', {}).get('label')}"
+            ),
+        ),
+        Deferral(
+            name="opentelemetry_tracing",
+            guide_module="M14",
+            decision="Per-stage timings in the response; no OTel exporter.",
+            because=(
+                "the numbers that inform a decision (embed / retrieve / generate ms, "
+                "token counts) are already collected and returned per request. OTel "
+                "adds a collector and a backend, which is infrastructure rather than "
+                "insight at one user and one process"
+            ),
+            revisit_when="more than one process or service needs to correlate a trace",
+            cost_if_wrong="no distributed trace when there is something to distribute",
+        ),
+    ]
+    return {
+        "deferrals": [d.to_json() for d in items],
+        "expired": [d.name for d in items if d.expired],
+        "note": "a deferral stored as a predicate expires by itself; one stored as "
+                "prose sounds settled forever",
+    }
+
+
+def render(rev: dict[str, Any]) -> str:
+    lines = ["deferred decisions (each with the condition that expires it):", ""]
+    for d in rev["deferrals"]:
+        mark = "EXPIRED -- revisit" if d["expired"] else "still valid"
+        lines.append(f"  [{mark}] {d['name']} ({d['guide_module']})")
+        lines.append(f"      decision : {d['decision']}")
+        lines.append(f"      because  : {d['because']}")
+        lines.append(f"      revisit  : {d['revisit_when']}")
+        lines.append(f"      evidence : {d['evidence']}")
+    return "\n".join(lines)

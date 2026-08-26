@@ -1,0 +1,25 @@
+{
+ "id": "3ae709a5e51f",
+ "kind": "ingest",
+ "state": "done",
+ "created_at": "2026-08-25T20:06:13+00:00",
+ "updated_at": "2026-08-25T20:06:13+00:00",
+ "started_at": "2026-08-25T20:06:13+00:00",
+ "finished_at": "2026-08-25T20:06:13+00:00",
+ "progress": {
+  "stage": "parsing",
+  "current": 2,
+  "total": 3,
+  "detail": "doc-2.pdf"
+ },
+ "result": {
+  "ok": true,
+  "n": 3
+ },
+ "error": null,
+ "params": {
+  "files": [
+   "a.pdf"
+  ]
+ }
+}

@@ -1,0 +1,20 @@
+{
+ "id": "8c65e7046d5c",
+ "kind": "ingest",
+ "state": "failed",
+ "created_at": "2026-08-26T03:43:31+00:00",
+ "updated_at": "2026-08-26T03:43:31+00:00",
+ "started_at": "2026-08-26T03:43:31+00:00",
+ "finished_at": "2026-08-26T03:43:31+00:00",
+ "progress": {
+  "stage": "parsing",
+  "current": 0,
+  "total": 15,
+  "detail": "hnsw_p2.png"
+ },
+ "result": null,
+ "error": "NameError: name 'limits' is not defined\nTraceback (most recent call last):\n  File \"C:\\Users\\Inzint1\\Projects\\learning-rag\\ragkit\\jobs.py\", line 178, in _run\n    job.result = fn(job)\n                 ~~^^^^^\n  File \"C:\\Users\\Inzint1\\Projects\\learning-rag\\app\\api.py\", line 518, in work\n    res = pipeline.ingest(caption_images=caption_images, verbose=False,\n                          on_progress=progress)\n  File \"C:\\Users\\Inzint1\\Projects\\learning-rag\\ragkit\\pipeline.py\", line 168, in ingest\n    src, blocks, diag = L.load(p, caption_images=caption_images)\n                        ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Inzint1\\Projects\\learning-rag\\ragkit\\ingest\\loaders.py\", line 831, in load\n    return load_image(path, caption=caption_images)\n  File \"C:\\Users\\Inzint1\\Projects\\learning-rag\\ragkit\\ingest\\loaders.py\", line 760, in load_image\n    limits.seen(\"caption_image\", n=1)\n    ^^^^^^\nNameError: name 'limits' is not defined\n",
+ "params": {
+  "caption_images": true
+ }
+}

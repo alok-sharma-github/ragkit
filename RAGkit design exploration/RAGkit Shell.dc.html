@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#f6f5f2;color:#23282e;font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3a5d8f;text-decoration:none}
+a:hover{color:#2c4a75;text-decoration:underline}
+::selection{background:rgba(58,93,143,.18)}
+@keyframes ragkit-pulse{0%,100%{opacity:.25}50%{opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh">
+  <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;background:#eceae3;border-bottom:1px solid #ddd9cf;flex-wrap:wrap">
+    <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">PROTOTYPE · SHELL</div>
+    <div onClick="{{ goUpload }}" style="{{ stUpload }}" style-hover="border-color:#8a857a">1 · Upload &amp; states</div>
+    <div onClick="{{ goConvo }}" style="{{ stConvo }}" style-hover="border-color:#8a857a">2 · Conversation</div>
+    <div style="font-size:11.5px;color:#b3aea2;padding:4px 10px;white-space:nowrap">3 · Corpus</div>
+    <div style="font-size:11.5px;color:#b3aea2;padding:4px 10px;white-space:nowrap">4 · Removal</div>
+    <div style="font-size:11.5px;color:#b3aea2;padding:4px 10px;white-space:nowrap">History</div>
+    <div style="font-size:11.5px;color:#b3aea2;padding:4px 10px;white-space:nowrap">Empty state</div>
+    <div style="flex:1"></div>
+    <a href="RAGkit Answers.dc.html" style="font-size:11.5px">Answer states →</a>
+  </div>
+
+  <div style="max-width:660px;margin:0 auto;padding:52px 24px 96px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+      <div style="font-family:'Source Serif 4',serif;font-size:15px;font-weight:600;letter-spacing:.3px">RAGkit</div>
+      <div style="font-size:11px;color:#8a857a">answers from your documents, with receipts</div>
+    </div>
+
+    <sc-if value="{{ onUpload }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Upload and document states">
+      <div style="display:flex;align-items:baseline;gap:14px;margin-top:26px">
+        <div style="font-family:'Source Serif 4',serif;font-size:22px;font-weight:600">Documents</div>
+        <div style="font-size:12px;color:#8a857a">1 ready · 2 preparing · you can ask now</div>
+      </div>
+      <div style="border:1px dashed #c9c2b2;border-radius:6px;padding:22px;margin-top:18px;text-align:center">
+        <div style="font-size:13.5px;color:#5d5850">Drop files here, or <a href="#">browse</a></div>
+        <div style="font-size:12px;color:#8a857a;margin-top:5px">PDF, Word, spreadsheets. A large PDF takes a couple of minutes — you can ask questions while it works.</div>
+      </div>
+
+      <div style="margin-top:8px">
+        <div style="padding:16px 4px;border-bottom:1px solid #e3dfd6;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:13.5px;font-weight:600">clinical-overview_2024.pdf</div>
+            <div style="font-size:12px;color:#8a857a;margin-top:3px">48 pages · mostly text · added 2 minutes ago</div>
+          </div>
+          <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#8a857a">READY</div>
+        </div>
+
+        <div style="padding:16px 4px;border-bottom:1px solid #e3dfd6;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:13.5px;font-weight:600">efficacy-appendix_2024.pdf</div>
+            <div style="font-size:12px;color:#8a857a;margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span>Reading pages — {{ pages }} of 48 · about a minute left</span><span style="width:120px;height:3px;background:#e3dfd6;border-radius:2px;display:inline-block"><span style="display:block;height:3px;background:#3a5d8f;border-radius:2px;width: {{ pw }}"></span></span></div>
+          </div>
+          <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#3a5d8f;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#3a5d8f;animation:ragkit-pulse 1.1s ease-in-out infinite"></span>PREPARING</div>
+        </div>
+
+        <div style="padding:16px 4px;border-bottom:1px solid #e3dfd6;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:13.5px;font-weight:600;color:#5d5850">results-tables_2024.pdf</div>
+            <div style="font-size:12px;color:#8a857a;margin-top:3px">Queued — starts when the one above finishes</div>
+          </div>
+          <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#8a857a">QUEUED</div>
+        </div>
+
+        <div style="padding:16px 4px;border-bottom:1px solid #e3dfd6">
+          <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">
+            <div style="flex:1;min-width:220px">
+              <div style="font-size:13.5px;font-weight:600">safety-appendix_2024.pdf</div>
+              <sc-if value="{{ notResumed }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:12px;color:#5d5850;margin-top:3px;line-height:1.6;max-width:440px">Ready to search, but 9 of its 31 images aren't described yet — answers that need those images will be thinner, or handed to the source. Paused by a rate limit; resumes on its own at 2:10 PM.</div>
+              </sc-if>
+              <sc-if value="{{ resumed }}">
+              <div style="font-size:12px;color:#8a857a;margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span>Describing images — {{ imgs }} of 31</span><span style="width:120px;height:3px;background:#e3dfd6;border-radius:2px;display:inline-block"><span style="display:block;height:3px;background:#3a5d8f;border-radius:2px;width: {{ iw }}"></span></span></div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ notResumed }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#a8792f">SEARCHABLE · INCOMPLETE</div>
+              <div onClick="{{ resume }}" style="font-size:12px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:4px;padding:5px 12px;cursor:pointer" style-hover="border-color:#3a5d8f">Finish now</div>
+            </div>
+            </sc-if>
+            <sc-if value="{{ resumed }}">
+            <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#3a5d8f;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#3a5d8f;animation:ragkit-pulse 1.1s ease-in-out infinite"></span>PREPARING</div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="padding:16px 4px;border-bottom:1px solid #e3dfd6;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:13.5px;font-weight:600;color:#8a857a">scanned-archive_1998.pdf</div>
+            <div style="font-size:12px;color:#8a857a;margin-top:3px;max-width:440px;line-height:1.6">This file is a scan with no text layer, so there's nothing to search. An OCR'd copy will work.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#5d5850;border:1px solid #c9c2b2;border-radius:3px;padding:2px 7px">COULDN'T READ</div>
+            <a href="#" style="font-size:12px">Try again</a>
+            <a href="#" style="font-size:12px;color:#8a857a">Remove</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:34px">
+        <div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600">MEANWHILE, IF A QUESTION TOUCHES safety-appendix_2024.pdf</div>
+        <div style="background:#ffffff;border:1px solid #e3dfd6;border-radius:4px;padding:16px 18px;margin-top:10px">
+          <div style="font-size:12px;color:#8a857a">Which adverse events cluster early?</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:15.5px;line-height:1.75;margin-top:8px">Gastrointestinal complaints cluster in the first eight weeks<span style="font-size:10.5px;font-family:'IBM Plex Sans',sans-serif;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:3px">1</span> and were the most common reason for stopping early.<span style="font-size:10.5px;font-family:'IBM Plex Sans',sans-serif;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:3px">2</span></div>
+          <div style="font-size:12px;color:#a8792f;margin-top:12px;line-height:1.65;display:flex;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:#a8792f;flex:none;margin-top:5px"></span><span>9 images in safety-appendix_2024.pdf aren't described yet, so this answer couldn't use them. <span onClick="{{ resume }}" style="color:#3a5d8f;cursor:pointer">Finish preparing</span> to close the gap.</span></div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ onConvo }}">
+    <div data-screen-label="Degrading conversation">
+      <div style="display:flex;align-items:baseline;gap:14px;margin-top:26px">
+        <div style="font-family:'Source Serif 4',serif;font-size:22px;font-weight:600">Renagliptin dosing</div>
+        <div style="font-size:12px;color:#8a857a">4 turns · started 10:12 AM</div>
+      </div>
+      <div style="height:1px;background:#e3dfd6;margin:20px 0 4px"></div>
+
+      <div style="margin-top:26px">
+        <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16.5px;font-weight:600;line-height:1.5;margin-top:4px">How did the dose groups compare on efficacy?</div>
+      </div>
+      <div style="margin-top:14px">
+        <sc-if value="{{ tags }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#3a5d8f;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f"></span>FROM YOUR DOCUMENTS · 6 passages read</div>
+        </sc-if>
+        <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.85;margin-top:8px">HbA1c fell by roughly 0.6, 0.9, and 1.2 points at 2.5, 5, and 10 mg<span onClick="{{ tapF3 }}" style="{{ chF3 }}">Fig 3</span> and the reductions held through week 52.<span onClick="{{ tapB1 }}" style="{{ chB1 }}">1</span> Weight fell about 1.8 kg at the top dose.<span onClick="{{ tapF4 }}" style="{{ chF4 }}">Fig 4</span></div>
+      </div>
+
+      <div style="margin-top:32px">
+        <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16.5px;font-weight:600;line-height:1.5;margin-top:4px">Why is the 10 mg group's dropout higher?</div>
+      </div>
+      <div style="margin-top:14px">
+        <sc-if value="{{ tags }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#5d5850;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f"></span><span style="width:7px;height:7px;border-radius:50%;border:1.5px solid #a39d90;margin-left:-3px"></span>YOUR DOCUMENTS + THIS CONVERSATION · 2 new passages</div>
+        </sc-if>
+        <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.85;margin-top:8px">Gastrointestinal intolerance drove most early discontinuations,<span onClick="{{ tapB2 }}" style="{{ chB2 }}">2</span> and adverse events rose with dose.<span onClick="{{ tapF6 }}" style="{{ chF6 }}">Fig 6</span> Set against the extra 0.3-point benefit at 10 mg,<span onClick="{{ tapTA }}" style="{{ chTA }}">T1 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span> that's the tradeoff you're seeing.</div>
+      </div>
+
+      <div style="margin-top:32px">
+        <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16.5px;font-weight:600;line-height:1.5;margin-top:4px">So which dose would you pick?</div>
+      </div>
+      <div style="margin-top:14px">
+        <sc-if value="{{ showReadAs }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-bottom:10px"><span style="font-size:10px;letter-spacing:1px;color:#8a857a;font-weight:600">READ AS&nbsp;&nbsp;</span><span style="font-family:'Source Serif 4',serif;font-style:italic;font-size:14px;color:#5d5850">weigh efficacy against dropout for the doses above — a judgment, not a lookup</span></div>
+        </sc-if>
+        <sc-if value="{{ tags }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#8a857a;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;border:1.5px solid #a39d90"></span>THIS CONVERSATION · nothing new was read</div>
+        </sc-if>
+        <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.85;margin-top:8px">On what's above: 5 mg keeps most of the benefit<span onClick="{{ tapTA }}" style="{{ chTA }}">T1 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span> with clearly fewer dropouts.<span onClick="{{ tapTB }}" style="{{ chTB }}">T2 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span> That's a reading of this conversation, not your documents — the trial doesn't compare doses directly or make a recommendation.</div>
+      </div>
+
+      <div style="margin-top:32px">
+        <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16.5px;font-weight:600;line-height:1.5;margin-top:4px">Would that still hold for older patients?</div>
+      </div>
+      <div style="margin-top:14px">
+        <sc-if value="{{ tags }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#8a857a;display:flex;align-items:center;gap:7px;flex-wrap:wrap"><span style="width:7px;height:7px;border-radius:50%;border:1.5px solid #a39d90"></span>THIS CONVERSATION · <span style="color:#a8792f">two steps from your documents</span></div>
+        </sc-if>
+        <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.85;margin-top:8px">Nothing we've read speaks to age. The efficacy and dropout figures above<span onClick="{{ tapTA }}" style="{{ chTA }}">T1 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span><span onClick="{{ tapTB }}" style="{{ chTB }}">T2 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span> are trial-wide averages; whether they hold in older patients isn't something this conversation can tell you.</div>
+        <div style="background:#ffffff;border:1px solid #e3dfd6;border-radius:4px;padding:14px 16px;margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div style="font-size:13px;color:#5d5850;line-height:1.6;flex:1;min-width:240px">Your documents can answer this directly.</div>
+          <div style="background:#3a5d8f;color:#fff;font-size:12.5px;font-weight:500;padding:7px 14px;border-radius:4px;cursor:pointer;white-space:nowrap" style-hover="background:#2c4a75">Ask fresh: “renagliptin in older patients”</div>
+        </div>
+      </div>
+
+      <div style="margin-top:44px">
+        <input placeholder="Ask about your documents…" style="width:100%;box-sizing:border-box;border:1px solid #d5d0c5;border-radius:6px;padding:13px 15px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;background:#fff;color:#23282e;outline:none">
+        <div style="font-size:11.5px;color:#8a857a;margin-top:8px">Asking across 4 ready documents · safety-appendix_2024.pdf is still preparing — answers that need its images may be thinner</div>
+      </div>
+    </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ hasOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:min(620px,92vw);background:#ffffff;border:1px solid #d5d0c5;border-radius:6px;box-shadow:0 8px 32px rgba(35,40,46,.14);padding:16px 18px;z-index:50">
+    <div style="display:flex;justify-content:space-between;gap:12px">
+      <sc-if value="{{ card.isQ }}" hint-placeholder-val="{{ true }}"><div style="font-size:10.5px;letter-spacing:1.2px;color:#3a5d8f;font-weight:600">EXACT QUOTE</div></sc-if>
+      <sc-if value="{{ card.isR }}"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a8792f;font-weight:600">THE ASSISTANT'S READING OF A CHART — NOT A QUOTATION</div></sc-if>
+      <sc-if value="{{ card.isConv }}"><div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600">SAID EARLIER IN THIS CONVERSATION — NOT FROM YOUR DOCUMENTS</div></sc-if>
+      <div onClick="{{ closeCard }}" style="font-size:12px;color:#8a857a;cursor:pointer" style-hover="color:#23282e">close ×</div>
+    </div>
+    <sc-if value="{{ card.isQ }}" hint-placeholder-val="{{ true }}"><div style="font-family:'Source Serif 4',serif;font-size:15px;line-height:1.7;margin-top:8px">“{{ card.text }}”</div></sc-if>
+    <sc-if value="{{ card.isR }}"><div style="font-family:'Source Serif 4',serif;font-size:15px;line-height:1.7;margin-top:8px">{{ card.text }}</div></sc-if>
+    <sc-if value="{{ card.isConv }}">
+      <div style="font-family:'Source Serif 4',serif;font-size:15px;line-height:1.7;margin-top:8px">“{{ card.text }}”</div>
+      <div style="font-size:12.5px;color:#a8792f;margin-top:8px;line-height:1.6;display:flex;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:#a8792f;flex:none;margin-top:5px"></span><span>{{ card.origin }}</span></div>
+    </sc-if>
+    <div style="font-size:12px;color:#8a857a;margin-top:10px">{{ card.src }}</div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;groundingTags&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Conversation&quot;},&quot;showReadAs&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Conversation&quot;}}">
+class Component extends DCLogic {
+  state = { view: 'upload', open: null, resumed: false, pages: 31, imgs: 22 };
+
+  componentDidMount() {
+    this._t = setInterval(() => this.setState(s => ({
+      pages: s.pages >= 47 ? 31 : s.pages + 1,
+      imgs: s.resumed ? (s.imgs >= 30 ? 22 : s.imgs + 1) : s.imgs
+    })), 1300);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  cites() {
+    return {
+      b1: { k: 'q', text: 'Reductions in HbA1c were maintained in all renagliptin dose groups through week 52.', src: 'clinical-overview_2024.pdf · page 14' },
+      b2: { k: 'q', text: 'Gastrointestinal events accounted for the majority of early discontinuations, with onset typically within the first eight weeks.', src: 'clinical-overview_2024.pdf · page 19' },
+      f3: { k: 'r', text: 'As I read Figure 3: mean HbA1c falls about 0.6, 0.9, and 1.2 points by week 26 at the three doses.', src: 'efficacy-appendix_2024.pdf · Figure 3 · page 9' },
+      f4: { k: 'r', text: 'As I read Figure 4: the 10 mg weight curve ends near \u22121.8 kg at week 26.', src: 'efficacy-appendix_2024.pdf · Figure 4 · page 10' },
+      f6: { k: 'r', text: 'As I read Figure 6: adverse-event bars rise with dose \u2014 roughly 38%, 44%, and 51%.', src: 'safety-appendix_2024.pdf · Figure 6 · page 9' },
+      tA: { k: 'conv', text: 'the extra HbA1c benefit at 10 mg over 5 mg is about 0.3 points', origin: 'That claim rested on the assistant\u2019s reading of Figure 3 \u2014 it was never a quotation.', src: 'Turn 1 of this conversation' },
+      tB: { k: 'conv', text: 'dropout rises with dose', origin: 'That claim rested on the assistant\u2019s reading of Figure 6 \u2014 it was never a quotation.', src: 'Turn 2 of this conversation' }
+    };
+  }
+
+  renderVals() {
+    const { view, open, resumed, pages, imgs } = this.state;
+    const tags = this.props.groundingTags ?? true;
+    const showReadAs = this.props.showReadAs ?? true;
+    const cites = this.cites();
+    const base = "font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;font-weight:500;border-radius:3px;padding:0 5px;margin-left:4px;cursor:pointer;vertical-align:3px;white-space:nowrap;";
+    const ch = (id) => {
+      const k = cites[id].k, on = open === id;
+      if (k === 'r') return base + (on ? 'background:#a8792f;color:#fff;border:1px solid #a8792f' : 'border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07)');
+      if (k === 'conv') return base + (on ? 'background:#8a857a;color:#fff;border:1px dotted #8a857a' : 'border:1px dotted #a39d90;color:#6e6a60');
+      return base + (on ? 'background:#3a5d8f;color:#fff;border:1px solid #3a5d8f' : 'border:1px solid rgba(58,93,143,.4);color:#3a5d8f');
+    };
+    const tap = (id) => () => this.setState({ open: this.state.open === id ? null : id });
+    const oc = open ? cites[open] : null;
+    const tab = (on) => 'font-size:11.5px;padding:4px 10px;border-radius:3px;cursor:pointer;white-space:nowrap;border:1px solid ' + (on ? '#8a857a;background:#fbfaf7;color:#23282e' : 'transparent;color:#6e6a60');
+    return {
+      onUpload: view === 'upload', onConvo: view === 'convo',
+      goUpload: () => this.setState({ view: 'upload', open: null }),
+      goConvo: () => this.setState({ view: 'convo', open: null }),
+      stUpload: tab(view === 'upload'), stConvo: tab(view === 'convo'),
+      pages, pw: Math.round(pages / 48 * 100) + '%',
+      imgs, iw: Math.round(imgs / 31 * 100) + '%',
+      resumed, notResumed: !resumed, resume: () => this.setState({ resumed: true }),
+      tags, showReadAs,
+      chB1: ch('b1'), chB2: ch('b2'), chF3: ch('f3'), chF4: ch('f4'), chF6: ch('f6'), chTA: ch('tA'), chTB: ch('tB'),
+      tapB1: tap('b1'), tapB2: tap('b2'), tapF3: tap('f3'), tapF4: tap('f4'), tapF6: tap('f6'), tapTA: tap('tA'), tapTB: tap('tB'),
+      hasOpen: !!open, closeCard: () => this.setState({ open: null }),
+      card: oc ? { isQ: oc.k === 'q', isR: oc.k === 'r', isConv: oc.k === 'conv', text: oc.text, origin: oc.origin || '', src: oc.src }
+        : { isQ: true, isR: false, isConv: false, text: '', origin: '', src: '' }
+    };
+  }
+}
+</script>
+</body>
+</html>

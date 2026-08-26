@@ -1,0 +1,54 @@
+{
+  "gemini-3.1-pro-preview::rubric-v1": {
+    "kappa": 0.897,
+    "raw_agreement": 0.933,
+    "chance_agreement": 0.353,
+    "n": 30,
+    "class_counts": {
+      "partly_supported": 13,
+      "supported": 10,
+      "unsupported": 7
+    },
+    "dominant_class_share": 0.433,
+    "prevalence_warning": false,
+    "sufficient": true,
+    "judge_model": "gemini-3.1-pro-preview",
+    "rubric_version": 1,
+    "labelled_before_verdicts": false,
+    "estimate_type": "discrimination (sample is class-balanced and oversamples hard cases), NOT a population faithfulness statistic",
+    "agreement_by_text_source": {
+      "markdown": {
+        "n": 26,
+        "agree": 25
+      },
+      "markdown,page_text_clip": {
+        "n": 2,
+        "agree": 2
+      },
+      "gemini_caption,markdown": {
+        "n": 2,
+        "agree": 1
+      }
+    },
+    "sample_limitations": {
+      "n": 30,
+      "class_counts": {
+        "supported": 10,
+        "partly_supported": 10,
+        "unsupported": 10
+      },
+      "by_text_source": {
+        "markdown": 26,
+        "markdown,page_text_clip": 2,
+        "gemini_caption,markdown": 2
+      },
+      "hard_case_items": 4,
+      "hard_case_sufficient": false,
+      "cannot_measure": [
+        "judge/human agreement on page_text_clip (repaired-table) sources: only 4 item(s); the corpus contains 3 such children, so this cluster is unmeasurable at this corpus size"
+      ],
+      "estimate_type": "discrimination on a class-balanced sample, NOT a population faithfulness statistic"
+    },
+    "passes_gate": true
+  }
+}

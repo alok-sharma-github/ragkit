@@ -1,0 +1,1072 @@
+{
+  "withheld": false,
+  "gate": {
+    "may_emit_judged_metrics": true,
+    "validated": true,
+    "judge_model": "gemini-3.1-pro-preview",
+    "generator_model": "gemini-3.7-flash",
+    "self_grading_collision": false,
+    "detail": {
+      "key": "gemini-3.1-pro-preview::rubric-v1",
+      "kappa": 0.897,
+      "raw_agreement": 0.933,
+      "chance_agreement": 0.353,
+      "n": 30,
+      "class_counts": {
+        "partly_supported": 13,
+        "supported": 10,
+        "unsupported": 7
+      },
+      "dominant_class_share": 0.433,
+      "prevalence_warning": false,
+      "sufficient": true,
+      "judge_model": "gemini-3.1-pro-preview",
+      "rubric_version": 1,
+      "labelled_before_verdicts": false,
+      "estimate_type": "discrimination (sample is class-balanced and oversamples hard cases), NOT a population faithfulness statistic",
+      "agreement_by_text_source": {
+        "markdown": {
+          "n": 26,
+          "agree": 25
+        },
+        "markdown,page_text_clip": {
+          "n": 2,
+          "agree": 2
+        },
+        "gemini_caption,markdown": {
+          "n": 2,
+          "agree": 1
+        }
+      },
+      "sample_limitations": {
+        "n": 30,
+        "class_counts": {
+          "supported": 10,
+          "partly_supported": 10,
+          "unsupported": 10
+        },
+        "by_text_source": {
+          "markdown": 26,
+          "markdown,page_text_clip": 2,
+          "gemini_caption,markdown": 2
+        },
+        "hard_case_items": 4,
+        "hard_case_sufficient": false,
+        "cannot_measure": [
+          "judge/human agreement on page_text_clip (repaired-table) sources: only 4 item(s); the corpus contains 3 such children, so this cluster is unmeasurable at this corpus size"
+        ],
+        "estimate_type": "discrimination on a class-balanced sample, NOT a population faithfulness statistic"
+      },
+      "passes_gate": true,
+      "threshold": 0.6
+    },
+    "withheld_because": null,
+    "note": ""
+  },
+  "n": 92,
+  "n_failed_verdicts": 1,
+  "supported": {
+    "n": 91,
+    "hits": 90,
+    "rate": 0.989,
+    "label": "90/91 = 99%"
+  },
+  "partly": {
+    "n": 91,
+    "hits": 0,
+    "rate": 0.0,
+    "label": "0/91 = 0%"
+  },
+  "unsupported": {
+    "n": 91,
+    "hits": 1,
+    "rate": 0.011,
+    "label": "1/91 = 1%"
+  },
+  "answers_question": {
+    "n": 91,
+    "hits": 90,
+    "rate": 0.989,
+    "label": "90/91 = 99%"
+  },
+  "by_text_source": {
+    "": {
+      "supported": {
+        "n": 1,
+        "hits": 1,
+        "rate": null,
+        "label": "1 of 1"
+      },
+      "answers_question": {
+        "n": 1,
+        "hits": 1,
+        "rate": null,
+        "label": "1 of 1"
+      }
+    },
+    "gemini_caption,markdown": {
+      "supported": {
+        "n": 5,
+        "hits": 5,
+        "rate": null,
+        "label": "5 of 5"
+      },
+      "answers_question": {
+        "n": 5,
+        "hits": 5,
+        "rate": null,
+        "label": "5 of 5"
+      }
+    },
+    "markdown": {
+      "supported": {
+        "n": 82,
+        "hits": 81,
+        "rate": 0.988,
+        "label": "81/82 = 99%"
+      },
+      "answers_question": {
+        "n": 82,
+        "hits": 81,
+        "rate": 0.988,
+        "label": "81/82 = 99%"
+      }
+    },
+    "markdown,page_text_clip": {
+      "supported": {
+        "n": 3,
+        "hits": 3,
+        "rate": null,
+        "label": "3 of 3"
+      },
+      "answers_question": {
+        "n": 3,
+        "hits": 3,
+        "rate": null,
+        "label": "3 of 3"
+      }
+    }
+  },
+  "rows": [
+    {
+      "question": "What are the two main drawbacks of k-NN graph approaches identified in proximity graph techniques?",
+      "stratum": "simple_factual",
+      "text_source": "gemini_caption,markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "By what alternative name is the Navigable Small World (NSW) proximity graph algorithm also known?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What model and baseline are evaluated in Figure 1 for performance across document positions in a 20-document context?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "According to the caption of Figure 1 in 'Lost in the Middle', what are the terms used to describe the biases where models perform better at the very beginning versus the end of their input context?",
+      "stratum": "simple_factual",
+      "text_source": "gemini_caption,markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "What approximate token count is associated with 20 total retrieved documents in the multi-document QA evaluation subplots?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 0
+    },
+    {
+      "question": "Which evaluated model line in Figure 5 corresponds to the dashed coral line with dots?",
+      "stratum": "table_or_image",
+      "text_source": "gemini_caption,markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "According to the node contents diagram in Figure 1, what are the child nodes and text embedding vector for node Index #8?",
+      "stratum": "table_or_image",
+      "text_source": "gemini_caption,markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 0
+    },
+    {
+      "question": "Which three language models were used in controlled experiments to show that RAPTOR outperforms current retrieval augmentation?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "How many context units and tokens are used for level C0 in the Podcast Transcripts dataset according to Table 2?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "What percentage reduction in context tokens does GraphRAG achieve compared to source text summarization for root-level community summaries (C0)?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "According to Table 3, what was the average number of extracted claims for condition C2 on the Podcast Transcripts dataset?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 0
+    },
+    {
+      "question": "When comparing non-tied aggregated LLM labels to claim-based labels, what percentage of pairwise comparisons matched for comprehensiveness?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "In Table 4, what is the average number of clusters reported for the News Articles dataset under condition C2 at a distance threshold of 0.7?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What mechanism do the authors propose as an exploratory approach that follows the information scent contained in higher-level community summaries?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "unsupported",
+      "answers_question": false,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "In the example LLM-generated assessment on the News article dataset, which system won the evaluation metric 'Directness'?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "Which public figures were specifically highlighted in the Na\u00efve RAG response to the question regarding repeatedly mentioned public figures in entertainment articles?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 0
+    },
+    {
+      "question": "In Table 6 under the Diversity metric, what are the Mean 1 and Mean 2 scores for the pairwise comparison of C0 vs C1 on the News Articles dataset?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "What is the brute-force (BF) search time and dimensionality (d) for the CoPhIR dataset listed in Table 1?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "Which compiler version and optimization flag were used to compile Hierarchical NSW for the vector space benchmark experiments?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What are the build time and peak memory consumption for Hierarchical NSW on the 200M subset of 1B SIFT when configured with M=16 and efConstruction=500?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "On which dataset was the strongest enhancement of Hierarchical NSW over NSW observed (almost 3 orders of magnitude)?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What are the MAP, NDCG@10, and Recall@1k scores for HyDE on the DL19 benchmark without relevance judgements?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 3
+    },
+    {
+      "question": "In the evaluation on Mr.TyDi (Table 3), what is the MRR@100 score of HyDE on the Japanese subset?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What specific model version of the 52-billion Cohere model was evaluated as an instruction LM for HyDE on TREC DL19/20?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What method does MPT-30B-Instruct use to represent positional information?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the closed-book accuracy and oracle accuracy for the LongChat-13B (16K) model on the multi-document question answering task?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "According to the evaluation on multi-document QA experiments, how much would it have cost to evaluate GPT-4 on the full multi-document QA and key-value retrieval experiments?",
+      "stratum": "simple_factual",
+      "text_source": "gemini_caption,markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What value corresponds to the key \"9f4a92b9-5f69-4725-ba1e-403f08dea695\" in the example JSON object shown in Figure 6 of the synthetic key-value retrieval task?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "How many key-value pairs are tested across the different input context lengths in the synthetic key-value retrieval task experiments?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the maximum token count for LongChat-13B (16K) in the 30-document question answering setting?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What are the average and standard deviation token counts for MPT-30B in the 140 KV pairs retrieval setting?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the performance of LongChat-13B (16K) when evaluated on the multi-document QA task with 20 total retrieved documents at Index 14?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "In the multi-document QA task evaluation with 30 total retrieved documents, what performance did GPT-3.5-Turbo (16K) achieve at Index 9?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What part number should be replaced if fault code ERR_5522 recurs within one hour on an MRA appliance?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "What is the lead time and model compatibility for part number PN-8891-B?",
+      "stratum": "table_or_image",
+      "text_source": "markdown,page_text_clip",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What accuracy score does Ragas achieve for faithfulness in pairwise comparisons on the WikiEval dataset?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "How were ties handled when ChatGPT assigned the same score to both candidate answers in the GPT Score baseline?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the ROUGE score achieved by SBERT with RAPTOR on NarrativeQA when using UnifiedQA-3B as the language model?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "What is the F-1 Match score of CoLT5 XL on the QASPER dataset according to the comparison table?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "On the QuALITY dev dataset, what accuracy does RAPTOR achieve when paired with the GPT-3 language model?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What accuracy score does RAPTOR + GPT-4 achieve on the QuALITY dataset hard subset?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "In the layer querying experiment for Story 1 from the QuALITY dataset, what performance is achieved when querying 3 layers starting from Layer 2?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "In the RAPTOR tree summarization analysis across datasets, what is the average summary length in tokens for the QASPER dataset?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What percentage of sampled nodes in RAPTOR were found to contain some form of hallucination during manual evaluation?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "In the evaluation of RAPTOR querying different tree layers for Story 2 (Table 14), what performance score is achieved when querying 2 layers starting from Layer 1?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What weights were originally applied in the BLEU-4 calculation script before being modified to (0.25, 0.25, 0.25, 0.25)?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "According to Table 18, what is the percentage of retrieved nodes coming from non-leaf nodes for the Quality dataset when using the BM25 retriever?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "What is the performance score of RAPTOR for Story 3 when querying 3 layers starting from Layer 2?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "What percentage of retrieved nodes come from Layer 4 for the NarrativeQA dataset when using DPR as the retriever?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "When using BM25 as the retriever, what percentage of nodes retrieved for the Quality dataset are from Layer 1?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "unsupported",
+      "answers_question": false,
+      "failed": true,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "What are the four types of reflection tokens used in SELF-RAG, along with their possible output values?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 7
+    },
+    {
+      "question": "In the SELF-RAG inference algorithm, which reflection token is predicted when Retrieve equals 'No'?",
+      "stratum": "multi_hop",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "What is the FactScore (FS) achieved by the SELF-RAG 7B model on the Bio task according to Table 2?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "According to the table of contents, on what page does Section A.3 'SELF-RAG Inference' begin?",
+      "stratum": "table_or_image",
+      "text_source": "markdown,page_text_clip",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "Which appendix section in the document outline provides the 'Full List of Instructions and Demonstrations for GPT-4'?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown,page_text_clip",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the number of instances sourced from 'Open Assistant 1' in the training data statistics for the generator LM M?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "According to the reward prediction accuracy comparison using GPT-4 predictions as ground truth, what accuracy does FLAN-3B achieve on the ISREL reward prediction task?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "What are the two stages GraphRAG uses an LLM for when building its graph index?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 4
+    },
+    {
+      "question": "Which organizational department at Microsoft are Newman Cheng, Joshua Bradley, and Steven Truitt affiliated with?",
+      "stratum": "multi_hop",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What community detection algorithm is utilized hierarchically in the GraphRAG pipeline to recursively detect sub-communities?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "In the GraphRAG knowledge graph extraction process, how are duplicate instances of a given relationship represented in the graph edges?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "Which software library was used to implement Leiden community detection in the GraphRAG indexing process?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "How many total nodes and edges were in the resulting graph after indexing the Podcast dataset?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the arXiv preprint identifier for the paper titled 'MultiHop-RAG: Benchmarking retrieval-augmented generation for multi-hop queries' by Tang and Yang?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "In which journal was the paper 'From Louvain to Leiden: guaranteeing well-connected communities' by Traag, Waltman, and Van Eck published?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "According to the entity extraction prompt instructions, what specific fields must be extracted for each identified relationship pair?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 4
+    },
+    {
+      "question": "What value should be assigned to the 'winner' field in the comparative evaluation prompt if the two answers are fundamentally similar with immaterial differences?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "In the INSERT algorithm (Algorithm 1) for Hierarchical NSW, how is the new element's layer level l generated?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "What formula represents the average memory consumption per element in Hierarchical NSW based on link parameters?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the URL for the open-source code repository associated with the HyDE paper?",
+      "stratum": "exact_identifier",
+      "text_source": "",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "How can HyDE be utilized practically as a search system evolves from its initial launch and its dense retriever grows stronger?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 3
+    },
+    {
+      "question": "What template prompt is used to instruct the model to write a counter argument for a given passage?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "Which specific languages are explicitly mentioned in the multilingual passage generation prompt template?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the training context length for Flan-T5-XXL in both the encoder and decoder?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What behavior does LongChat-13B (16K) exhibit when the key to retrieve is placed at the start of the input context in key-value retrieval?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "Who served as the TACL action editor thanked in the acknowledgments of the Lost in the Middle study?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "Which researcher was specifically thanked in the paper's acknowledgements for assistance with the AmbigQA dataset?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "How many random multi-document QA examples were used when evaluating GPT-4 (8K) with 20 total documents?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What effect does randomizing the distractor order (and mentioning it in the prompt) have on performance when the relevant information is placed at the very beginning of the context?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "Which OpenAI model is used to generate text embeddings when computing the Answer Relevance score in Ragas?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "By how much does coupling RAPTOR retrieval with GPT-4 improve performance on the QuALITY benchmark?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "What contact email address is provided for the authors of the RAPTOR paper published at ICLR 2024?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "Which dataset was used to test both the tree traversal and collapsed tree approaches on 20 stories?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What is the title of the paper published by Jeff Johnson, Matthijs Douze, and Herv\u00e9 J\u00e9gou in the IEEE Transactions on Big Data in 2019?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "Which embeddings and model were utilized in the ablation study comparing RAPTOR's clustering against balanced tree-style encoding on QuALITY?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What parameter sizes were evaluated for SELF-RAG in the experiments described in the introductory paper?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "Into what two categories are reflection tokens classified in the SELF-RAG framework?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": true,
+      "citations_verified": 0
+    },
+    {
+      "question": "Which funding organization or award supported Akari Asai during the Self-RAG work?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "What grant number is associated with the DARPA MCS program funding via NIWC Pacific in the Self-RAG acknowledgements?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    },
+    {
+      "question": "Which table demonstrates the instructions and demonstrations used for collecting the five-way output tokens for IsUse?",
+      "stratum": "exact_identifier",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "What is the judgment on whether retrieval is needed for the instruction \"Find the area of a circle given its radius. Radius = 4\" according to the demonstrations in Table 8?",
+      "stratum": "table_or_image",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 2
+    },
+    {
+      "question": "According to the perceived utility rubric, what does a score of 3 indicate?",
+      "stratum": "simple_factual",
+      "text_source": "markdown",
+      "faithfulness": "supported",
+      "answers_question": true,
+      "failed": false,
+      "abstained": false,
+      "citations_verified": 1
+    }
+  ]
+}

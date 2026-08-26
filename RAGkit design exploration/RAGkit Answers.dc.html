@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#f6f5f2;color:#23282e;font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3a5d8f;text-decoration:none}
+a:hover{color:#2c4a75;text-decoration:underline}
+::selection{background:rgba(58,93,143,.18)}
+@keyframes ragkit-pulse{0%,100%{opacity:.25}50%{opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh">
+  <div style="display:flex;align-items:center;gap:10px;padding:9px 20px;background:#eceae3;border-bottom:1px solid #ddd9cf;flex-wrap:wrap">
+    <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">PROTOTYPE · STATES</div>
+    <div onClick="{{ goMixed }}" style="{{ stMixed }}" style-hover="border-color:#8a857a">2 · Mixed evidence</div>
+    <div onClick="{{ goRefusal }}" style="{{ stRefusal }}" style-hover="border-color:#8a857a">3 · Useful refusal</div>
+    <div onClick="{{ goAgg }}" style="{{ stAgg }}" style-hover="border-color:#8a857a">5 · Corpus-wide</div>
+    <div onClick="{{ goWait }}" style="{{ stWait }}" style-hover="border-color:#8a857a">Waiting</div>
+    <div style="font-size:11.5px;color:#b3aea2;padding:4px 10px;white-space:nowrap">1 · Well-sourced</div>
+    <div style="font-size:11.5px;color:#b3aea2;padding:4px 10px;white-space:nowrap">4 · Out of scope</div>
+    <div style="flex:1"></div>
+    <sc-if value="{{ onMixedTab }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div style="font-size:10px;letter-spacing:1px;color:#8a857a">MIX</div>
+        <div onClick="{{ goM31 }}" style="{{ stM31 }}" style-hover="border-color:#8a857a">3 : 1</div>
+        <div onClick="{{ goM27 }}" style="{{ stM27 }}" style-hover="border-color:#8a857a">2 : 7</div>
+        <div onClick="{{ goM09 }}" style="{{ stM09 }}" style-hover="border-color:#8a857a">0 : 9</div>
+        <div style="width:1px;height:16px;background:#d5d0c5"></div>
+        <div onClick="{{ goApprA }}" style="{{ stApprA }}" style-hover="border-color:#8a857a">A · marked claims</div>
+        <div onClick="{{ goApprB }}" style="{{ stApprB }}" style-hover="border-color:#8a857a">B · grouped evidence</div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="max-width:660px;margin:0 auto;padding:52px 24px 96px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+      <div style="font-family:'Source Serif 4',serif;font-size:15px;font-weight:600;letter-spacing:.3px">RAGkit</div>
+      <div style="font-size:11px;color:#8a857a">answers from your documents, with receipts</div>
+    </div>
+
+    <sc-if value="{{ onSrc }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Source view">
+      <div onClick="{{ srcBack }}" style="font-size:13px;color:#3a5d8f;cursor:pointer;margin-top:20px" style-hover="text-decoration:underline">← Back to the answer</div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-top:18px;flex-wrap:wrap">
+        <div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:600">{{ srcDoc }}</div>
+        <div style="font-size:12.5px;color:#8a857a">{{ srcLoc }}</div>
+      </div>
+      <sc-if value="{{ srcIsQ }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#ffffff;border:1px solid #e3dfd6;border-radius:3px;max-width:560px;padding:44px 48px;margin-top:20px">
+          <sc-for list="{{ barsTop }}" as="b" hint-placeholder-count="4"><div style="height:9px;background:#eceae3;border-radius:2px;margin-top:10px;width: {{ b.w }}"></div></sc-for>
+          <div style="font-family:'Source Serif 4',serif;font-size:15px;line-height:1.75;background:rgba(58,93,143,.10);padding:10px 12px;border-radius:3px;margin-top:16px">{{ srcQuote }}</div>
+          <sc-for list="{{ barsBot }}" as="b" hint-placeholder-count="3"><div style="height:9px;background:#eceae3;border-radius:2px;margin-top:10px;width: {{ b.w }}"></div></sc-for>
+        </div>
+        <div style="font-size:12px;color:#8a857a;margin-top:12px">Highlighted — the exact span this answer cites. Everything else on the page is the document's own text.</div>
+      </sc-if>
+      <sc-if value="{{ srcIsR }}">
+        <div style="background:#efede7;border:1px solid #e3dfd6;border-radius:3px;max-width:560px;height:320px;margin-top:20px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#8a857a">{{ srcFig }} — image · {{ srcDoc }}</div>
+        <div style="max-width:560px;margin-top:10px"><span style="font-size:10px;letter-spacing:1px;color:#8a857a;font-weight:600">DOCUMENT CAPTION&nbsp;&nbsp;</span><span style="font-family:'Source Serif 4',serif;font-style:italic;font-size:13.5px;color:#5d5850">{{ srcCap }}</span></div>
+        <div style="max-width:560px;border:1px solid rgba(168,121,47,.45);background:rgba(168,121,47,.05);border-radius:4px;padding:14px 16px;margin-top:16px">
+          <div style="font-size:10.5px;letter-spacing:1.2px;color:#a8792f;font-weight:600">THE ASSISTANT'S DESCRIPTION — ITS WORDS, NOT THE DOCUMENT'S</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:15.5px;line-height:1.7;margin-top:8px">{{ srcDesc }}</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ srcIsC }}">
+        <div style="background:#efede7;border:1px solid #e3dfd6;border-radius:3px;max-width:560px;height:220px;margin-top:20px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#8a857a">{{ srcFig }} — as printed · {{ srcDoc }}</div>
+        <div style="max-width:560px;margin-top:10px"><span style="font-size:10px;letter-spacing:1px;color:#8a857a;font-weight:600">DOCUMENT CAPTION&nbsp;&nbsp;</span><span style="font-family:'Source Serif 4',serif;font-style:italic;font-size:13.5px;color:#5d5850">{{ srcCap }}</span></div>
+        <div style="max-width:560px;border:1px solid rgba(58,93,143,.35);background:rgba(58,93,143,.04);border-radius:4px;padding:14px 16px;margin-top:16px">
+          <div style="font-size:10.5px;letter-spacing:1.2px;color:#3a5d8f;font-weight:600">DOCUMENT TEXT — STRUCTURE INFERRED BY THE ASSISTANT</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:15px;margin-top:10px">“{{ srcRaw }}”</div>
+          <div style="font-size:13px;color:#5d5850;line-height:1.65;margin-top:8px">{{ srcNote }}</div>
+        </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ onMixed }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Mixed evidence">
+      <div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600;margin-top:26px">YOU ASKED</div>
+      <div style="font-family:'Source Serif 4',serif;font-size:22px;font-weight:600;line-height:1.4;margin-top:6px">{{ mixQ }}</div>
+      <sc-if value="{{ showMeta }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:12px;color:#8a857a;margin-top:10px">{{ metaText }}</div>
+      </sc-if>
+      <div style="height:1px;background:#e3dfd6;margin:22px 0 8px"></div>
+      <sc-if value="{{ zeroQ }}" hint-placeholder-val="{{ false }}">
+      <div style="border-top:1px solid #e3dfd6;border-bottom:1px solid #e3dfd6;padding:12px 2px;margin-top:14px;font-size:13px;color:#5d5850;line-height:1.65"><span style="width:6px;height:6px;border-radius:50%;background:#a8792f;display:inline-block;margin-right:8px"></span>Nothing in this answer is an exact quotation. Every claim comes from the assistant's reading of charts and tables — open a source before acting on a number.</div>
+      </sc-if>
+
+      <sc-for list="{{ paras }}" as="p" hint-placeholder-count="2">
+        <div style="font-family:'Source Serif 4',serif;font-size:17px;line-height:1.9;margin-top:18px"><sc-for list="{{ p.segs }}" as="g" hint-placeholder-count="4"><sc-if value="{{ g.plain }}" hint-placeholder-val="{{ true }}"><span>{{ g.t }}</span></sc-if><sc-if value="{{ g.isQ }}"><span>{{ g.t }}</span><span onClick="{{ g.tap }}" style="{{ g.chipSt }}">{{ g.chip }}</span></sc-if><sc-if value="{{ g.isR }}"><span style="border-bottom:2px dotted rgba(168,121,47,.55)">{{ g.t }}</span><span onClick="{{ g.tap }}" style="{{ g.chipSt }}">{{ g.chip }}</span></sc-if><sc-if value="{{ g.isC }}"><span style="border-bottom:2px dashed rgba(58,93,143,.4)">{{ g.t }}</span><span onClick="{{ g.tap }}" style="{{ g.chipSt }}">{{ g.chip }}</span></sc-if></sc-for></div>
+      </sc-for>
+
+      <sc-if value="{{ hasOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#ffffff;border:1px solid #e3dfd6;border-radius:4px;padding:18px 20px;margin-top:20px">
+        <sc-if value="{{ card.isQuote }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;justify-content:space-between;gap:12px">
+            <div style="font-size:10.5px;letter-spacing:1.2px;color:#3a5d8f;font-weight:600">EXACT QUOTE</div>
+            <div onClick="{{ closeCard }}" style="font-size:12px;color:#8a857a;cursor:pointer" style-hover="color:#23282e">close ×</div>
+          </div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.7;margin-top:10px">“{{ card.quote }}”</div>
+        </sc-if>
+        <sc-if value="{{ card.isClip }}">
+          <div style="display:flex;justify-content:space-between;gap:12px">
+            <div style="font-size:10.5px;letter-spacing:1.2px;color:#3a5d8f;font-weight:600">DOCUMENT TEXT — STRUCTURE INFERRED BY THE ASSISTANT</div>
+            <div onClick="{{ closeCard }}" style="font-size:12px;color:#8a857a;cursor:pointer" style-hover="color:#23282e">close ×</div>
+          </div>
+          <div style="font-size:12px;color:#8a857a;margin-top:10px">The page's text, as extracted:</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:15px;margin-top:4px">“{{ card.raw }}”</div>
+          <div style="font-size:13px;color:#5d5850;line-height:1.65;margin-top:8px">{{ card.note }}</div>
+        </sc-if>
+        <sc-if value="{{ card.isFig }}">
+          <div style="display:flex;justify-content:space-between;gap:12px">
+            <div style="font-size:10.5px;letter-spacing:1.2px;color:#a8792f;font-weight:600">THE ASSISTANT'S READING OF A CHART — NOT A QUOTATION</div>
+            <div onClick="{{ closeCard }}" style="font-size:12px;color:#8a857a;cursor:pointer" style-hover="color:#23282e">close ×</div>
+          </div>
+          <div style="display:flex;gap:18px;margin-top:12px;align-items:flex-start">
+            <div style="width:150px;height:96px;flex:none;background:#efede7;border:1px solid #e3dfd6;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#8a857a">{{ card.fig }}</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:15.5px;line-height:1.65">{{ card.desc }}</div>
+          </div>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <div style="font-size:12px;color:#5d5850">{{ card.doc }} · {{ card.loc }}</div>
+          <div onClick="{{ openSrcFromCard }}" style="font-size:12.5px;color:#3a5d8f;cursor:pointer" style-hover="text-decoration:underline">Open the source →</div>
+          <div style="flex:1"></div>
+          <sc-if value="{{ cardFIdle }}" hint-placeholder-val="{{ true }}"><div onClick="{{ cardFlagStart }}" style="font-size:11.5px;color:#8a857a;cursor:pointer" style-hover="color:#23282e;text-decoration:underline">Flag this claim</div></sc-if>
+          <sc-if value="{{ cardFAsk }}">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <div style="font-size:11.5px;color:#5d5850">What's wrong?</div>
+              <div onClick="{{ flagPick }}" style="font-size:11.5px;border:1px solid #d5d0c5;border-radius:3px;padding:3px 8px;cursor:pointer;background:#fff" style-hover="border-color:#8a857a">This isn't in the source</div>
+              <div onClick="{{ flagPick }}" style="font-size:11.5px;border:1px solid #d5d0c5;border-radius:3px;padding:3px 8px;cursor:pointer;background:#fff" style-hover="border-color:#8a857a">The source doesn't say this</div>
+              <div onClick="{{ flagCancel }}" style="font-size:11.5px;color:#8a857a;cursor:pointer" style-hover="color:#23282e">cancel</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ cardFDone }}"><div style="font-size:11.5px;color:#5d5850">Noted — thanks. This claim goes into review.</div></sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ apprA }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:12px;color:#8a857a;margin-top:24px;line-height:1.9"><sc-if value="{{ hasQChips }}" hint-placeholder-val="{{ true }}"><span style="font-size:10.5px;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:0 5px">1</span> quoted from your documents&nbsp; · &nbsp;</sc-if><sc-if value="{{ hasCChips }}"><span style="font-size:10.5px;border:1px dashed rgba(58,93,143,.45);color:#3a5d8f;border-radius:3px;padding:0 5px">Tbl 4</span> document text, structure inferred&nbsp; · &nbsp;</sc-if><sc-if value="{{ hasRChips }}"><span style="font-size:10.5px;border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07);border-radius:3px;padding:0 5px">Fig 3</span> read from a chart by the assistant</sc-if> — open one to see the evidence</div>
+      </sc-if>
+
+      <sc-if value="{{ apprB }}">
+      <div style="margin-top:34px">
+        <div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600">EVIDENCE</div>
+        <div style="font-size:12px;color:#3a5d8f;font-weight:500;margin-top:14px">Quoted exactly from your documents</div>
+        <sc-if value="{{ noQuoted }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#8a857a;margin-top:8px;padding:0 12px">none — nothing in this answer is an exact quotation</div></sc-if>
+        <sc-for list="{{ quotedRows }}" as="r" hint-placeholder-count="2">
+          <div onClick="{{ r.pick }}" style="{{ r.st }}">
+            <div style="display:flex;gap:10px;align-items:baseline">
+              <span style="font-size:10.5px;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:0 5px;flex:none">{{ r.n }}</span>
+              <div style="flex:1">
+                <div style="font-family:'Source Serif 4',serif;font-size:14.5px;line-height:1.6">“{{ r.text }}”</div>
+                <div style="font-size:11.5px;color:#8a857a;margin-top:5px">{{ r.doc }} · {{ r.loc }} · <span onClick="{{ r.openSrc }}" style="color:#3a5d8f;cursor:pointer">open</span> · <sc-if value="{{ r.fIdle }}" hint-placeholder-val="{{ true }}"><span onClick="{{ r.flagStart }}" style="cursor:pointer">flag</span></sc-if><sc-if value="{{ r.fAsk }}"><span onClick="{{ flagPick }}" style="color:#3a5d8f;cursor:pointer">this isn't in the source</span> · <span onClick="{{ flagPick }}" style="color:#3a5d8f;cursor:pointer">the source doesn't say this</span> · <span onClick="{{ flagCancel }}" style="cursor:pointer">cancel</span></sc-if><sc-if value="{{ r.fDone }}"><span>noted — thanks</span></sc-if></div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ hasClip }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;color:#3a5d8f;font-weight:500;margin-top:18px">Document text with structure inferred by the assistant</div></sc-if>
+        <sc-for list="{{ clipRows }}" as="r" hint-placeholder-count="1">
+          <div onClick="{{ r.pick }}" style="{{ r.st }}">
+            <div style="display:flex;gap:10px;align-items:baseline">
+              <span style="font-size:10.5px;border:1px dashed rgba(58,93,143,.45);color:#3a5d8f;border-radius:3px;padding:0 5px;flex:none">{{ r.n }}</span>
+              <div style="flex:1">
+                <div style="font-family:'Source Serif 4',serif;font-size:14.5px;line-height:1.6">“{{ r.text }}”</div>
+                <div style="font-size:11.5px;color:#8a857a;margin-top:5px">value–label pairing inferred · {{ r.doc }} · {{ r.loc }} · <span onClick="{{ r.openSrc }}" style="color:#3a5d8f;cursor:pointer">open</span> · <sc-if value="{{ r.fIdle }}" hint-placeholder-val="{{ true }}"><span onClick="{{ r.flagStart }}" style="cursor:pointer">flag</span></sc-if><sc-if value="{{ r.fAsk }}"><span onClick="{{ flagPick }}" style="color:#3a5d8f;cursor:pointer">this isn't in the source</span> · <span onClick="{{ flagPick }}" style="color:#3a5d8f;cursor:pointer">the source doesn't say this</span> · <span onClick="{{ flagCancel }}" style="cursor:pointer">cancel</span></sc-if><sc-if value="{{ r.fDone }}"><span>noted — thanks</span></sc-if></div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ hasRead }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;color:#a8792f;font-weight:500;margin-top:18px">Read from charts by the assistant — not quotations</div></sc-if>
+        <sc-for list="{{ readRows }}" as="r" hint-placeholder-count="2">
+          <div onClick="{{ r.pick }}" style="{{ r.st }}">
+            <div style="display:flex;gap:10px;align-items:baseline">
+              <span style="font-size:10.5px;border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07);border-radius:3px;padding:0 5px;flex:none">{{ r.n }}</span>
+              <div style="flex:1">
+                <div style="font-family:'Source Serif 4',serif;font-size:14.5px;line-height:1.6">{{ r.text }}</div>
+                <div style="font-size:11.5px;color:#8a857a;margin-top:5px">{{ r.doc }} · {{ r.loc }} · <span onClick="{{ r.openSrc }}" style="color:#3a5d8f;cursor:pointer">open the figure</span> · <sc-if value="{{ r.fIdle }}" hint-placeholder-val="{{ true }}"><span onClick="{{ r.flagStart }}" style="cursor:pointer">flag</span></sc-if><sc-if value="{{ r.fAsk }}"><span onClick="{{ flagPick }}" style="color:#3a5d8f;cursor:pointer">this isn't in the source</span> · <span onClick="{{ flagPick }}" style="color:#3a5d8f;cursor:pointer">the source doesn't say this</span> · <span onClick="{{ flagCancel }}" style="cursor:pointer">cancel</span></sc-if><sc-if value="{{ r.fDone }}"><span>noted — thanks</span></sc-if></div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ onRefusal }}">
+    <div data-screen-label="Useful refusal">
+      <div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600;margin-top:26px">YOU ASKED</div>
+      <div style="font-family:'Source Serif 4',serif;font-size:22px;font-weight:600;line-height:1.4;margin-top:6px">What did we spend with Meridian Labs in Q3 2025?</div>
+      <div style="height:1px;background:#e3dfd6;margin:22px 0 26px"></div>
+      <div><span style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#5d5850;border:1px solid #d5d0c5;border-radius:3px;padding:3px 8px">FOUND — NOT QUOTED</span></div>
+      <div style="font-family:'Source Serif 4',serif;font-size:19px;font-weight:600;line-height:1.5;margin-top:16px">It's in your documents. I won't quote it.</div>
+      <div style="font-family:'Source Serif 4',serif;font-size:16.5px;line-height:1.85;margin-top:12px">Table 2 on page 4 of <span style="font-weight:600">vendor-costs_2025.xlsx</span> lists spend by vendor and quarter, and Meridian Labs is in it. That table didn't come through cleanly when I ingested the file, so any figure I read from it could be wrong. The Q3 2025 column has what you need.</div>
+      <div style="background:#ffffff;border:1px solid #e3dfd6;border-radius:4px;padding:16px 18px;margin-top:22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:13px;font-weight:600">vendor-costs_2025.xlsx</div>
+          <div style="font-size:12px;color:#8a857a;margin-top:3px">Table 2 · Vendor spend by quarter · page 4</div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="background:#3a5d8f;color:#ffffff;font-size:13px;font-weight:500;padding:8px 16px;border-radius:4px;cursor:pointer" style-hover="background:#2c4a75">Open the table</div>
+      </div>
+      <div style="font-size:12px;color:#8a857a;margin-top:18px;line-height:1.7">If the table reads fine to you, <a href="#">flag this</a> — it teaches the system what it got wrong.</div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ onAgg }}">
+    <div data-screen-label="Corpus-wide limit">
+      <div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600;margin-top:26px">YOU ASKED</div>
+      <div style="font-family:'Source Serif 4',serif;font-size:22px;font-weight:600;line-height:1.4;margin-top:6px">What are the main themes across all of these documents?</div>
+      <div style="height:1px;background:#e3dfd6;margin:22px 0 26px"></div>
+      <div><span style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#5d5850;border:1px solid #d5d0c5;border-radius:3px;padding:3px 8px">A LIMIT, NOT A MISS</span></div>
+      <div style="font-family:'Source Serif 4',serif;font-size:19px;font-weight:600;line-height:1.5;margin-top:16px">This needs all your documents read at once. I work passage by passage.</div>
+      <div style="font-family:'Source Serif 4',serif;font-size:16.5px;line-height:1.85;margin-top:12px">I answer by finding the few passages most relevant to a question and reading those. “Main themes across everything” isn't in any passage — it's a property of the whole corpus, and a summary built from a handful of excerpts would be a sample dressed up as a survey. Answering badly here would be worse than telling you this.</div>
+      <div style="margin-top:26px">
+        <div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600">WHAT WORKS INSTEAD</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:15.5px;line-height:1.8;margin-top:10px">Name a theme and I'll find who discusses it — “which documents mention renal dosing?”</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:15.5px;line-height:1.8;margin-top:6px">Or pick two or three documents and I'll compare those:</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <div style="font-size:12px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:3px;padding:5px 10px;cursor:pointer" style-hover="border-color:#3a5d8f">clinical-overview_2024.pdf</div>
+          <div style="font-size:12px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:3px;padding:5px 10px;cursor:pointer" style-hover="border-color:#3a5d8f">safety-appendix_2024.pdf</div>
+          <div style="font-size:12px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:3px;padding:5px 10px;cursor:pointer" style-hover="border-color:#3a5d8f">efficacy-appendix_2024.pdf</div>
+          <div style="font-size:12px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:3px;padding:5px 10px;cursor:pointer" style-hover="border-color:#3a5d8f">vendor-costs_2025.xlsx</div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ onWait }}">
+    <div data-screen-label="Waiting">
+      <div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600;margin-top:26px">YOU ASKED</div>
+      <div style="font-family:'Source Serif 4',serif;font-size:22px;font-weight:600;line-height:1.4;margin-top:6px">How did the dose groups compare on efficacy?</div>
+      <div style="height:1px;background:#e3dfd6;margin:22px 0 26px"></div>
+      <sc-if value="{{ narrate }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ waitLines }}" as="w" hint-placeholder-count="2">
+          <div><sc-if value="{{ w.done }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:center;font-size:13.5px;color:#8a857a"><span style="width:7px;height:7px;border-radius:50%;background:#c9c2b2;flex:none"></span><span>{{ w.t }}</span></div></sc-if><sc-if value="{{ w.cur }}"><div style="display:flex;gap:10px;align-items:center;font-size:14.5px;color:#23282e"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f;flex:none;animation:ragkit-pulse 1.1s ease-in-out infinite"></span><span>{{ w.t }}</span></div></sc-if></div>
+        </sc-for>
+        </div>
+        <div style="font-size:12px;color:#8a857a;margin-top:28px;line-height:1.7">Counts appear only once they're true — the narration reports findings, not progress. Toggle it off in Tweaks to compare against a plain “Working…”.</div>
+      </sc-if>
+      <sc-if value="{{ noNarrate }}">
+        <div style="display:flex;gap:10px;align-items:center;font-size:14.5px;color:#5d5850"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f;flex:none;animation:ragkit-pulse 1.1s ease-in-out infinite"></span><span>Working…</span></div>
+      </sc-if>
+    </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;markModelClaims&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Mixed evidence&quot;},&quot;showAnswerMeta&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Mixed evidence&quot;},&quot;narratedWaiting&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Waiting&quot;}}">
+class Component extends DCLogic {
+  state = { view: 'mixed', appr: 'a', mix: 'm27', open: null, hl: null, src: null, flag: { id: null, step: 0 }, wait: 0 };
+
+  componentDidMount() {
+    this._t = setInterval(() => this.setState(s => ({ wait: (s.wait + 1) % 5 })), 1500);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  cites() {
+    return {
+      c1: { k: 'q', chip: '1', doc: 'clinical-overview_2024.pdf', loc: 'page 18', quote: 'Discontinuation due to adverse events occurred in 6.2% of renagliptin-treated patients versus 4.8% of placebo-treated patients.' },
+      c2: { k: 'q', chip: '2', doc: 'clinical-overview_2024.pdf', loc: 'page 19', quote: 'Gastrointestinal events accounted for the majority of early discontinuations, with onset typically within the first eight weeks.' },
+      c3: { k: 'q', chip: '3', doc: 'clinical-overview_2024.pdf', loc: 'page 22', quote: 'No new safety signals were identified through the 52-week extension.' },
+      f1: { k: 'r', chip: 'Fig 2', doc: 'safety-appendix_2024.pdf', loc: 'Figure 2 · page 7', fig: 'Figure 2', desc: 'As I read Figure 2 (discontinuation over time): after week 12 both curves flatten, and the remaining rate is roughly one patient per hundred per month.', cap: 'Figure 2. Kaplan\u2013Meier estimate of treatment discontinuation through week 52.' },
+      q1: { k: 'q', chip: '1', doc: 'clinical-overview_2024.pdf', loc: 'page 12', quote: 'The primary efficacy endpoint was change from baseline in HbA1c at week 26.' },
+      q2: { k: 'q', chip: '2', doc: 'clinical-overview_2024.pdf', loc: 'page 14', quote: 'Reductions in HbA1c were maintained in all renagliptin dose groups through week 52.' },
+      r1: { k: 'r', chip: 'Fig 3', doc: 'efficacy-appendix_2024.pdf', loc: 'Figure 3 · page 9', fig: 'Figure 3', desc: 'As I read Figure 3: mean HbA1c falls about 0.6, 0.9, and 1.2 points by week 26 at 2.5, 5, and 10 mg.', cap: 'Figure 3. Mean change in HbA1c (%) from baseline, by visit and dose group.' },
+      r2: { k: 'r', chip: 'Fig 3', doc: 'efficacy-appendix_2024.pdf', loc: 'Figure 3 · page 9', fig: 'Figure 3', desc: 'The placebo curve in Figure 3 ends near \u22120.2 points at week 26.', cap: 'Figure 3. Mean change in HbA1c (%) from baseline, by visit and dose group.' },
+      t1: { k: 'c', chip: 'Tbl 4', doc: 'results-tables_2024.pdf', loc: 'Table 4 · page 13', fig: 'Table 4', raw: 'Responders (HbA1c <7%)   31   42   47', note: 'The assistant matched those values to the 2.5 mg, 5 mg, and 10 mg columns by their position on the page. Check the pairing against the table.', cap: 'Table 4. Glycaemic response at week 26.' },
+      r3: { k: 'r', chip: 'Fig 4', doc: 'efficacy-appendix_2024.pdf', loc: 'Figure 4 · page 10', fig: 'Figure 4', desc: 'As I read Figure 4: the 10 mg weight curve ends near \u22121.8 kg at week 26.', cap: 'Figure 4. Mean change in body weight (kg) from baseline.' },
+      r4: { k: 'r', chip: 'Fig 4', doc: 'efficacy-appendix_2024.pdf', loc: 'Figure 4 · page 10', fig: 'Figure 4', desc: 'The placebo weight curve in Figure 4 stays within \u00b10.3 kg throughout.', cap: 'Figure 4. Mean change in body weight (kg) from baseline.' },
+      r5: { k: 'r', chip: 'Fig 5', doc: 'efficacy-appendix_2024.pdf', loc: 'Figure 5 · page 11', fig: 'Figure 5', desc: 'Both active-dose curves in Figure 5 flatten near week 18.', cap: 'Figure 5. HbA1c (%) over 52 weeks, all arms.' },
+      r6: { k: 'r', chip: 'Fig 5', doc: 'efficacy-appendix_2024.pdf', loc: 'Figure 5 · page 11', fig: 'Figure 5', desc: 'The 5 mg and 10 mg curves in Figure 5 overlap from week 30 onward.', cap: 'Figure 5. HbA1c (%) over 52 weeks, all arms.' },
+      a1: { k: 'r', chip: 'Fig 6', doc: 'safety-appendix_2024.pdf', loc: 'Figure 6 · page 9', fig: 'Figure 6', desc: 'As I read Figure 6: 38%, 44%, and 51% of patients report at least one adverse event at 2.5, 5, and 10 mg.', cap: 'Figure 6. Patients with \u22651 adverse event, by dose.' },
+      a2: { k: 'r', chip: 'Fig 6', doc: 'safety-appendix_2024.pdf', loc: 'Figure 6 · page 9', fig: 'Figure 6', desc: 'The placebo bar in Figure 6 reads about 35%.', cap: 'Figure 6. Patients with \u22651 adverse event, by dose.' },
+      a3: { k: 'r', chip: 'Fig 6', doc: 'safety-appendix_2024.pdf', loc: 'Figure 6 · page 9', fig: 'Figure 6', desc: 'Discontinuation bars in Figure 6 rise with dose in the same order.', cap: 'Figure 6. Patients with \u22651 adverse event, by dose.' },
+      a4: { k: 'r', chip: 'Fig 7', doc: 'safety-appendix_2024.pdf', loc: 'Figure 7 · page 10', fig: 'Figure 7', desc: 'The largest category band in Figure 7 is gastrointestinal complaints.', cap: 'Figure 7. Adverse events by category and onset week.' },
+      a5: { k: 'r', chip: 'Fig 7', doc: 'safety-appendix_2024.pdf', loc: 'Figure 7 · page 10', fig: 'Figure 7', desc: 'The GI band in Figure 7 is concentrated before week 8.', cap: 'Figure 7. Adverse events by category and onset week.' },
+      a6: { k: 'c', chip: 'Tbl 8', doc: 'safety-appendix_2024.pdf', loc: 'Table 8 · page 12', fig: 'Table 8', raw: 'Severe AEs   3   4   6', note: 'The assistant paired those counts with the 2.5 mg, 5 mg, and 10 mg columns by position. Check the pairing against the table.', cap: 'Table 8. Severe adverse events by arm.' },
+      a7: { k: 'c', chip: 'Tbl 8', doc: 'safety-appendix_2024.pdf', loc: 'Table 8 · page 12', fig: 'Table 8', raw: 'Treatment-related, placebo   0', note: 'Same table; the assistant read the placebo column by position.', cap: 'Table 8. Severe adverse events by arm.' },
+      a8: { k: 'r', chip: 'Fig 7', doc: 'safety-appendix_2024.pdf', loc: 'Figure 7 · page 10', fig: 'Figure 7', desc: 'The hypoglycaemia band in Figure 7 stays under 2% in every arm.', cap: 'Figure 7. Adverse events by category and onset week.' },
+      a9: { k: 'r', chip: 'Fig 6', doc: 'safety-appendix_2024.pdf', loc: 'Figure 6 · page 9', fig: 'Figure 6', desc: 'No bar in Figure 6 increases between the week-26 and week-52 panels.', cap: 'Figure 6. Patients with \u22651 adverse event, by dose.' }
+    };
+  }
+
+  mixes() {
+    return {
+      m31: {
+        q: 'What was the discontinuation rate in the Phase 3 trial, and how did it compare with placebo?',
+        meta: '2 documents · 3 exact quotations · 1 chart reading',
+        paras: [
+          [ { t: 'In the pivotal Phase 3 trial, 6.2% of patients on renagliptin discontinued treatment because of adverse events, compared with 4.8% on placebo.', id: 'c1' },
+            { t: ' Gastrointestinal intolerance was the most common reason, and it occurred almost entirely in the first eight weeks.', id: 'c2' } ],
+          [ { t: 'After week 12 the discontinuation rate fell sharply in both arms \u2014 ' },
+            { t: 'to roughly one patient per hundred per month', id: 'f1' },
+            { t: ' \u2014 and no new safety signals emerged through week 52.', id: 'c3' } ]
+        ]
+      },
+      m27: {
+        q: 'How did HbA1c and body weight change across the renagliptin dose groups?',
+        meta: '3 documents · 2 exact quotations · 6 chart readings · 1 table with inferred structure',
+        paras: [
+          [ { t: 'The trial\u2019s primary endpoint was change from baseline in HbA1c at week 26.', id: 'q1' },
+            { t: ' At that visit, HbA1c fell by roughly 0.6, 0.9, and 1.2 percentage points in the 2.5 mg, 5 mg, and 10 mg groups', id: 'r1' },
+            { t: ', against about 0.2 on placebo', id: 'r2' },
+            { t: '. The share of patients reaching HbA1c below 7% was 31%, 42%, and 47% by ascending dose', id: 't1' },
+            { t: '.' } ],
+          [ { t: 'Body weight fell by about 1.8 kg in the 10 mg group', id: 'r3' },
+            { t: ' and was essentially flat on placebo', id: 'r4' },
+            { t: '. The glycaemic effect plateaued around week 18', id: 'r5' },
+            { t: ', with the 5 mg and 10 mg curves overlapping from week 30 onward', id: 'r6' },
+            { t: '. ' },
+            { t: 'All dose groups maintained the reduction through week 52.', id: 'q2' } ]
+        ]
+      },
+      m09: {
+        q: 'Summarize the adverse-event profile shown in the safety figures.',
+        meta: '1 document · 0 exact quotations · 7 chart readings · 2 table claims with inferred structure',
+        paras: [
+          [ { t: 'Adverse events rose with dose \u2014 roughly 38%, 44%, and 51% of patients reported at least one event at 2.5, 5, and 10 mg', id: 'a1' },
+            { t: ', against about 35% on placebo', id: 'a2' },
+            { t: '. Discontinuations attributed to adverse events followed the same ordering', id: 'a3' },
+            { t: '. Gastrointestinal complaints were the largest category', id: 'a4' },
+            { t: ' and clustered in the first eight weeks', id: 'a5' },
+            { t: '.' } ],
+          [ { t: 'Severe events were rare \u2014 3, 4, and 6 by ascending dose', id: 'a6' },
+            { t: ', with none judged treatment-related in the placebo arm', id: 'a7' },
+            { t: '. Hypoglycaemia stayed under 2% in every arm', id: 'a8' },
+            { t: ', and no dose group\u2019s event rate rose after week 26', id: 'a9' },
+            { t: '.' } ]
+        ]
+      }
+    };
+  }
+
+  renderVals() {
+    const { view, appr, mix, open, hl, src, flag, wait } = this.state;
+    const markModel = this.props.markModelClaims ?? true;
+    const showMeta = this.props.showAnswerMeta ?? true;
+    const narrate = this.props.narratedWaiting ?? true;
+    const cites = this.cites();
+    const data = this.mixes()[mix];
+    const chipBase = "font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;font-weight:500;border-radius:3px;padding:0 5px;margin-left:4px;cursor:pointer;vertical-align:3px;white-space:nowrap;";
+    const chipSt = (id, k) => {
+      const on = open === id || hl === id;
+      if (k === 'r') return chipBase + (on ? 'background:#a8792f;color:#fff;border:1px solid #a8792f' : 'border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07)');
+      if (k === 'c') return chipBase + (on ? 'background:#3a5d8f;color:#fff;border:1px dashed #3a5d8f' : 'border:1px dashed rgba(58,93,143,.5);color:#3a5d8f');
+      return chipBase + (on ? 'background:#3a5d8f;color:#fff;border:1px solid #3a5d8f' : 'border:1px solid rgba(58,93,143,.4);color:#3a5d8f');
+    };
+    const tap = (id) => () => {
+      if (this.state.appr === 'a') this.setState({ open: this.state.open === id ? null : id, flag: { id: null, step: 0 } });
+      else this.setState({ hl: this.state.hl === id ? null : id });
+    };
+    const paras = data.paras.map(segs => ({ segs: segs.map(g => {
+      if (!g.id) return { t: g.t, plain: true };
+      const k = cites[g.id].k;
+      const marked = appr === 'a' && markModel;
+      return { t: g.t, chip: cites[g.id].chip, tap: tap(g.id), chipSt: chipSt(g.id, k),
+        isQ: k === 'q' || !marked, isR: k === 'r' && marked, isC: k === 'c' && marked };
+    }) }));
+    const ids = data.paras.flat().filter(g => g.id).map(g => g.id);
+    const kinds = ids.map(id => cites[id].k);
+    const rowSt = (id) => 'padding:12px;margin-top:8px;border-radius:4px;cursor:pointer;border:1px solid ' + (hl === id ? '#c9c2b2;background:#fbfaf7' : 'transparent;background:transparent');
+    const flagStart = (id) => () => this.setState({ flag: { id, step: 1 } });
+    const mkRow = (id) => {
+      const c = cites[id];
+      return { n: c.chip, text: c.k === 'q' ? c.quote : (c.k === 'c' ? c.raw : c.desc), doc: c.doc, loc: c.loc,
+        st: rowSt(id), pick: () => this.setState({ hl: this.state.hl === id ? null : id }),
+        openSrc: () => this.setState({ src: id, flag: { id: null, step: 0 } }),
+        flagStart: flagStart(id),
+        fIdle: !(flag.id === id) || flag.step === 0, fAsk: flag.id === id && flag.step === 1, fDone: flag.id === id && flag.step === 2 };
+    };
+    const quotedRows = ids.filter(id => cites[id].k === 'q').map(mkRow);
+    const clipRows = ids.filter(id => cites[id].k === 'c').map(mkRow);
+    const readRows = ids.filter(id => cites[id].k === 'r').map(mkRow);
+    const oc = open ? cites[open] : null;
+    const card = oc ? { isQuote: oc.k === 'q', isClip: oc.k === 'c', isFig: oc.k === 'r', quote: oc.quote || '', raw: oc.raw || '', note: oc.note || '', desc: oc.desc || '', fig: oc.fig || '', doc: oc.doc, loc: oc.loc }
+      : { isQuote: true, isClip: false, isFig: false, quote: '', raw: '', note: '', desc: '', fig: '', doc: '', loc: '' };
+    const sc = src ? cites[src] : null;
+    const tab = (on) => 'font-size:11.5px;padding:4px 10px;border-radius:3px;cursor:pointer;white-space:nowrap;border:1px solid ' + (on ? '#8a857a;background:#fbfaf7;color:#23282e' : 'transparent;color:#6e6a60');
+    const phases = ['Searching 9 documents', 'Found 6 passages in 3 documents', 'Checking which passages can be quoted exactly \u2014 2 can', 'Writing. Every claim will link to its source.'];
+    return {
+      onMixedTab: view === 'mixed', onMixed: view === 'mixed' && !src, onRefusal: view === 'refusal', onAgg: view === 'agg', onWait: view === 'wait',
+      onSrc: !!src && view === 'mixed',
+      goMixed: () => this.setState({ view: 'mixed' }), goRefusal: () => this.setState({ view: 'refusal', src: null }),
+      goAgg: () => this.setState({ view: 'agg', src: null }), goWait: () => this.setState({ view: 'wait', src: null, wait: 0 }),
+      stMixed: tab(view === 'mixed'), stRefusal: tab(view === 'refusal'), stAgg: tab(view === 'agg'), stWait: tab(view === 'wait'),
+      goM31: () => this.setState({ mix: 'm31', open: null, hl: null, src: null, flag: { id: null, step: 0 } }),
+      goM27: () => this.setState({ mix: 'm27', open: null, hl: null, src: null, flag: { id: null, step: 0 } }),
+      goM09: () => this.setState({ mix: 'm09', open: null, hl: null, src: null, flag: { id: null, step: 0 } }),
+      stM31: tab(mix === 'm31'), stM27: tab(mix === 'm27'), stM09: tab(mix === 'm09'),
+      apprA: appr === 'a', apprB: appr === 'b',
+      goApprA: () => this.setState({ appr: 'a', hl: null }), goApprB: () => this.setState({ appr: 'b', open: null }),
+      stApprA: tab(appr === 'a'), stApprB: tab(appr === 'b'),
+      showMeta, mixQ: data.q, metaText: data.meta, zeroQ: !kinds.includes('q'),
+      paras, hasOpen: !!open && appr === 'a', card, closeCard: () => this.setState({ open: null, flag: { id: null, step: 0 } }),
+      hasQChips: kinds.includes('q'), hasCChips: kinds.includes('c'), hasRChips: kinds.includes('r'),
+      quotedRows, clipRows, readRows, noQuoted: quotedRows.length === 0, hasClip: clipRows.length > 0, hasRead: readRows.length > 0,
+      cardFIdle: !!open && (flag.id !== open || flag.step === 0), cardFAsk: !!open && flag.id === open && flag.step === 1, cardFDone: !!open && flag.id === open && flag.step === 2,
+      cardFlagStart: () => this.setState({ flag: { id: this.state.open, step: 1 } }),
+      flagPick: () => this.setState({ flag: { id: this.state.flag.id, step: 2 } }),
+      flagCancel: () => this.setState({ flag: { id: null, step: 0 } }),
+      openSrcFromCard: () => this.setState({ src: this.state.open }),
+      srcBack: () => this.setState({ src: null }),
+      srcIsQ: !!sc && sc.k === 'q', srcIsR: !!sc && sc.k === 'r', srcIsC: !!sc && sc.k === 'c',
+      srcDoc: sc ? sc.doc : '', srcLoc: sc ? sc.loc : '', srcQuote: sc ? (sc.quote || '') : '', srcDesc: sc ? (sc.desc || '') : '',
+      srcRaw: sc ? (sc.raw || '') : '', srcNote: sc ? (sc.note || '') : '', srcFig: sc ? (sc.fig || '') : '', srcCap: sc ? (sc.cap || '') : '',
+      barsTop: [{ w: '96%' }, { w: '89%' }, { w: '93%' }, { w: '58%' }], barsBot: [{ w: '95%' }, { w: '90%' }, { w: '42%' }],
+      narrate, noNarrate: !narrate,
+      waitLines: phases.map((t, i) => ({ t, done: i < wait, cur: i === wait }))
+    };
+  }
+}
+</script>
+</body>
+</html>

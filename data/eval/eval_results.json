@@ -1,0 +1,4282 @@
+{
+  "seconds": 4.0,
+  "regression_tests": {
+    "What is the Precision@5 for the BM25_ONLY method in the Meridian Retri": {
+      "passes_at_budget": 250,
+      "passes_at_headline": true,
+      "needles": 1
+    },
+    "According to Meridian Retrieval Benchmark Internal Report R-4471, how ": {
+      "passes_at_budget": 250,
+      "passes_at_headline": true,
+      "needles": 1
+    },
+    "What is the configured value and application stage for efConstruction ": {
+      "passes_at_budget": 3000,
+      "passes_at_headline": false,
+      "needles": 1
+    },
+    "How does HYBRID_RRF_RR process the top 50 candidates compared to HYBRI": {
+      "passes_at_budget": 250,
+      "passes_at_headline": true,
+      "needles": 1
+    }
+  },
+  "token_budget": 1500,
+  "budget_sweep": {
+    "250": {
+      "child_strict": {
+        "n": 92,
+        "hits": 25,
+        "rate": 0.272,
+        "sufficient": true,
+        "ci95": [
+          0.191,
+          0.37
+        ],
+        "label": "25/92 = 27%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 44,
+        "rate": 0.478,
+        "sufficient": true,
+        "ci95": [
+          0.379,
+          0.579
+        ],
+        "label": "44/92 = 48%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 21,
+        "rate": 0.228,
+        "sufficient": true,
+        "ci95": [
+          0.154,
+          0.324
+        ],
+        "label": "21/92 = 23%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 40,
+        "rate": 0.435,
+        "sufficient": true,
+        "ci95": [
+          0.338,
+          0.537
+        ],
+        "label": "40/92 = 43%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 60,
+        "rate": 0.652,
+        "sufficient": true,
+        "ci95": [
+          0.551,
+          0.742
+        ],
+        "label": "60/92 = 65%"
+      },
+      "mean_child_tokens": 98,
+      "mean_parent_tokens": 84,
+      "child_no_delivery": 31,
+      "parent_no_delivery": 45
+    },
+    "500": {
+      "child_strict": {
+        "n": 92,
+        "hits": 55,
+        "rate": 0.598,
+        "sufficient": true,
+        "ci95": [
+          0.496,
+          0.692
+        ],
+        "label": "55/92 = 60%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 73,
+        "rate": 0.793,
+        "sufficient": true,
+        "ci95": [
+          0.7,
+          0.864
+        ],
+        "label": "73/92 = 79%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 42,
+        "rate": 0.457,
+        "sufficient": true,
+        "ci95": [
+          0.359,
+          0.558
+        ],
+        "label": "42/92 = 46%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 62,
+        "rate": 0.674,
+        "sufficient": true,
+        "ci95": [
+          0.573,
+          0.761
+        ],
+        "label": "62/92 = 67%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "mean_child_tokens": 357,
+      "mean_parent_tokens": 236,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 22
+    },
+    "1000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 73,
+        "rate": 0.793,
+        "sufficient": true,
+        "ci95": [
+          0.7,
+          0.864
+        ],
+        "label": "73/92 = 79%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 84,
+        "rate": 0.913,
+        "sufficient": true,
+        "ci95": [
+          0.838,
+          0.955
+        ],
+        "label": "84/92 = 91%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 58,
+        "rate": 0.63,
+        "sufficient": true,
+        "ci95": [
+          0.528,
+          0.722
+        ],
+        "label": "58/92 = 63%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 73,
+        "rate": 0.793,
+        "sufficient": true,
+        "ci95": [
+          0.7,
+          0.864
+        ],
+        "label": "73/92 = 79%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 834,
+      "mean_parent_tokens": 588,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 9
+    },
+    "1500": {
+      "child_strict": {
+        "n": 92,
+        "hits": 78,
+        "rate": 0.848,
+        "sufficient": true,
+        "ci95": [
+          0.761,
+          0.907
+        ],
+        "label": "78/92 = 85%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 84,
+        "rate": 0.913,
+        "sufficient": true,
+        "ci95": [
+          0.838,
+          0.955
+        ],
+        "label": "84/92 = 91%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 71,
+        "rate": 0.772,
+        "sufficient": true,
+        "ci95": [
+          0.676,
+          0.846
+        ],
+        "label": "71/92 = 77%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 81,
+        "rate": 0.88,
+        "sufficient": true,
+        "ci95": [
+          0.798,
+          0.932
+        ],
+        "label": "81/92 = 88%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 1314,
+      "mean_parent_tokens": 1166,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 1
+    },
+    "3000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 88,
+        "rate": 0.957,
+        "sufficient": true,
+        "ci95": [
+          0.893,
+          0.983
+        ],
+        "label": "88/92 = 96%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 89,
+        "rate": 0.967,
+        "sufficient": true,
+        "ci95": [
+          0.908,
+          0.989
+        ],
+        "label": "89/92 = 97%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 84,
+        "rate": 0.913,
+        "sufficient": true,
+        "ci95": [
+          0.838,
+          0.955
+        ],
+        "label": "84/92 = 91%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 85,
+        "rate": 0.924,
+        "sufficient": true,
+        "ci95": [
+          0.851,
+          0.963
+        ],
+        "label": "85/92 = 92%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 2730,
+      "mean_parent_tokens": 2544,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 0
+    },
+    "6000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 90,
+        "rate": 0.978,
+        "sufficient": true,
+        "ci95": [
+          0.924,
+          0.994
+        ],
+        "label": "90/92 = 98%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 87,
+        "rate": 0.946,
+        "sufficient": true,
+        "ci95": [
+          0.879,
+          0.977
+        ],
+        "label": "87/92 = 95%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 88,
+        "rate": 0.957,
+        "sufficient": true,
+        "ci95": [
+          0.893,
+          0.983
+        ],
+        "label": "88/92 = 96%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 5613,
+      "mean_parent_tokens": 5528,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 0
+    },
+    "12000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 11324,
+      "mean_parent_tokens": 11548,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 0
+    }
+  },
+  "golden_set": {
+    "total": 101,
+    "evaluable": 97,
+    "quarantined": 4,
+    "by_stratum": {
+      "simple_factual": 33,
+      "exact_identifier": 19,
+      "table_or_image": 38,
+      "multi_hop": 2,
+      "out_of_scope": 5
+    },
+    "by_anchor": {
+      "asset": 3,
+      "needle": 89,
+      "none": 5
+    },
+    "by_source": {
+      "assets/hnsw_p2.png": 2,
+      "assets/lost-in-the-middle_p1.png": 2,
+      "assets/lost-in-the-middle_p5.png": 2,
+      "assets/raptor_p2.png": 2,
+      "graphrag-local-to-global.pdf": 19,
+      "hnsw.pdf": 6,
+      "hyde.pdf": 7,
+      "lost-in-the-middle.pdf": 15,
+      "manual.docx": 2,
+      "ragas.pdf": 3,
+      "raptor.pdf": 18,
+      "self-rag.pdf": 14,
+      "": 5
+    },
+    "multi_needle": 32,
+    "ambiguous_needles": 6,
+    "with_distractor": 74,
+    "human_verified": 0
+  },
+  "index_provenance": {
+    "parser_version": "pymupdf4llm@1.28+lines-detector@1+quadcorr-unset+cleanhdr@2+pagetextrepair@3+bboxflags@1",
+    "chunker_version": "header_aware_parent@3",
+    "pipeline_fingerprint": "6fd55e19a82a7c28",
+    "strategy": "header_aware_parent",
+    "dim": 768,
+    "n_children": 802,
+    "uniform_provenance": true,
+    "child_text_source": {
+      "gemini_caption": 11,
+      "markdown": 788,
+      "page_text_clip": 3
+    },
+    "n_header_missing": 3,
+    "resolved_models": {
+      "workhorse": "gemini-3.7-flash",
+      "cheap": "gemini-3.5-flash-lite",
+      "judge": "gemini-3.1-pro-preview",
+      "embedding": "gemini-embedding-001",
+      "embedding_multimodal": "gemini-embedding-2"
+    }
+  },
+  "metrics": {
+    "n_items": 101,
+    "stratum_coverage": {
+      "declared": [
+        "aggregative",
+        "ambiguous",
+        "exact_identifier",
+        "multi_hop",
+        "out_of_scope",
+        "simple_factual",
+        "table_or_image"
+      ],
+      "present": [
+        "exact_identifier",
+        "multi_hop",
+        "out_of_scope",
+        "simple_factual",
+        "table_or_image"
+      ],
+      "missing": [
+        "aggregative",
+        "ambiguous"
+      ],
+      "thin": [
+        "multi_hop"
+      ]
+    },
+    "n_scored": 92,
+    "n_quarantined": 4,
+    "n_skipped_out_of_scope": 5,
+    "min_n_for_rate": 10,
+    "headline": {
+      "child_strict": {
+        "n": 92,
+        "hits": 78,
+        "rate": 0.848,
+        "sufficient": true,
+        "ci95": [
+          0.761,
+          0.907
+        ],
+        "label": "78/92 = 85%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 84,
+        "rate": 0.913,
+        "sufficient": true,
+        "ci95": [
+          0.838,
+          0.955
+        ],
+        "label": "84/92 = 91%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 71,
+        "rate": 0.772,
+        "sufficient": true,
+        "ci95": [
+          0.676,
+          0.846
+        ],
+        "label": "71/92 = 77%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 81,
+        "rate": 0.88,
+        "sufficient": true,
+        "ci95": [
+          0.798,
+          0.932
+        ],
+        "label": "81/92 = 88%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 1314,
+      "mean_parent_tokens": 1166,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 1
+    },
+    "parent_minus_child_strict": -0.076,
+    "by_stratum": {
+      "exact_identifier": {
+        "child_strict": {
+          "n": 19,
+          "hits": 17,
+          "rate": 0.895,
+          "sufficient": true,
+          "ci95": [
+            0.686,
+            0.971
+          ],
+          "label": "17/19 = 89%"
+        },
+        "child_partial": {
+          "n": 19,
+          "hits": 17,
+          "rate": 0.895,
+          "sufficient": true,
+          "ci95": [
+            0.686,
+            0.971
+          ],
+          "label": "17/19 = 89%"
+        },
+        "parent_strict": {
+          "n": 19,
+          "hits": 15,
+          "rate": 0.789,
+          "sufficient": true,
+          "ci95": [
+            0.567,
+            0.915
+          ],
+          "label": "15/19 = 79%"
+        },
+        "parent_partial": {
+          "n": 19,
+          "hits": 15,
+          "rate": 0.789,
+          "sufficient": true,
+          "ci95": [
+            0.567,
+            0.915
+          ],
+          "label": "15/19 = 79%"
+        },
+        "source_hit": {
+          "n": 19,
+          "hits": 19,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.832,
+            1.0
+          ],
+          "label": "19/19 = 100%"
+        },
+        "mean_child_tokens": 1302,
+        "mean_parent_tokens": 1023,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 1
+      },
+      "multi_hop": {
+        "child_strict": {
+          "n": 2,
+          "hits": 1,
+          "rate": null,
+          "sufficient": false,
+          "label": "1 of 2"
+        },
+        "child_partial": {
+          "n": 2,
+          "hits": 1,
+          "rate": null,
+          "sufficient": false,
+          "label": "1 of 2"
+        },
+        "parent_strict": {
+          "n": 2,
+          "hits": 1,
+          "rate": null,
+          "sufficient": false,
+          "label": "1 of 2"
+        },
+        "parent_partial": {
+          "n": 2,
+          "hits": 1,
+          "rate": null,
+          "sufficient": false,
+          "label": "1 of 2"
+        },
+        "source_hit": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "mean_child_tokens": 1360,
+        "mean_parent_tokens": 1181,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "simple_factual": {
+        "child_strict": {
+          "n": 33,
+          "hits": 29,
+          "rate": 0.879,
+          "sufficient": true,
+          "ci95": [
+            0.727,
+            0.952
+          ],
+          "label": "29/33 = 88%"
+        },
+        "child_partial": {
+          "n": 33,
+          "hits": 29,
+          "rate": 0.879,
+          "sufficient": true,
+          "ci95": [
+            0.727,
+            0.952
+          ],
+          "label": "29/33 = 88%"
+        },
+        "parent_strict": {
+          "n": 33,
+          "hits": 28,
+          "rate": 0.848,
+          "sufficient": true,
+          "ci95": [
+            0.691,
+            0.933
+          ],
+          "label": "28/33 = 85%"
+        },
+        "parent_partial": {
+          "n": 33,
+          "hits": 28,
+          "rate": 0.848,
+          "sufficient": true,
+          "ci95": [
+            0.691,
+            0.933
+          ],
+          "label": "28/33 = 85%"
+        },
+        "source_hit": {
+          "n": 33,
+          "hits": 33,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.896,
+            1.0
+          ],
+          "label": "33/33 = 100%"
+        },
+        "mean_child_tokens": 1286,
+        "mean_parent_tokens": 1134,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "table_or_image": {
+        "child_strict": {
+          "n": 38,
+          "hits": 31,
+          "rate": 0.816,
+          "sufficient": true,
+          "ci95": [
+            0.666,
+            0.908
+          ],
+          "label": "31/38 = 82%"
+        },
+        "child_partial": {
+          "n": 38,
+          "hits": 37,
+          "rate": 0.974,
+          "sufficient": true,
+          "ci95": [
+            0.865,
+            0.995
+          ],
+          "label": "37/38 = 97%"
+        },
+        "parent_strict": {
+          "n": 38,
+          "hits": 27,
+          "rate": 0.711,
+          "sufficient": true,
+          "ci95": [
+            0.552,
+            0.83
+          ],
+          "label": "27/38 = 71%"
+        },
+        "parent_partial": {
+          "n": 38,
+          "hits": 37,
+          "rate": 0.974,
+          "sufficient": true,
+          "ci95": [
+            0.865,
+            0.995
+          ],
+          "label": "37/38 = 97%"
+        },
+        "source_hit": {
+          "n": 38,
+          "hits": 38,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.908,
+            1.0
+          ],
+          "label": "38/38 = 100%"
+        },
+        "mean_child_tokens": 1342,
+        "mean_parent_tokens": 1265,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      }
+    },
+    "by_anchor": {
+      "asset": {
+        "child_strict": {
+          "n": 3,
+          "hits": 3,
+          "rate": null,
+          "sufficient": false,
+          "label": "3 of 3"
+        },
+        "child_partial": {
+          "n": 3,
+          "hits": 3,
+          "rate": null,
+          "sufficient": false,
+          "label": "3 of 3"
+        },
+        "parent_strict": {
+          "n": 3,
+          "hits": 3,
+          "rate": null,
+          "sufficient": false,
+          "label": "3 of 3"
+        },
+        "parent_partial": {
+          "n": 3,
+          "hits": 3,
+          "rate": null,
+          "sufficient": false,
+          "label": "3 of 3"
+        },
+        "source_hit": {
+          "n": 3,
+          "hits": 3,
+          "rate": null,
+          "sufficient": false,
+          "label": "3 of 3"
+        },
+        "mean_child_tokens": 1304,
+        "mean_parent_tokens": 1161,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "needle": {
+        "child_strict": {
+          "n": 89,
+          "hits": 75,
+          "rate": 0.843,
+          "sufficient": true,
+          "ci95": [
+            0.753,
+            0.904
+          ],
+          "label": "75/89 = 84%"
+        },
+        "child_partial": {
+          "n": 89,
+          "hits": 81,
+          "rate": 0.91,
+          "sufficient": true,
+          "ci95": [
+            0.833,
+            0.954
+          ],
+          "label": "81/89 = 91%"
+        },
+        "parent_strict": {
+          "n": 89,
+          "hits": 68,
+          "rate": 0.764,
+          "sufficient": true,
+          "ci95": [
+            0.666,
+            0.84
+          ],
+          "label": "68/89 = 76%"
+        },
+        "parent_partial": {
+          "n": 89,
+          "hits": 78,
+          "rate": 0.876,
+          "sufficient": true,
+          "ci95": [
+            0.792,
+            0.93
+          ],
+          "label": "78/89 = 88%"
+        },
+        "source_hit": {
+          "n": 89,
+          "hits": 89,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.959,
+            1.0
+          ],
+          "label": "89/89 = 100%"
+        },
+        "mean_child_tokens": 1314,
+        "mean_parent_tokens": 1166,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 1
+      }
+    },
+    "by_source": {
+      "assets/hnsw_p2.png": {
+        "child_strict": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "child_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "parent_strict": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "parent_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "source_hit": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "mean_child_tokens": 1174,
+        "mean_parent_tokens": 1202,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "assets/lost-in-the-middle_p1.png": {
+        "child_strict": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "child_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "parent_strict": {
+          "n": 2,
+          "hits": 1,
+          "rate": null,
+          "sufficient": false,
+          "label": "1 of 2"
+        },
+        "parent_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "source_hit": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "mean_child_tokens": 1332,
+        "mean_parent_tokens": 1042,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "assets/lost-in-the-middle_p5.png": {
+        "child_strict": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "child_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "parent_strict": {
+          "n": 2,
+          "hits": 1,
+          "rate": null,
+          "sufficient": false,
+          "label": "1 of 2"
+        },
+        "parent_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "source_hit": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "mean_child_tokens": 1245,
+        "mean_parent_tokens": 1169,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "assets/raptor_p2.png": {
+        "child_strict": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "child_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "parent_strict": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "parent_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "source_hit": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "mean_child_tokens": 1434,
+        "mean_parent_tokens": 1160,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "graphrag-local-to-global.pdf": {
+        "child_strict": {
+          "n": 19,
+          "hits": 16,
+          "rate": 0.842,
+          "sufficient": true,
+          "ci95": [
+            0.624,
+            0.945
+          ],
+          "label": "16/19 = 84%"
+        },
+        "child_partial": {
+          "n": 19,
+          "hits": 16,
+          "rate": 0.842,
+          "sufficient": true,
+          "ci95": [
+            0.624,
+            0.945
+          ],
+          "label": "16/19 = 84%"
+        },
+        "parent_strict": {
+          "n": 19,
+          "hits": 14,
+          "rate": 0.737,
+          "sufficient": true,
+          "ci95": [
+            0.512,
+            0.882
+          ],
+          "label": "14/19 = 74%"
+        },
+        "parent_partial": {
+          "n": 19,
+          "hits": 15,
+          "rate": 0.789,
+          "sufficient": true,
+          "ci95": [
+            0.567,
+            0.915
+          ],
+          "label": "15/19 = 79%"
+        },
+        "source_hit": {
+          "n": 19,
+          "hits": 19,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.832,
+            1.0
+          ],
+          "label": "19/19 = 100%"
+        },
+        "mean_child_tokens": 1305,
+        "mean_parent_tokens": 1151,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "hnsw.pdf": {
+        "child_strict": {
+          "n": 6,
+          "hits": 5,
+          "rate": null,
+          "sufficient": false,
+          "label": "5 of 6"
+        },
+        "child_partial": {
+          "n": 6,
+          "hits": 6,
+          "rate": null,
+          "sufficient": false,
+          "label": "6 of 6"
+        },
+        "parent_strict": {
+          "n": 6,
+          "hits": 5,
+          "rate": null,
+          "sufficient": false,
+          "label": "5 of 6"
+        },
+        "parent_partial": {
+          "n": 6,
+          "hits": 6,
+          "rate": null,
+          "sufficient": false,
+          "label": "6 of 6"
+        },
+        "source_hit": {
+          "n": 6,
+          "hits": 6,
+          "rate": null,
+          "sufficient": false,
+          "label": "6 of 6"
+        },
+        "mean_child_tokens": 1293,
+        "mean_parent_tokens": 1231,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "hyde.pdf": {
+        "child_strict": {
+          "n": 7,
+          "hits": 6,
+          "rate": null,
+          "sufficient": false,
+          "label": "6 of 7"
+        },
+        "child_partial": {
+          "n": 7,
+          "hits": 6,
+          "rate": null,
+          "sufficient": false,
+          "label": "6 of 7"
+        },
+        "parent_strict": {
+          "n": 7,
+          "hits": 6,
+          "rate": null,
+          "sufficient": false,
+          "label": "6 of 7"
+        },
+        "parent_partial": {
+          "n": 7,
+          "hits": 6,
+          "rate": null,
+          "sufficient": false,
+          "label": "6 of 7"
+        },
+        "source_hit": {
+          "n": 7,
+          "hits": 7,
+          "rate": null,
+          "sufficient": false,
+          "label": "7 of 7"
+        },
+        "mean_child_tokens": 1313,
+        "mean_parent_tokens": 988,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 1
+      },
+      "lost-in-the-middle.pdf": {
+        "child_strict": {
+          "n": 15,
+          "hits": 13,
+          "rate": 0.867,
+          "sufficient": true,
+          "ci95": [
+            0.621,
+            0.963
+          ],
+          "label": "13/15 = 87%"
+        },
+        "child_partial": {
+          "n": 15,
+          "hits": 15,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.796,
+            1.0
+          ],
+          "label": "15/15 = 100%"
+        },
+        "parent_strict": {
+          "n": 15,
+          "hits": 13,
+          "rate": 0.867,
+          "sufficient": true,
+          "ci95": [
+            0.621,
+            0.963
+          ],
+          "label": "13/15 = 87%"
+        },
+        "parent_partial": {
+          "n": 15,
+          "hits": 15,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.796,
+            1.0
+          ],
+          "label": "15/15 = 100%"
+        },
+        "source_hit": {
+          "n": 15,
+          "hits": 15,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.796,
+            1.0
+          ],
+          "label": "15/15 = 100%"
+        },
+        "mean_child_tokens": 1298,
+        "mean_parent_tokens": 1252,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "manual.docx": {
+        "child_strict": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "child_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "parent_strict": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "parent_partial": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "source_hit": {
+          "n": 2,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 2"
+        },
+        "mean_child_tokens": 1186,
+        "mean_parent_tokens": 1352,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "ragas.pdf": {
+        "child_strict": {
+          "n": 3,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 3"
+        },
+        "child_partial": {
+          "n": 3,
+          "hits": 3,
+          "rate": null,
+          "sufficient": false,
+          "label": "3 of 3"
+        },
+        "parent_strict": {
+          "n": 3,
+          "hits": 2,
+          "rate": null,
+          "sufficient": false,
+          "label": "2 of 3"
+        },
+        "parent_partial": {
+          "n": 3,
+          "hits": 3,
+          "rate": null,
+          "sufficient": false,
+          "label": "3 of 3"
+        },
+        "source_hit": {
+          "n": 3,
+          "hits": 3,
+          "rate": null,
+          "sufficient": false,
+          "label": "3 of 3"
+        },
+        "mean_child_tokens": 1341,
+        "mean_parent_tokens": 1281,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "raptor.pdf": {
+        "child_strict": {
+          "n": 18,
+          "hits": 14,
+          "rate": 0.778,
+          "sufficient": true,
+          "ci95": [
+            0.548,
+            0.91
+          ],
+          "label": "14/18 = 78%"
+        },
+        "child_partial": {
+          "n": 18,
+          "hits": 16,
+          "rate": 0.889,
+          "sufficient": true,
+          "ci95": [
+            0.672,
+            0.969
+          ],
+          "label": "16/18 = 89%"
+        },
+        "parent_strict": {
+          "n": 18,
+          "hits": 13,
+          "rate": 0.722,
+          "sufficient": true,
+          "ci95": [
+            0.491,
+            0.875
+          ],
+          "label": "13/18 = 72%"
+        },
+        "parent_partial": {
+          "n": 18,
+          "hits": 15,
+          "rate": 0.833,
+          "sufficient": true,
+          "ci95": [
+            0.608,
+            0.942
+          ],
+          "label": "15/18 = 83%"
+        },
+        "source_hit": {
+          "n": 18,
+          "hits": 18,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.824,
+            1.0
+          ],
+          "label": "18/18 = 100%"
+        },
+        "mean_child_tokens": 1347,
+        "mean_parent_tokens": 1144,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      },
+      "self-rag.pdf": {
+        "child_strict": {
+          "n": 14,
+          "hits": 12,
+          "rate": 0.857,
+          "sufficient": true,
+          "ci95": [
+            0.601,
+            0.96
+          ],
+          "label": "12/14 = 86%"
+        },
+        "child_partial": {
+          "n": 14,
+          "hits": 12,
+          "rate": 0.857,
+          "sufficient": true,
+          "ci95": [
+            0.601,
+            0.96
+          ],
+          "label": "12/14 = 86%"
+        },
+        "parent_strict": {
+          "n": 14,
+          "hits": 10,
+          "rate": 0.714,
+          "sufficient": true,
+          "ci95": [
+            0.454,
+            0.883
+          ],
+          "label": "10/14 = 71%"
+        },
+        "parent_partial": {
+          "n": 14,
+          "hits": 11,
+          "rate": 0.786,
+          "sufficient": true,
+          "ci95": [
+            0.524,
+            0.924
+          ],
+          "label": "11/14 = 79%"
+        },
+        "source_hit": {
+          "n": 14,
+          "hits": 14,
+          "rate": 1.0,
+          "sufficient": true,
+          "ci95": [
+            0.785,
+            1.0
+          ],
+          "label": "14/14 = 100%"
+        },
+        "mean_child_tokens": 1334,
+        "mean_parent_tokens": 1145,
+        "child_no_delivery": 0,
+        "parent_no_delivery": 0
+      }
+    },
+    "quarantined_regression_tests": {
+      "What is the Precision@5 for the BM25_ONLY method in the Meridian Retri": {
+        "child_strict": true,
+        "parent_strict": true
+      },
+      "According to Meridian Retrieval Benchmark Internal Report R-4471, how ": {
+        "child_strict": true,
+        "parent_strict": true
+      },
+      "What is the configured value and application stage for efConstruction ": {
+        "child_strict": true,
+        "parent_strict": false
+      },
+      "How does HYBRID_RRF_RR process the top 50 candidates compared to HYBRI": {
+        "child_strict": true,
+        "parent_strict": true
+      }
+    }
+  },
+  "per_item": [
+    {
+      "question": "What are the two main drawbacks of k-NN graph approaches identified in proximity graph techniques?",
+      "stratum": "simple_factual",
+      "source_id": "assets/hnsw_p2.png",
+      "anchor": "asset",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {},
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 5,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1192,
+      "parent_tokens": 1242,
+      "text_sources": [
+        "gemini_caption",
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "By what alternative name is the Navigable Small World (NSW) proximity graph algorithm also known?",
+      "stratum": "exact_identifier",
+      "source_id": "assets/hnsw_p2.png",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "In [25, 26, 30] authors proposed a proximity graph K-ANNS algorithm called Navigable Small World (NSW, also known as Metricized Small World, MSW)": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1155,
+      "parent_tokens": 1162,
+      "text_sources": [
+        "gemini_caption",
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What model and baseline are evaluated in Figure 1 for performance across document positions in a 20-document context?",
+      "stratum": "table_or_image",
+      "source_id": "assets/lost-in-the-middle_p1.png",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "20 Total Retrieved Documents (~4K tokens)": "contained",
+        "gpt-3.5-turbo-0613": "contained",
+        "gpt-3.5-turbo-0613 (closed-book)": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1312,
+      "parent_tokens": 994,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to the caption of Figure 1 in 'Lost in the Middle', what are the terms used to describe the biases where models perform better at the very beginning versus the end of their input context?",
+      "stratum": "simple_factual",
+      "source_id": "assets/lost-in-the-middle_p1.png",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "occurs at the very beginning (primacy bias) or end of its input context (recency bias)": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1353,
+      "parent_tokens": 1089,
+      "text_sources": [
+        "gemini_caption",
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What approximate token count is associated with 20 total retrieved documents in the multi-document QA evaluation subplots?",
+      "stratum": "table_or_image",
+      "source_id": "assets/lost-in-the-middle_p5.png",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "20 Total Retrieved Documents (~4K tokens)": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 10,
+      "n_parents": 7,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1201,
+      "parent_tokens": 1083,
+      "text_sources": [
+        "gemini_caption",
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which evaluated model line in Figure 5 corresponds to the dashed coral line with dots?",
+      "stratum": "table_or_image",
+      "source_id": "assets/lost-in-the-middle_p5.png",
+      "anchor": "asset",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {},
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 10,
+      "n_parents": 8,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1289,
+      "parent_tokens": 1255,
+      "text_sources": [
+        "gemini_caption",
+        "markdown",
+        "page_text_clip"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to the node contents diagram in Figure 1, what are the child nodes and text embedding vector for node Index #8?",
+      "stratum": "table_or_image",
+      "source_id": "assets/raptor_p2.png",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Child Nodes: 2, 3": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1436,
+      "parent_tokens": 1335,
+      "text_sources": [
+        "gemini_caption",
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which three language models were used in controlled experiments to show that RAPTOR outperforms current retrieval augmentation?",
+      "stratum": "simple_factual",
+      "source_id": "assets/raptor_p2.png",
+      "anchor": "asset",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {},
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1432,
+      "parent_tokens": 986,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the Precision@5 for the BM25_ONLY method in the Meridian Retrieval Benchmark report?",
+      "stratum": "table_or_image",
+      "source_id": "benchmark-report.pdf",
+      "anchor": "needle",
+      "quarantined": true,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "|BM25_ONLY|0.601|0.549|11|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 10,
+      "n_parents": 9,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1308,
+      "parent_tokens": 1309,
+      "text_sources": [
+        "markdown",
+        "page_text_clip"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to Meridian Retrieval Benchmark Internal Report R-4471, how many queries in the evaluation set contain an exact identifier?",
+      "stratum": "simple_factual",
+      "source_id": "benchmark-report.pdf",
+      "anchor": "needle",
+      "quarantined": true,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "evaluation set contains 400 queries, 90 of which contain an exact identifier": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1160,
+      "parent_tokens": 723,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the configured value and application stage for efConstruction in the configuration parameters table?",
+      "stratum": "table_or_image",
+      "source_id": "benchmark-report.pdf",
+      "anchor": "needle",
+      "quarantined": true,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "|efConstruction|200|build time|no query effect|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 2,
+      "n_children": 9,
+      "n_parents": 0,
+      "child_no_delivery": false,
+      "parent_no_delivery": true,
+      "child_tokens": 1438,
+      "parent_tokens": 0,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "How does HYBRID_RRF_RR process the top 50 candidates compared to HYBRID_RRF?",
+      "stratum": "simple_factual",
+      "source_id": "benchmark-report.pdf",
+      "anchor": "needle",
+      "quarantined": true,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "HYBRID_RRF_RR adds a cross-encoder reranker over\nthe top 50 candidates, which is where the latency comes from.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 10,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1438,
+      "parent_tokens": 685,
+      "text_sources": [
+        "markdown",
+        "page_text_clip"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "How many context units and tokens are used for level C0 in the Podcast Transcripts dataset according to Table 2?",
+      "stratum": "table_or_image",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 2: Number of context units (community summaries for **C0-C3** and text chunks for **TS** )": "contained",
+        "**Units**|34|367|969|1310|1669|55|555|1797|2142|3197|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1357,
+      "parent_tokens": 1368,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What percentage reduction in context tokens does GraphRAG achieve compared to source text summarization for root-level community summaries (C0)?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "while for root-level community summaries ( **C0** ), it required over 97% fewer tokens.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 5,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1266,
+      "parent_tokens": 1290,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to Table 3, what was the average number of extracted claims for condition C2 on the Podcast Transcripts dataset?",
+      "stratum": "table_or_image",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 3: Average number of extracted claims, reported by condition and dataset type.": "contained",
+        "|C2|31.62|**32.46**|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1156,
+      "parent_tokens": 1364,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "When comparing non-tied aggregated LLM labels to claim-based labels, what percentage of pairwise comparisons matched for comprehensiveness?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "the aggregated LLM label matched the claim-based label in 78% of pairwise comparisons for comprehensiveness and 69-70% for diversity": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1252,
+      "parent_tokens": 1366,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In Table 4, what is the average number of clusters reported for the News Articles dataset under condition C2 at a distance threshold of 0.7?",
+      "stratum": "table_or_image",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 4: Average number of clusters across different distance thresholds, reported by condition and dataset type.": "contained",
+        "News Articles|0.6<br>0.7|**21.65**<br>**20.19**|20.38<br>19.06|20.30<br>19.03|20.52<br>19.13|20.13<br>18.62|16.78<br>15.80|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 7,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1392,
+      "parent_tokens": 1129,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What mechanism do the authors propose as an exploratory approach that follows the information scent contained in higher-level community summaries?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "implemented as a more exploratory \u201cdrill down\u201d mechanism that follows the information scent contained in higher-level community summaries.": "absent"
+      },
+      "needle_fraction": 0.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1268,
+      "parent_tokens": 1444,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the example LLM-generated assessment on the News article dataset, which system won the evaluation metric 'Directness'?",
+      "stratum": "table_or_image",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "**Directness: Winner=2 (Na\u00a8\u0131ve RAG)**. Answer 2 is better because it directly lists specific public": "contained",
+        "Table 5: Example question, answers, and LLM-generated assessments for the News article dataset.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1359,
+      "parent_tokens": 1345,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which public figures were specifically highlighted in the Na\u00efve RAG response to the question regarding repeatedly mentioned public figures in entertainment articles?",
+      "stratum": "table_or_image",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "**Taylor Swift**[...] **Travis Kelce**[...] **Britney Spears**[...] **Justin Timberlake**[...]": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 1,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1435,
+      "parent_tokens": 1027,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In Table 6 under the Diversity metric, what are the Mean 1 and Mean 2 scores for the pairwise comparison of C0 vs C1 on the News Articles dataset?",
+      "stratum": "table_or_image",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "Table 6: Pairwise comparisons of six conditions on four metrics across 125 questions and two datasets.": "absent",
+        "||C0|C1|49.76|50.24|-0.13|1|39.68|60.32|-3.61|**0.003**|": "absent"
+      },
+      "needle_fraction": 0.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1393,
+      "parent_tokens": 1400,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the brute-force (BF) search time and dimensionality (d) for the CoPhIR dataset listed in Table 1?",
+      "stratum": "table_or_image",
+      "source_id": "hnsw.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "CoPhIR|MPEG-7 features extracted from the images [53]|2M|272|370 ms|L2|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1276,
+      "parent_tokens": 1245,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which compiler version and optimization flag were used to compile Hierarchical NSW for the vector space benchmark experiments?",
+      "stratum": "exact_identifier",
+      "source_id": "hnsw.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Hierarchical NSW was compiled using the GCC 5.3 with -Ofast optimization flag.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1395,
+      "parent_tokens": 1104,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What are the build time and peak memory consumption for Hierarchical NSW on the 200M subset of 1B SIFT when configured with M=16 and efConstruction=500?",
+      "stratum": "table_or_image",
+      "source_id": "hnsw.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "|Hierarchical NSW|5.6 hours|64 Gb|_M_=16,_efConstruction_=500 (1)|": "contained",
+        "Parameters for comparison between Hierarchical NSW and Faiss on a 200M subset of 1B SIFT dataset.": "absent"
+      },
+      "needle_fraction": 0.5,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1309,
+      "parent_tokens": 1489,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "On which dataset was the strongest enhancement of Hierarchical NSW over NSW observed (almost 3 orders of magnitude)?",
+      "stratum": "simple_factual",
+      "source_id": "hnsw.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "The strongest enhancement over NSW, almost by 3 orders of magnitude is observed for the dataset with the lowest dimensionality, the wiki-8 with JS-divergence.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1365,
+      "parent_tokens": 1405,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What are the MAP, NDCG@10, and Recall@1k scores for HyDE on the DL19 benchmark without relevance judgements?",
+      "stratum": "table_or_image",
+      "source_id": "hyde.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "HyDE|**41.8**|**61.3**|**88.0**|**38.2**|**57.9**|**84.4**|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 7,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1458,
+      "parent_tokens": 1494,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the evaluation on Mr.TyDi (Table 3), what is the MRR@100 score of HyDE on the Japanese subset?",
+      "stratum": "table_or_image",
+      "source_id": "hyde.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 3: MRR@100 on Mr.Tydi.": "contained",
+        "|HyDE|**41.7**|**30.6**|**30.7**|41.3|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1275,
+      "parent_tokens": 1226,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What specific model version of the 52-billion Cohere model was evaluated as an instruction LM for HyDE on TREC DL19/20?",
+      "stratum": "exact_identifier",
+      "source_id": "hyde.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "In particular, we consider a 52-billion Cohere model (command-xlarge-20221108) and a 11-billion FLAN model (FLAN-T5-xxl; Wei et al. (2022)).": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1318,
+      "parent_tokens": 1183,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What method does MPT-30B-Instruct use to represent positional information?",
+      "stratum": "simple_factual",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "MPT-30B-Instruct uses ALiBi (Press et al., 2022) to represent positional information.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1395,
+      "parent_tokens": 1255,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the closed-book accuracy and oracle accuracy for the LongChat-13B (16K) model on the multi-document question answering task?",
+      "stratum": "table_or_image",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "|LongChat-13B (16K)|35.0%|83.4%|": "contained",
+        "Table 1: Closed-book and oracle accuracy of language models on the multi-document question answering task.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 8,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1320,
+      "parent_tokens": 1456,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to the evaluation on multi-document QA experiments, how much would it have cost to evaluate GPT-4 on the full multi-document QA and key-value retrieval experiments?",
+      "stratum": "simple_factual",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Evaluating GPT-4 on the full multi-document QA and key-value retrieval experiments would cost upwards of $6000.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 6,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1257,
+      "parent_tokens": 1362,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What value corresponds to the key \"9f4a92b9-5f69-4725-ba1e-403f08dea695\" in the example JSON object shown in Figure 6 of the synthetic key-value retrieval task?",
+      "stratum": "exact_identifier",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "\"9f4a92b9-5f69-4725-ba1e-403f08dea695\": \"703a7ce5-f17f-4e6d-b895-5836ba5ec71c\"": "contained",
+        "Key: \"**9f4a92b9-5f69-4725-ba1e-403f08dea695**\"": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 6,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1284,
+      "parent_tokens": 1416,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "How many key-value pairs are tested across the different input context lengths in the synthetic key-value retrieval task experiments?",
+      "stratum": "simple_factual",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "We experiment with input contexts containing 75, 140, and 300 key-value pairs (500 examples each).": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1347,
+      "parent_tokens": 1052,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the maximum token count for LongChat-13B (16K) in the 30-document question answering setting?",
+      "stratum": "table_or_image",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 3: Token count statistics for each of the evaluated models on each of the document question answering settings.": "contained",
+        "LongChat-13B (16K)|1749.9_\u00b1_112.4|2511|3464.6_\u00b1_202.3|4955|5181.9_\u00b1_294.7|7729": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 8,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1338,
+      "parent_tokens": 1338,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What are the average and standard deviation token counts for MPT-30B in the 140 KV pairs retrieval setting?",
+      "stratum": "table_or_image",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 4: Token count statistics for each of the evaluated models on each of the key-value (KV) retrieval settings.": "contained",
+        "MPT-30B|4110.5_\u00b1_23.8|4187|7600.9_\u00b1_31.1|7687|16192.4_\u00b1_46.6|16319": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 7,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1306,
+      "parent_tokens": 1445,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the performance of LongChat-13B (16K) when evaluated on the multi-document QA task with 20 total retrieved documents at Index 14?",
+      "stratum": "table_or_image",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 6: Model performance when evaluated on the multi-document QA task with 20 total retrieved documents.": "absent",
+        "|LongChat-13B (16K)|68.6%|57.4%|55.3%|52.5%|55.0%|": "contained"
+      },
+      "needle_fraction": 0.5,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 6,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1271,
+      "parent_tokens": 1449,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the multi-document QA task evaluation with 30 total retrieved documents, what performance did GPT-3.5-Turbo (16K) achieve at Index 9?",
+      "stratum": "table_or_image",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 7: Model performance when evaluated on the multi-document QA task with 30 total retrieved documents.": "absent",
+        "|GPT-3.5-Turbo (16K)|73.4%|55.1%|50.5%|50.9%|51.8%|54.9%|63.7%|": "contained"
+      },
+      "needle_fraction": 0.5,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1370,
+      "parent_tokens": 1205,
+      "text_sources": [
+        "gemini_caption",
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What part number should be replaced if fault code ERR_5522 recurs within one hour on an MRA appliance?",
+      "stratum": "exact_identifier",
+      "source_id": "manual.docx",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "If ERR_5522 recurs within one hour, replace part number PN-8891-A.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 30,
+      "n_parents": 24,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1137,
+      "parent_tokens": 1461,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the lead time and model compatibility for part number PN-8891-B?",
+      "stratum": "table_or_image",
+      "source_id": "manual.docx",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "| PN-8891-B | Index shard controller board, revision B | MRA-8800 only | 10 days |": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 31,
+      "n_parents": 18,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1235,
+      "parent_tokens": 1243,
+      "text_sources": [
+        "markdown",
+        "page_text_clip"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What accuracy score does Ragas achieve for faithfulness in pairwise comparisons on the WikiEval dataset?",
+      "stratum": "table_or_image",
+      "source_id": "ragas.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 1: Agreement with human annotators in pairwise comparisons of faithfulness, answer relevance and context relevance, using the WikEval dataset (accuracy).": "contained",
+        "|Ragas|**0.95**|**0.78**|**0.70**|": "absent"
+      },
+      "needle_fraction": 0.5,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1383,
+      "parent_tokens": 1499,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "How were ties handled when ChatGPT assigned the same score to both candidate answers in the GPT Score baseline?",
+      "stratum": "simple_factual",
+      "source_id": "ragas.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Ties, where the same score is assigned by the LLM to both answer candidates, were broken randomly. The second baseline, shown as _GPT Ranking_": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 5,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1190,
+      "parent_tokens": 1196,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the ROUGE score achieved by SBERT with RAPTOR on NarrativeQA when using UnifiedQA-3B as the language model?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 1: **NarrativeQA Performance With + Without RAPTOR:**": "contained",
+        "|**SBERT with RAPTOR**|**30.87%**|**23.50%**|**6.42%**|**19.20%**|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 10,
+      "n_parents": 6,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1397,
+      "parent_tokens": 1442,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the F-1 Match score of CoLT5 XL on the QASPER dataset according to the comparison table?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 5: Results on F-1 Match scores of various models on the QASPER dataset.": "contained",
+        "CoLT5 XL (Ainslie et al.,2023)|53.9|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 10,
+      "n_parents": 9,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1412,
+      "parent_tokens": 1412,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "On the QuALITY dev dataset, what accuracy does RAPTOR achieve when paired with the GPT-3 language model?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 4: Comparison of accuracies on the QuALITY dev dataset for two different language models": "absent",
+        "|**RAPTOR**|**62.4**|**56.6**|": "contained"
+      },
+      "needle_fraction": 0.5,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 8,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1400,
+      "parent_tokens": 1458,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What accuracy score does RAPTOR + GPT-4 achieve on the QuALITY dataset hard subset?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 7: Accuracies of the QuALITY dataset on both the overall test set and the more challenging hard subset.": "contained",
+        "|**RAPTOR + GPT-4**|**82.6**|**76.2**|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 10,
+      "n_parents": 9,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1436,
+      "parent_tokens": 1413,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the layer querying experiment for Story 1 from the QuALITY dataset, what performance is achieved when querying 3 layers starting from Layer 2?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 8: Performance of RAPTOR when querying different tree layers for Story 1 from the QuALITY dataset.": "contained",
+        "|3 layers|-|-|**73.68**|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 14,
+      "n_parents": 10,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1385,
+      "parent_tokens": 835,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the RAPTOR tree summarization analysis across datasets, what is the average summary length in tokens for the QASPER dataset?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 10: Statistics of Average Summary Length and Child Node Length Across Datasets": "contained",
+        "|QASPER|145.9|86.2|5.7|.35|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1349,
+      "parent_tokens": 1433,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What percentage of sampled nodes in RAPTOR were found to contain some form of hallucination during manual evaluation?",
+      "stratum": "simple_factual",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Out of the 150 nodes sampled, 4% (6 nodes) contained some form of hallucination.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1256,
+      "parent_tokens": 483,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the evaluation of RAPTOR querying different tree layers for Story 2 (Table 14), what performance score is achieved when querying 2 layers starting from Layer 1?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 14: Performance of RAPTOR when querying different layers of the tree for Story 2.": "contained",
+        "|2 layers|-|**64.7**|52.9|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 16,
+      "n_parents": 16,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1388,
+      "parent_tokens": 1388,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What weights were originally applied in the BLEU-4 calculation script before being modified to (0.25, 0.25, 0.25, 0.25)?",
+      "stratum": "simple_factual",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "The original script applied a weight of 1 to the highest order n-gram (4-gram) and 0 to the rest in its BLEU-4 calculation (i.e., weights=(0, 0, 0, 1)).": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1207,
+      "parent_tokens": 681,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to Table 18, what is the percentage of retrieved nodes coming from non-leaf nodes for the Quality dataset when using the BM25 retriever?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 18: Percentage of nodes from non-leaf nodes across different datasets and retrievers": "contained",
+        "|Quality|32.28%|24.41%|32.36%|": "absent"
+      },
+      "needle_fraction": 0.5,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 8,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1327,
+      "parent_tokens": 1308,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the performance score of RAPTOR for Story 3 when querying 3 layers starting from Layer 2?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 15: Performance of RAPTOR when querying different layers of the tree for Story 3.": "contained",
+        "|3 layers|-|-|**83.3**|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 15,
+      "n_parents": 15,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1344,
+      "parent_tokens": 1344,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What percentage of retrieved nodes come from Layer 4 for the NarrativeQA dataset when using DPR as the retriever?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 19: Percentage of nodes from different layers with DPR as the retriever": "contained",
+        "|4|0.003%|-|-|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 13,
+      "n_parents": 11,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1266,
+      "parent_tokens": 939,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "When using BM25 as the retriever, what percentage of nodes retrieved for the Quality dataset are from Layer 1?",
+      "stratum": "table_or_image",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 21: Percentage of nodes from different layers with BM25 as the retriever": "contained",
+        "|1|28.79%|28.85%|21.57%|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 15,
+      "n_parents": 13,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1335,
+      "parent_tokens": 1320,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What are the four types of reflection tokens used in SELF-RAG, along with their possible output values?",
+      "stratum": "table_or_image",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 1: Four types of reflection tokens used in SELF-RAG. Each type uses several tokens to represent its output values.": "contained",
+        "|**Retrieve**|_x_/_x, y_|_{_yes, no, continue_}_|Decides when to retrieve with_R_|": "contained",
+        "|**ISREL**|_x, d_|_{_**relevant**, irrelevant_}_|_d_provides useful information to solve_x_.|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1315,
+      "parent_tokens": 1327,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the SELF-RAG inference algorithm, which reflection token is predicted when Retrieve equals 'No'?",
+      "stratum": "multi_hop",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "**else if**<br>**Retrieve** ==No**then**": "absent",
+        "_Mgen_ predicts<br>**ISUSE** given_x, yt_|_\u25b7_Critique": "absent"
+      },
+      "needle_fraction": 0.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1399,
+      "parent_tokens": 1105,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the FactScore (FS) achieved by the SELF-RAG 7B model on the Bio task according to Table 2?",
+      "stratum": "table_or_image",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 2: Overall experiment results on six tasks.": "contained",
+        "SELF-RAG 7B|54.9|66.4|72.4|67.3|**81.2**|30.0|35.7|**74.3**|66.9|67.8|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1440,
+      "parent_tokens": 1231,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to the table of contents, on what page does Section A.3 'SELF-RAG Inference' begin?",
+      "stratum": "table_or_image",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "A.3\nSELF-RAG Inference . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 25,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1276,
+      "parent_tokens": 1181,
+      "text_sources": [
+        "markdown",
+        "page_text_clip"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which appendix section in the document outline provides the 'Full List of Instructions and Demonstrations for GPT-4'?",
+      "stratum": "exact_identifier",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "D Full List of Instructions and Demonstrations for GPT-4\n21": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1349,
+      "parent_tokens": 1316,
+      "text_sources": [
+        "markdown",
+        "page_text_clip"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the number of instances sourced from 'Open Assistant 1' in the training data statistics for the generator LM M?",
+      "stratum": "table_or_image",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "|Open Assistant 1|Instruction-following|Open-Instruct|9,464|": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1414,
+      "parent_tokens": 879,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to the reward prediction accuracy comparison using GPT-4 predictions as ground truth, what accuracy does FLAN-3B achieve on the ISREL reward prediction task?",
+      "stratum": "table_or_image",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": true,
+      "needle_coverage": {
+        "|FLAN-3B|85.6|73.1|**82.0**|72.1|": "contained",
+        "Figure 5: Reward prediction accuracy using GPT-4 predictions as ground-truth predictions.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 11,
+      "n_parents": 1,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1254,
+      "parent_tokens": 575,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What are the two stages GraphRAG uses an LLM for when building its graph index?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "first, to derive an entity knowledge graph from the source documents, then to pregenerate community summaries for all groups of closely related entities.": "absent"
+      },
+      "needle_fraction": 0.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1430,
+      "parent_tokens": 1187,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which organizational department at Microsoft are Newman Cheng, Joshua Bradley, and Steven Truitt affiliated with?",
+      "stratum": "multi_hop",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "2Microsoft Strategic Missions and Technologies": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1321,
+      "parent_tokens": 1257,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What community detection algorithm is utilized hierarchically in the GraphRAG pipeline to recursively detect sub-communities?",
+      "stratum": "exact_identifier",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "In our pipeline, we use Leiden community detection (Traag et al., 2019) in a hierarchical manner, recursively detecting sub-communities": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1175,
+      "parent_tokens": 1004,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the GraphRAG knowledge graph extraction process, how are duplicate instances of a given relationship represented in the graph edges?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Relationships are aggregated into graph edges, where the number of duplicates for a given relationship becomes edge weights.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1197,
+      "parent_tokens": 653,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which software library was used to implement Leiden community detection in the GraphRAG indexing process?",
+      "stratum": "exact_identifier",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "We implemented Leiden community detection using the graspologic library (Chung et al., 2019).": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1280,
+      "parent_tokens": 367,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "How many total nodes and edges were in the resulting graph after indexing the Podcast dataset?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "The indexing process resulted in a graph consisting of 8,564 nodes and 20,691 edges for the Podcast dataset": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 5,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1166,
+      "parent_tokens": 675,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the arXiv preprint identifier for the paper titled 'MultiHop-RAG: Benchmarking retrieval-augmented generation for multi-hop queries' by Tang and Yang?",
+      "stratum": "exact_identifier",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Tang, Y. and Yang, Y. (2024). MultiHop-RAG: Benchmarking retrieval-augmented generation for multi-hop queries. _arXiv preprint arXiv:2401.15391_ .": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 1,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1387,
+      "parent_tokens": 1162,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In which journal was the paper 'From Louvain to Leiden: guaranteeing well-connected communities' by Traag, Waltman, and Van Eck published?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Traag, V. A., Waltman, L., and Van Eck, N. J. (2019). From Louvain to Leiden: guaranteeing well-connected communities. _Scientific Reports_ , 9(1).": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 1,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1366,
+      "parent_tokens": 1162,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to the entity extraction prompt instructions, what specific fields must be extracted for each identified relationship pair?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "source entity: name of the source entity, as identified in step 1": "contained",
+        "target entity: name of the target entity, as identified in step 1": "contained",
+        "relationship strength: a numeric score indicating strength of the relationship between the source entity and target entity": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1309,
+      "parent_tokens": 1289,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What value should be assigned to the 'winner' field in the comparative evaluation prompt if the two answers are fundamentally similar with immaterial differences?",
+      "stratum": "simple_factual",
+      "source_id": "graphrag-local-to-global.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "either1(ifAnswer1isbetter)and2(ifAnswer2isbetter)or0iftheyarefundamentally\nsimilarandthedifferencesareimmaterial.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1287,
+      "parent_tokens": 1389,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "In the INSERT algorithm (Algorithm 1) for Hierarchical NSW, how is the new element's layer level l generated?",
+      "stratum": "exact_identifier",
+      "source_id": "hnsw.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "l \u2190 \u230a-ln( unif (0..1))\u2219 mL \u230b // new element\u2019s level": "contained",
+        "normalization factor for level generation mL": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1244,
+      "parent_tokens": 980,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What formula represents the average memory consumption per element in Hierarchical NSW based on link parameters?",
+      "stratum": "simple_factual",
+      "source_id": "hnsw.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Thus, the average memory consumption per element is (Mmax0+mL \u2219Mmax)\u2219bytes_per_link.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1168,
+      "parent_tokens": 1164,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the URL for the open-source code repository associated with the HyDE paper?",
+      "stratum": "exact_identifier",
+      "source_id": "hyde.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "Our open source code is available at https://github. com/texttron/hyde.": "absent"
+      },
+      "needle_fraction": 0.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 0,
+      "child_no_delivery": false,
+      "parent_no_delivery": true,
+      "child_tokens": 1336,
+      "parent_tokens": 0,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "How can HyDE be utilized practically as a search system evolves from its initial launch and its dense retriever grows stronger?",
+      "stratum": "simple_factual",
+      "source_id": "hyde.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "As the dense retriever grows stronger, more queries will be routed to it, with only less common and emerging ones going to HyDE backend.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1325,
+      "parent_tokens": 1431,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What template prompt is used to instruct the model to write a counter argument for a given passage?",
+      "stratum": "exact_identifier",
+      "source_id": "hyde.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Please write a counter argument for the passage Passage: [PASSAGE] Counter Argument:": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1149,
+      "parent_tokens": 343,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which specific languages are explicitly mentioned in the multilingual passage generation prompt template?",
+      "stratum": "simple_factual",
+      "source_id": "hyde.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Please write a passage in Swahili/Korean/Japanese/Bengali to answer the question in detail.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1331,
+      "parent_tokens": 1241,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the training context length for Flan-T5-XXL in both the encoder and decoder?",
+      "stratum": "simple_factual",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Flan-T5-XXL is trained with a sequences of 512 tokens (encoder and decoder).": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1268,
+      "parent_tokens": 1167,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What behavior does LongChat-13B (16K) exhibit when the key to retrieve is placed at the start of the input context in key-value retrieval?",
+      "stratum": "simple_factual",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "placed at the start of the input context, LongChat13B (16K) tends to generate code to retrieve the key, rather than outputting the value directly.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1337,
+      "parent_tokens": 980,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Who served as the TACL action editor thanked in the acknowledgments of the Lost in the Middle study?",
+      "stratum": "exact_identifier",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "We would like to thank Luke Zettlemoyer, who served as our TACL action editor": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1437,
+      "parent_tokens": 1427,
+      "text_sources": [
+        "gemini_caption",
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which researcher was specifically thanked in the paper's acknowledgements for assistance with the AmbigQA dataset?",
+      "stratum": "simple_factual",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Further, we are grateful to Sewon Min for her help with the AmbigQA dataset.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1126,
+      "parent_tokens": 359,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "How many random multi-document QA examples were used when evaluating GPT-4 (8K) with 20 total documents?",
+      "stratum": "simple_factual",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "We evaluate GPT-4 (8K) on a subset of 500 random multi-document QA examples with 20 total documents in each input context": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 6,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1324,
+      "parent_tokens": 1446,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What effect does randomizing the distractor order (and mentioning it in the prompt) have on performance when the relevant information is placed at the very beginning of the context?",
+      "stratum": "simple_factual",
+      "source_id": "lost-in-the-middle.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "randomization slightly decreases performance when the relevant information is at the very beginning of the context": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1083,
+      "parent_tokens": 1420,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which OpenAI model is used to generate text embeddings when computing the Answer Relevance score in Ragas?",
+      "stratum": "exact_identifier",
+      "source_id": "ragas.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "We then obtain embeddings for all questions using the text-embedding-ada-002 model, available from the OpenAI API.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 1,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1450,
+      "parent_tokens": 1148,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "By how much does coupling RAPTOR retrieval with GPT-4 improve performance on the QuALITY benchmark?",
+      "stratum": "simple_factual",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "coupling RAPTOR retrieval with the use of GPT-4, we can improve the best performance on the QuALITY benchmark by 20% in absolute accuracy.": "absent"
+      },
+      "needle_fraction": 0.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 6,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1403,
+      "parent_tokens": 1322,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What contact email address is provided for the authors of the RAPTOR paper published at ICLR 2024?",
+      "stratum": "exact_identifier",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "Parth Sarthi, Salman Abdullah, Aditi Tuli, Shubh Khanna, Anna Goldie, Christopher D. Manning Stanford University psarthi@cs.stanford.edu": "absent"
+      },
+      "needle_fraction": 0.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1279,
+      "parent_tokens": 1197,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which dataset was used to test both the tree traversal and collapsed tree approaches on 20 stories?",
+      "stratum": "exact_identifier",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "We tested both approaches on 20 stories from the QASPER dataset.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 5,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1393,
+      "parent_tokens": 1434,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the title of the paper published by Jeff Johnson, Matthijs Douze, and Herv\u00e9 J\u00e9gou in the IEEE Transactions on Big Data in 2019?",
+      "stratum": "exact_identifier",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "Jeff Johnson, Matthijs Douze, and Herv\u00b4e J\u00b4egou. Billion-Scale Similarity Search with GPUs. IEEE Transactions on Big Data , 7(3):535\u2013547, 2019.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 2,
+      "n_children": 6,
+      "n_parents": 1,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1376,
+      "parent_tokens": 326,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which embeddings and model were utilized in the ablation study comparing RAPTOR's clustering against balanced tree-style encoding on QuALITY?",
+      "stratum": "simple_factual",
+      "source_id": "raptor.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Both configurations in this ablation study utilized SBERT embeddings and UnifiedQA to maintain consistency in retrieval.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 7,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1298,
+      "parent_tokens": 855,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What parameter sizes were evaluated for SELF-RAG in the experiments described in the introductory paper?",
+      "stratum": "simple_factual",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "Experiments show that SELFRAG (7B and 13B parameters) significantly outperforms state-of-the-art LLMs and retrieval-augmented models": "absent"
+      },
+      "needle_fraction": 0.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 1,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1416,
+      "parent_tokens": 963,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Into what two categories are reflection tokens classified in the SELF-RAG framework?",
+      "stratum": "simple_factual",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {
+        "Reflection tokens are categorized into retrieval and critique tokens to indicate the need for retrieval and its generation quality respectively": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1272,
+      "parent_tokens": 1105,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which funding organization or award supported Akari Asai during the Self-RAG work?",
+      "stratum": "simple_factual",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Akari Asai is supported by the IBM Fellowship.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 20,
+      "n_parents": 15,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1216,
+      "parent_tokens": 1294,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What grant number is associated with the DARPA MCS program funding via NIWC Pacific in the Self-RAG acknowledgements?",
+      "stratum": "exact_identifier",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "DARPA MCS program through NIWC Pacific (N66001-19-2-4031), NSF IIS-2044660": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 24,
+      "n_parents": 14,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1277,
+      "parent_tokens": 1162,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "Which table demonstrates the instructions and demonstrations used for collecting the five-way output tokens for IsUse?",
+      "stratum": "exact_identifier",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "Table 12 shows an instruction and demonstrations used to collect the five-way output tokens for **<mark>I</mark> S** **<mark>U</mark> SE** .": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 9,
+      "n_parents": 3,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1309,
+      "parent_tokens": 1243,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the judgment on whether retrieval is needed for the instruction \"Find the area of a circle given its radius. Radius = 4\" according to the demonstrations in Table 8?",
+      "stratum": "table_or_image",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "**Instruction** Find the area of a circle given its radius. Radius = 4 **Need retrieval?** [No]": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 8,
+      "n_parents": 4,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1401,
+      "parent_tokens": 1190,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "According to the perceived utility rubric, what does a score of 3 indicate?",
+      "stratum": "simple_factual",
+      "source_id": "self-rag.pdf",
+      "anchor": "needle",
+      "quarantined": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
+      "needle_coverage": {
+        "3: The response is acceptable, but some major additions or improvements are needed to satisfy users\u2019 needs.": "contained"
+      },
+      "needle_fraction": 1.0,
+      "source_hit": true,
+      "rank_first_hit": 0,
+      "n_children": 6,
+      "n_parents": 2,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 1333,
+      "parent_tokens": 1458,
+      "text_sources": [
+        "markdown"
+      ],
+      "skipped": ""
+    },
+    {
+      "question": "What is the dollar cost per query of running reciprocal rank fusion in production?",
+      "stratum": "out_of_scope",
+      "source_id": "",
+      "anchor": "none",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {},
+      "needle_fraction": 0.0,
+      "source_hit": false,
+      "rank_first_hit": null,
+      "n_children": 0,
+      "n_parents": 0,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 0,
+      "parent_tokens": 0,
+      "text_sources": [],
+      "skipped": "out_of_scope: scored in the generation tier, not here"
+    },
+    {
+      "question": "Which cloud provider does the Meridian Retrieval Appliance ship on?",
+      "stratum": "out_of_scope",
+      "source_id": "",
+      "anchor": "none",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {},
+      "needle_fraction": 0.0,
+      "source_hit": false,
+      "rank_first_hit": null,
+      "n_children": 0,
+      "n_parents": 0,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 0,
+      "parent_tokens": 0,
+      "text_sources": [],
+      "skipped": "out_of_scope: scored in the generation tier, not here"
+    },
+    {
+      "question": "What is the p99 latency of gemini-embedding-001 under load?",
+      "stratum": "out_of_scope",
+      "source_id": "",
+      "anchor": "none",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {},
+      "needle_fraction": 0.0,
+      "source_hit": false,
+      "rank_first_hit": null,
+      "n_children": 0,
+      "n_parents": 0,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 0,
+      "parent_tokens": 0,
+      "text_sources": [],
+      "skipped": "out_of_scope: scored in the generation tier, not here"
+    },
+    {
+      "question": "How many engineers were on the GraphRAG team?",
+      "stratum": "out_of_scope",
+      "source_id": "",
+      "anchor": "none",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {},
+      "needle_fraction": 0.0,
+      "source_hit": false,
+      "rank_first_hit": null,
+      "n_children": 0,
+      "n_parents": 0,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 0,
+      "parent_tokens": 0,
+      "text_sources": [],
+      "skipped": "out_of_scope: scored in the generation tier, not here"
+    },
+    {
+      "question": "What is the licence fee for the BGE reranker?",
+      "stratum": "out_of_scope",
+      "source_id": "",
+      "anchor": "none",
+      "quarantined": false,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
+      "needle_coverage": {},
+      "needle_fraction": 0.0,
+      "source_hit": false,
+      "rank_first_hit": null,
+      "n_children": 0,
+      "n_parents": 0,
+      "child_no_delivery": false,
+      "parent_no_delivery": false,
+      "child_tokens": 0,
+      "parent_tokens": 0,
+      "text_sources": [],
+      "skipped": "out_of_scope: scored in the generation tier, not here"
+    }
+  ],
+  "degradations": []
+}

@@ -1,0 +1,18 @@
+{
+ "id": "918a93b6c0ab",
+ "kind": "ingest",
+ "state": "failed",
+ "created_at": "2026-08-25T20:06:15+00:00",
+ "updated_at": "2026-08-25T20:06:15+00:00",
+ "started_at": "2026-08-25T20:06:15+00:00",
+ "finished_at": "2026-08-25T20:06:15+00:00",
+ "progress": {
+  "stage": "",
+  "current": 0,
+  "total": 0,
+  "detail": ""
+ },
+ "result": null,
+ "error": "ValueError: deliberate\nTraceback (most recent call last):\n  File \"C:\\Users\\Inzint1\\Projects\\learning-rag\\ragkit\\jobs.py\", line 178, in _run\n    job.result = fn(job)\n                 ~~^^^^^\n  File \"<stdin>\", line 19, in boom\nValueError: deliberate\n",
+ "params": {}
+}

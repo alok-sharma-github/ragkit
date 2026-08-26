@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#f6f5f2;color:#23282e;font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3a5d8f;text-decoration:none}
+a:hover{color:#2c4a75;text-decoration:underline}
+::selection{background:rgba(58,93,143,.18)}
+@keyframes ragkit-pulse{0%,100%{opacity:.25}50%{opacity:1}}
+</style>
+</helmet>
+<div style="display:grid;grid-template-columns:264px 1fr;min-height:100vh">
+  <div style="background:#f1efe9;border-right:1px solid #ddd9cf;padding:20px 14px;display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;align-items:baseline;gap:10px;padding:0 8px 14px"><div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600">RAGkit</div><div style="font-size:10.5px;color:#8a857a">your documents, with receipts</div></div>
+
+    <sc-if value="{{ notEmpty }}" hint-placeholder-val="{{ true }}">
+      <div style="border:1px solid #3a5d8f;color:#3a5d8f;background:#fff;border-radius:5px;padding:9px 12px;font-size:13px;font-weight:500;text-align:center;cursor:pointer" style-hover="background:#3a5d8f;color:#fff">Ask a new question</div>
+      <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600;padding:18px 8px 6px">CORPUS</div>
+      <div onClick="{{ goCorpus }}" style="{{ navCorpusSt }}" style-hover="background:#fbfaf7">
+        <div style="font-size:13px;font-weight:500">Your documents</div>
+        <div style="font-size:11px;color:#8a857a;margin-top:2px">{{ sbDocsLine }}</div>
+      </div>
+      <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600;padding:18px 8px 6px">CONVERSATIONS</div>
+      <sc-for list="{{ convos }}" as="c" hint-placeholder-count="3">
+        <div onClick="{{ c.go }}" style="{{ c.st }}" style-hover="background:#fbfaf7">
+          <div style="font-size:13px;color:#23282e;display:flex;align-items:center;gap:7px"><span style="{{ c.titleSt }}">{{ c.title }}</span><sc-if value="{{ c.changed }}" hint-placeholder-val="{{ false }}"><span style="width:6px;height:6px;border-radius:50%;border:1.5px solid #a39d90;flex:none"></span></sc-if></div>
+          <div style="font-size:11px;color:#8a857a;margin-top:2px">{{ c.sub }}</div>
+        </div>
+      </sc-for>
+    </sc-if>
+    <sc-if value="{{ emptyMode }}">
+      <div style="border:1px solid #d5d0c5;color:#a39d90;background:#fbfaf7;border-radius:5px;padding:9px 12px;font-size:13px;text-align:center;cursor:default">Ask a new question — add a document first</div>
+      <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600;padding:18px 8px 6px">CORPUS</div>
+      <div style="padding:9px 8px"><div style="font-size:13px;color:#8a857a">Your documents</div><div style="font-size:11px;color:#a39d90;margin-top:2px">none yet</div></div>
+      <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600;padding:18px 8px 6px">CONVERSATIONS</div>
+      <div style="padding:9px 8px;font-size:11px;color:#a39d90">your questions will appear here</div>
+    </sc-if>
+
+    <div style="flex:1"></div>
+    <div style="font-size:10.5px;color:#a39d90;padding:0 8px 6px;line-height:1.6">Answers come only from the documents above — there is no general knowledge here.</div>
+    <sc-if value="{{ notEmpty }}" hint-placeholder-val="{{ true }}"><div onClick="{{ goEmpty }}" style="font-size:10.5px;color:#8a857a;padding:0 8px;cursor:pointer" style-hover="color:#23282e">Prototype: first-run state →</div></sc-if>
+    <sc-if value="{{ emptyMode }}"><div onClick="{{ goThread }}" style="font-size:10.5px;color:#8a857a;padding:0 8px;cursor:pointer" style-hover="color:#23282e">← Prototype: back to populated state</div></sc-if>
+  </div>
+
+  <div style="overflow-y:auto;max-height:100vh">
+    <sc-if value="{{ onThread }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Shell with conversation" style="max-width:680px;margin:0 auto;padding:40px 28px 60px">
+      <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+        <div style="font-family:'Source Serif 4',serif;font-size:21px;font-weight:600">Renagliptin dosing</div>
+        <div style="flex:1"></div>
+        <div onClick="{{ toggleScope }}" style="font-size:12px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:4px;padding:5px 11px;cursor:pointer;white-space:nowrap" style-hover="border-color:#3a5d8f">Scope: {{ scopeLabel }} ▾</div>
+      </div>
+
+      <sc-if value="{{ scopeOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #d5d0c5;border-radius:6px;padding:14px 16px;margin-top:12px">
+        <div style="font-size:11px;color:#8a857a;line-height:1.6">Answers in this conversation can only come from checked documents. Narrowing scope applies from your next question.</div>
+        <sc-for list="{{ scopeRows }}" as="d" hint-placeholder-count="5">
+          <div onClick="{{ d.toggle }}" style="display:flex;align-items:center;gap:10px;padding:8px 2px;cursor:pointer;border-top:1px solid #efede7;margin-top:6px">
+            <div style="{{ d.boxSt }}">{{ d.check }}</div>
+            <div style="flex:1"><span style="font-size:13px">{{ d.name }}</span><sc-if value="{{ d.inc }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:#a8792f">&nbsp; still describing images</span></sc-if></div>
+          </div>
+        </sc-for>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 2px;border-top:1px solid #efede7;margin-top:6px;opacity:.55">
+          <div style="width:15px;height:15px;border:1px dashed #c9c2b2;border-radius:3px"></div>
+          <div style="font-size:13px;color:#8a857a">scanned-archive_1998.pdf — can't be included; it couldn't be read</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <div style="height:1px;background:#e3dfd6;margin:18px 0 4px"></div>
+
+      <div style="margin-top:24px">
+        <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16.5px;font-weight:600;line-height:1.5;margin-top:4px">How did the dose groups compare on efficacy?</div>
+      </div>
+      <div style="margin-top:12px">
+        <div style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#3a5d8f;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f"></span>FROM YOUR DOCUMENTS · 6 passages read</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.85;margin-top:8px">HbA1c fell by roughly 0.6, 0.9, and 1.2 points at 2.5, 5, and 10 mg<span onClick="{{ tapF3 }}" style="{{ chF3 }}">Fig 3</span> and the reductions held through week 52.<span onClick="{{ tapB1 }}" style="{{ chB1 }}">1</span> Weight fell about 1.8 kg at the top dose.<span onClick="{{ tapF4 }}" style="{{ chF4 }}">Fig 4</span></div>
+      </div>
+
+      <div style="margin-top:30px">
+        <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16.5px;font-weight:600;line-height:1.5;margin-top:4px">Why is the 10 mg group's dropout higher?</div>
+      </div>
+      <div style="margin-top:12px">
+        <div style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#5d5850;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f"></span><span style="width:7px;height:7px;border-radius:50%;border:1.5px solid #a39d90;margin-left:-3px"></span>YOUR DOCUMENTS + THIS CONVERSATION · 2 new passages</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.85;margin-top:8px">Gastrointestinal intolerance drove most early discontinuations,<span onClick="{{ tapB2 }}" style="{{ chB2 }}">2</span> and adverse events rose with dose.<span onClick="{{ tapF6 }}" style="{{ chF6 }}">Fig 6</span> Set against the extra 0.3-point benefit at 10 mg,<span onClick="{{ tapTA }}" style="{{ chTA }}">T1 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span> that's the tradeoff you're seeing.</div>
+      </div>
+
+      <div style="margin-top:30px">
+        <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16.5px;font-weight:600;line-height:1.5;margin-top:4px">Would that still hold for older patients?</div>
+      </div>
+      <div style="margin-top:12px">
+        <div style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#8a857a;display:flex;align-items:center;gap:7px;flex-wrap:wrap"><span style="width:7px;height:7px;border-radius:50%;border:1.5px solid #a39d90"></span>THIS CONVERSATION · <span style="color:#a8792f">two steps from your documents</span></div>
+        <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.85;margin-top:8px">Nothing we've read speaks to age. The efficacy and dropout figures above<span onClick="{{ tapTA }}" style="{{ chTA }}">T1 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span><span onClick="{{ tapTB }}" style="{{ chTB }}">T2 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span> are trial-wide averages; whether they hold in older patients isn't something this conversation can tell you.</div>
+        <div style="background:#ffffff;border:1px solid #e3dfd6;border-radius:4px;padding:14px 16px;margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div style="font-size:13px;color:#5d5850;line-height:1.6;flex:1;min-width:240px">Your documents can answer this directly.</div>
+          <div style="background:#3a5d8f;color:#fff;font-size:12.5px;font-weight:500;padding:7px 14px;border-radius:4px;cursor:pointer;white-space:nowrap" style-hover="background:#2c4a75">Ask fresh: “renagliptin in older patients”</div>
+        </div>
+      </div>
+
+      <sc-if value="{{ narrowed }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:12px;margin-top:30px">
+        <div style="flex:1;height:1px;background:#e3dfd6"></div>
+        <div style="font-size:11.5px;color:#5d5850;text-align:center;line-height:1.6;max-width:420px">Scope narrowed to {{ scopeLabel }} — {{ excludedNames }} excluded from here on. Answers above still used it.</div>
+        <div style="flex:1;height:1px;background:#e3dfd6"></div>
+      </div>
+      </sc-if>
+
+      <div style="margin-top:40px">
+        <input placeholder="Ask about your documents…" style="width:100%;box-sizing:border-box;border:1px solid #d5d0c5;border-radius:6px;padding:13px 15px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;background:#fff;color:#23282e;outline:none">
+        <sc-if value="{{ showComposerLine }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:11.5px;color:#8a857a;margin-top:8px">{{ composerLine }}</div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ onCorpus }}">
+    <div data-screen-label="Corpus view" style="max-width:760px;margin:0 auto;padding:40px 28px 60px">
+      <div style="font-family:'Source Serif 4',serif;font-size:21px;font-weight:600">Your documents</div>
+      <div style="font-size:12.5px;color:#8a857a;margin-top:6px">{{ corpusSummary }}</div>
+      <div style="margin-top:16px;max-width:540px">
+        <div style="display:flex;height:8px;border-radius:4px;overflow:hidden"><span style="background:#d5d0c5;width: {{ aggT }}"></span><span style="background:#a9bbd4;width: {{ aggB }}"></span><span style="background:#d9b98a;width: {{ aggI }}"></span></div>
+        <div style="font-size:11px;color:#8a857a;margin-top:7px;line-height:1.7">Of {{ passTotal }} retrievable passages: <span style="display:inline-block;width:8px;height:8px;background:#d5d0c5;border-radius:2px"></span> {{ aggTn }} plain text &nbsp; <span style="display:inline-block;width:8px;height:8px;background:#a9bbd4;border-radius:2px"></span> {{ aggBn }} from tables — structure may be inferred &nbsp; <span style="display:inline-block;width:8px;height:8px;background:#d9b98a;border-radius:2px"></span> {{ aggIn }} image descriptions — the assistant's words</div>
+      </div>
+
+      <div style="margin-top:22px">
+        <sc-for list="{{ corpusRows }}" as="d" hint-placeholder-count="5">
+          <div style="display:flex;gap:16px;align-items:center;padding:15px 4px;border-top:1px solid #e3dfd6;flex-wrap:wrap">
+            <div style="flex:1;min-width:230px">
+              <div style="font-size:13.5px;font-weight:600;color:#23282e">{{ d.name }}</div>
+              <div style="font-size:11.5px;color:#8a857a;margin-top:3px">{{ d.meta }}</div>
+              <sc-if value="{{ d.note }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:#5d5850;margin-top:4px;line-height:1.6;max-width:420px">{{ d.noteText }}</div></sc-if>
+            </div>
+            <sc-if value="{{ d.hasComp }}" hint-placeholder-val="{{ true }}">
+            <div style="width:110px;flex:none"><div style="display:flex;height:6px;border-radius:3px;overflow:hidden"><span style="background:#d5d0c5;width: {{ d.tw }}"></span><span style="background:#a9bbd4;width: {{ d.bw }}"></span><span style="background:#d9b98a;width: {{ d.iw }}"></span></div><div style="font-size:10.5px;color:#a39d90;margin-top:4px">{{ d.passLabel }}</div></div>
+            </sc-if>
+            <sc-if value="{{ d.isReady }}" hint-placeholder-val="{{ true }}"><div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#8a857a;width:150px;flex:none">READY</div></sc-if>
+            <sc-if value="{{ d.isInc }}"><div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#a8792f;width:150px;flex:none">SEARCHABLE · INCOMPLETE</div></sc-if>
+            <sc-if value="{{ d.isFail }}"><div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#5d5850;border:1px solid #c9c2b2;border-radius:3px;padding:2px 7px;flex:none">COULDN'T READ</div></sc-if>
+            <div onClick="{{ d.remove }}" style="font-size:12px;color:#8a857a;flex:none;cursor:pointer" style-hover="color:#23282e;text-decoration:underline">Remove</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="border:1px dashed #c9c2b2;border-radius:6px;padding:16px;margin-top:20px;text-align:center;font-size:12.5px;color:#8a857a">Drop files here, or <a href="#">browse</a> — you can ask questions while they prepare</div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ onRemove }}">
+    <div data-screen-label="Removal" style="max-width:680px;margin:0 auto;padding:40px 28px 60px">
+      <div onClick="{{ goCorpus }}" style="font-size:13px;color:#3a5d8f;cursor:pointer" style-hover="text-decoration:underline">← Your documents</div>
+      <div style="font-family:'Source Serif 4',serif;font-size:21px;font-weight:600;margin-top:16px">Remove {{ rm.name }}</div>
+
+      <sc-if value="{{ rmPending }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#fff;border:1px solid #d5d0c5;border-radius:6px;padding:18px 20px;margin-top:16px">
+        <div style="font-size:13px;color:#5d5850">Removing it deletes everything derived from it:</div>
+        <sc-if value="{{ rm.hasPass }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:13.5px;margin-top:12px">{{ rm.passLine }}</div>
+        <div style="font-size:13.5px;margin-top:6px">Its place in search — questions can no longer draw on it</div>
+        </sc-if>
+        <sc-if value="{{ rm.noPass }}">
+        <div style="font-size:13.5px;margin-top:12px">Nothing was searchable from this file — removing it just clears the record.</div>
+        </sc-if>
+        <sc-if value="{{ rm.hasCited }}" hint-placeholder-val="{{ true }}">
+        <div style="border-top:1px solid #efede7;margin-top:14px;padding-top:12px">
+          <div style="font-size:13px;color:#5d5850">{{ rm.citedLead }}</div>
+          <div style="font-size:13px;color:#3a5d8f;margin-top:6px">{{ rm.citedList }} · <a href="#">view them</a></div>
+          <div style="font-size:12.5px;color:#8a857a;margin-top:8px;line-height:1.6">Their answers stay readable as they were. Citations into this file will say the source is gone.</div>
+        </div>
+        </sc-if>
+        <div style="display:flex;gap:12px;margin-top:18px;align-items:center">
+          <div onClick="{{ confirmRemove }}" style="background:#3a5d8f;color:#fff;font-size:13px;font-weight:500;padding:8px 16px;border-radius:4px;cursor:pointer" style-hover="background:#2c4a75">Remove document</div>
+          <div onClick="{{ goCorpus }}" style="font-size:13px;color:#8a857a;cursor:pointer" style-hover="color:#23282e">Keep it</div>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ rmDone }}">
+      <div style="background:#fff;border:1px solid #d5d0c5;border-radius:6px;padding:18px 20px;margin-top:16px">
+        <div style="font-size:13.5px">Removed.</div>
+        <div style="font-size:12.5px;color:#5d5850;margin-top:6px;line-height:1.65">{{ rm.doneLine }}</div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ rm.hasCited }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:34px">
+        <div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600">A CONVERSATION THAT CITED IT, AFTERWARDS</div>
+        <div style="background:#ffffff;border:1px solid #e3dfd6;border-radius:4px;padding:16px 18px;margin-top:10px">
+          <div style="font-size:12px;color:#8a857a">Renagliptin dosing · turn 1</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:15.5px;line-height:1.8;margin-top:8px">HbA1c fell by roughly 0.6, 0.9, and 1.2 points at 2.5, 5, and 10 mg<span onClick="{{ tapGX }}" style="{{ chGX }}">Fig 3</span> and the reductions held through week 52.<span onClick="{{ tapB1 }}" style="{{ chB1 }}">1</span></div>
+          <div style="font-size:11.5px;color:#8a857a;margin-top:10px">The answer stays as it was given. The grey citation can no longer be opened or verified — its source was removed.</div>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ onEmpty }}">
+    <div data-screen-label="Empty state" style="max-width:620px;margin:0 auto;padding:72px 28px 60px">
+      <div style="font-family:'Source Serif 4',serif;font-size:27px;font-weight:600;line-height:1.35">Answers from your documents, with receipts.</div>
+      <div style="font-size:14px;color:#5d5850;margin-top:10px;line-height:1.7">There is no general knowledge here. If it isn't in what you add, the answer is “not in your documents.”</div>
+
+      <div style="background:#ffffff;border:1px solid #e3dfd6;border-radius:5px;padding:18px 20px;margin-top:28px">
+        <div><span style="font-size:10px;letter-spacing:1px;font-weight:600;color:#8a857a;border:1px dashed #c9c2b2;border-radius:3px;padding:2px 7px">EXAMPLE — NOT YOUR DOCUMENTS YET</span></div>
+        <div style="font-size:12px;color:#8a857a;margin-top:12px">What notice period does the services contract require?</div>
+        <div style="font-family:'Source Serif 4',serif;font-size:15.5px;line-height:1.8;margin-top:8px">Either party may terminate with 60 days' written notice,<span style="font-size:10.5px;font-family:'IBM Plex Sans',sans-serif;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:3px;white-space:nowrap">1</span> and the fee schedule steps down after year two.<span style="font-size:10.5px;font-family:'IBM Plex Sans',sans-serif;border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07);border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:3px;white-space:nowrap">Fig 1</span></div>
+        <div style="font-size:11.5px;color:#8a857a;margin-top:10px;line-height:1.7">Every claim links to the exact place it came from — <span style="color:#3a5d8f">blue</span> is quoted text, <span style="color:#a8792f">amber</span> is a chart or table the assistant read for you.</div>
+        <div style="border-top:1px solid #efede7;margin-top:14px;padding-top:12px">
+          <span style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#5d5850;border:1px solid #d5d0c5;border-radius:3px;padding:2px 7px">FOUND — NOT QUOTED</span>
+          <div style="font-family:'Source Serif 4',serif;font-size:14.5px;margin-top:8px">“It's in your documents. I won't quote it.”</div>
+          <div style="font-size:11.5px;color:#8a857a;margin-top:6px">When it can't verify something, it hands you the source instead of a guess.</div>
+        </div>
+      </div>
+
+      <div style="border:1px dashed #c9c2b2;border-radius:6px;padding:30px;margin-top:24px;text-align:center;background:#fbfaf7">
+        <div style="font-size:15px;font-weight:600;color:#3a5d8f">Add your first documents</div>
+        <div style="font-size:12px;color:#8a857a;margin-top:6px">Drop files here, or <a href="#">browse</a> — PDF, Word, spreadsheets. A large PDF takes a couple of minutes.</div>
+      </div>
+    </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ hasOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);width:min(620px,92vw);background:#ffffff;border:1px solid #d5d0c5;border-radius:6px;box-shadow:0 8px 32px rgba(35,40,46,.14);padding:16px 18px;z-index:50">
+    <div style="display:flex;justify-content:space-between;gap:12px">
+      <sc-if value="{{ card.isQ }}" hint-placeholder-val="{{ true }}"><div style="font-size:10.5px;letter-spacing:1.2px;color:#3a5d8f;font-weight:600">EXACT QUOTE</div></sc-if>
+      <sc-if value="{{ card.isR }}"><div style="font-size:10.5px;letter-spacing:1.2px;color:#a8792f;font-weight:600">THE ASSISTANT'S READING OF A CHART — NOT A QUOTATION</div></sc-if>
+      <sc-if value="{{ card.isConv }}"><div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600">SAID EARLIER IN THIS CONVERSATION — NOT FROM YOUR DOCUMENTS</div></sc-if>
+      <sc-if value="{{ card.isGone }}"><div style="font-size:10.5px;letter-spacing:1.2px;color:#8a857a;font-weight:600">SOURCE REMOVED</div></sc-if>
+      <div onClick="{{ closeCard }}" style="font-size:12px;color:#8a857a;cursor:pointer" style-hover="color:#23282e">close ×</div>
+    </div>
+    <div style="font-family:'Source Serif 4',serif;font-size:15px;line-height:1.7;margin-top:8px">“{{ card.text }}”</div>
+    <sc-if value="{{ card.hasOrigin }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#a8792f;margin-top:8px;line-height:1.6;display:flex;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:#a8792f;flex:none;margin-top:5px"></span><span>{{ card.origin }}</span></div></sc-if>
+    <sc-if value="{{ card.isGone }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#5d5850;margin-top:8px;line-height:1.6">{{ card.goneNote }}</div></sc-if>
+    <div style="font-size:12px;color:#8a857a;margin-top:10px">{{ card.src }}</div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;composerStateLine&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Composer&quot;}}">
+class Component extends DCLogic {
+  state = { view: 'thread', open: null, scopeOpen: false, excluded: {}, removeId: null, removed: {} };
+
+  corpus() {
+    return [
+      { id: 'clin', name: 'clinical-overview_2024.pdf', meta: '48 pages · added Aug 12', st: 'ready', comp: [350, 18, 3], citedBy: ['Renagliptin dosing (today)'] },
+      { id: 'eff', name: 'efficacy-appendix_2024.pdf', meta: '36 pages · added Aug 12', st: 'ready', comp: [180, 22, 5], citedBy: ['Renagliptin dosing (today)', 'Adverse events overview (Aug 5)'] },
+      { id: 'res', name: 'results-tables_2024.pdf', meta: '22 pages · added Aug 19', st: 'ready', comp: [55, 30, 1], citedBy: [] },
+      { id: 'saf', name: 'safety-appendix_2024.pdf', meta: '31 pages · added today', st: 'inc', comp: [120, 8, 2], imgDone: 22, imgTotal: 31, citedBy: ['Renagliptin dosing (today)'] },
+      { id: 'ven', name: 'vendor-costs_2025.xlsx', meta: 'spreadsheet · added Aug 20', st: 'ready', comp: [4, 4, 0], citedBy: ['Vendor spend Q3 2025 (yesterday)'] },
+      { id: 'scan', name: 'scanned-archive_1998.pdf', meta: 'added Aug 21', st: 'fail', citedBy: [], failNote: 'A scan with no text layer \u2014 nothing to search. An OCR\u2019d copy will work.' }
+    ];
+  }
+
+  cites() {
+    return {
+      b1: { k: 'q', text: 'Reductions in HbA1c were maintained in all renagliptin dose groups through week 52.', src: 'clinical-overview_2024.pdf · page 14' },
+      b2: { k: 'q', text: 'Gastrointestinal events accounted for the majority of early discontinuations, with onset typically within the first eight weeks.', src: 'clinical-overview_2024.pdf · page 19' },
+      f3: { k: 'r', text: 'As I read Figure 3: mean HbA1c falls about 0.6, 0.9, and 1.2 points by week 26 at the three doses.', src: 'efficacy-appendix_2024.pdf · Figure 3 · page 9' },
+      f4: { k: 'r', text: 'As I read Figure 4: the 10 mg weight curve ends near \u22121.8 kg at week 26.', src: 'efficacy-appendix_2024.pdf · Figure 4 · page 10' },
+      f6: { k: 'r', text: 'As I read Figure 6: adverse-event bars rise with dose \u2014 roughly 38%, 44%, and 51%.', src: 'safety-appendix_2024.pdf · Figure 6 · page 9' },
+      tA: { k: 'conv', text: 'the extra HbA1c benefit at 10 mg over 5 mg is about 0.3 points', origin: 'That claim rested on the assistant\u2019s reading of Figure 3 \u2014 it was never a quotation.', src: 'Turn 1 of this conversation' },
+      tB: { k: 'conv', text: 'dropout rises with dose', origin: 'That claim rested on the assistant\u2019s reading of Figure 6 \u2014 it was never a quotation.', src: 'Turn 2 of this conversation' },
+      gx: { k: 'gone', text: 'HbA1c fell by roughly 0.6, 0.9, and 1.2 points at the three doses', goneNote: 'This cited the assistant\u2019s reading of Figure 3 in efficacy-appendix_2024.pdf, which was removed. The answer stays as it was given; this claim can no longer be verified.', src: 'cited today · source removed' }
+    };
+  }
+
+  renderVals() {
+    const { view, open, scopeOpen, excluded, removeId } = this.state;
+    const wantComposer = this.props.composerStateLine ?? true;
+    const corpus = this.corpus();
+    const searchable = corpus.filter(d => d.st !== 'fail');
+    const failed = corpus.filter(d => d.st === 'fail');
+    const incDocs = searchable.filter(d => d.st === 'inc');
+    const inScope = searchable.filter(d => !excluded[d.id]);
+    const excludedDocs = searchable.filter(d => excluded[d.id]);
+    const incInScope = inScope.filter(d => d.st === 'inc');
+    const total = searchable.length, n = inScope.length;
+    const scopeLabel = n === total ? 'all ' + total + ' documents' : n + ' of ' + total + ' documents';
+    const plural = (c, s, p) => c + ' ' + (c === 1 ? s : p);
+    const sbDocsLine = total + ' searchable' +
+      (incDocs.length ? ' · ' + plural(incDocs.length, 'still describing images', 'still describing images') : '') +
+      (failed.length ? ' · ' + plural(failed.length, 'unreadable', 'unreadable') : '');
+    const incNames = incInScope.map(d => d.name).join(' and ');
+    const composerLine = incInScope.length
+      ? 'Asking ' + plural(n, 'document', 'documents') + ' · ' + incNames + (incInScope.length === 1 ? ' is' : ' are') + ' still describing images — answers that need them may be thinner'
+      : (n < total ? 'Asking ' + n + ' of ' + total + ' documents' : '');
+    const agg = [0, 0, 0];
+    searchable.forEach(d => d.comp.forEach((v, i) => agg[i] += v));
+    const passTotal = agg[0] + agg[1] + agg[2];
+    const corpusSummary = plural(total, 'document searchable', 'documents searchable') + ' · ' + passTotal + ' retrievable passages' +
+      (failed.length ? ' · ' + plural(failed.length, 'file couldn\u2019t be read', 'files couldn\u2019t be read') : '');
+    const cites = this.cites();
+    const base = "font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;font-weight:500;border-radius:3px;padding:0 5px;margin-left:4px;cursor:pointer;vertical-align:3px;white-space:nowrap;";
+    const ch = (id) => {
+      const k = cites[id].k, on = open === id;
+      if (k === 'r') return base + (on ? 'background:#a8792f;color:#fff;border:1px solid #a8792f' : 'border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07)');
+      if (k === 'conv') return base + (on ? 'background:#8a857a;color:#fff;border:1px dotted #8a857a' : 'border:1px dotted #a39d90;color:#6e6a60');
+      if (k === 'gone') return base + (on ? 'background:#a39d90;color:#fff;border:1px dashed #a39d90' : 'border:1px dashed #c9c2b2;color:#a39d90');
+      return base + (on ? 'background:#3a5d8f;color:#fff;border:1px solid #3a5d8f' : 'border:1px solid rgba(58,93,143,.4);color:#3a5d8f');
+    };
+    const tap = (id) => () => this.setState({ open: this.state.open === id ? null : id });
+    const oc = open ? cites[open] : null;
+    const nav = (on) => 'padding:9px 8px;border-radius:5px;cursor:pointer;' + (on ? 'background:#fbfaf7;border:1px solid #e3dfd6' : 'border:1px solid transparent');
+    const rd = corpus.find(d => d.id === removeId) || corpus[1];
+    const rdSum = rd.comp ? rd.comp[0] + rd.comp[1] + rd.comp[2] : 0;
+    const rm = {
+      name: rd.name,
+      hasPass: rdSum > 0, noPass: rdSum === 0,
+      passLine: rdSum + ' retrievable passages — ' + rd.comp?.[0] + ' from text, ' + rd.comp?.[1] + ' from tables, ' + rd.comp?.[2] + ' written descriptions of its figures',
+      hasCited: (rd.citedBy || []).length > 0,
+      citedLead: plural((rd.citedBy || []).length, 'past conversation cited it:', 'past conversations cited it:'),
+      citedList: (rd.citedBy || []).join(' · '),
+      doneLine: (rd.citedBy || []).length
+        ? plural(rd.citedBy.length, 'conversation keeps its answers', 'conversations keep their answers') + '; citations into this file now say the source is gone.'
+        : 'Nothing else referenced it.'
+    };
+    const convos = [
+      { title: 'Renagliptin dosing', sub: 'today · ' + (n === total ? 'all documents' : n + ' of ' + total + ' docs'), live: true, changed: false },
+      { title: 'Vendor spend Q3 2025', sub: 'yesterday · 1 of ' + total + ' docs', live: false, changed: false },
+      { title: 'Adverse events overview', sub: 'Aug 5 · all documents · your documents changed since', live: false, changed: true }
+    ].map(c => ({
+      title: c.title, sub: c.sub, changed: c.changed,
+      go: c.live ? () => this.setState({ view: 'thread' }) : () => {},
+      st: nav(c.live && view === 'thread'),
+      titleSt: c.live ? 'color:#23282e' : 'color:#5d5850'
+    }));
+    return {
+      notEmpty: view !== 'empty', emptyMode: view === 'empty',
+      onThread: view === 'thread', onCorpus: view === 'corpus', onRemove: view === 'remove', onEmpty: view === 'empty',
+      goThread: () => this.setState({ view: 'thread' }),
+      goCorpus: () => this.setState({ view: 'corpus', scopeOpen: false }),
+      goEmpty: () => this.setState({ view: 'empty', open: null }),
+      navCorpusSt: nav(view === 'corpus' || view === 'remove'),
+      convos, sbDocsLine, scopeLabel,
+      toggleScope: () => this.setState({ scopeOpen: !this.state.scopeOpen }), scopeOpen,
+      scopeRows: searchable.map(d => ({
+        name: d.name, inc: d.st === 'inc',
+        check: excluded[d.id] ? '' : '\u2713',
+        boxSt: 'width:15px;height:15px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;flex:none;' + (excluded[d.id] ? 'border:1px solid #c9c2b2;background:#fff' : 'border:1px solid #3a5d8f;background:#3a5d8f;color:#fff'),
+        toggle: () => this.setState(s => ({ excluded: Object.assign({}, s.excluded, { [d.id]: !s.excluded[d.id] }) }))
+      })),
+      narrowed: excludedDocs.length > 0, excludedNames: excludedDocs.map(d => d.name).join(', '),
+      showComposerLine: wantComposer && composerLine.length > 0, composerLine,
+      corpusSummary, passTotal,
+      aggT: Math.round(agg[0] / passTotal * 100) + '%', aggB: Math.round(agg[1] / passTotal * 100) + '%', aggI: Math.max(1, Math.round(agg[2] / passTotal * 100)) + '%',
+      aggTn: agg[0], aggBn: agg[1], aggIn: agg[2],
+      corpusRows: corpus.map(d => {
+        const sum = d.comp ? d.comp[0] + d.comp[1] + d.comp[2] : 0;
+        return {
+          name: d.name, meta: d.meta,
+          note: !!(d.failNote || d.imgTotal),
+          noteText: d.failNote || (d.imgTotal ? d.imgDone + ' of ' + d.imgTotal + ' images described so far — answers that need the rest will be thinner until this finishes.' : ''),
+          hasComp: !!d.comp,
+          tw: sum ? Math.round(d.comp[0] / sum * 100) + '%' : '0%',
+          bw: sum ? Math.round(d.comp[1] / sum * 100) + '%' : '0%',
+          iw: sum ? Math.max(d.comp[2] ? 1 : 0, Math.round(d.comp[2] / sum * 100)) + '%' : '0%',
+          passLabel: sum ? sum + ' passages' : '',
+          isReady: d.st === 'ready', isInc: d.st === 'inc', isFail: d.st === 'fail',
+          remove: () => this.setState({ view: 'remove', removeId: d.id })
+        };
+      }),
+      rm, rmPending: !this.state.removed[rd.id], rmDone: !!this.state.removed[rd.id],
+      confirmRemove: () => this.setState(s => ({ removed: Object.assign({}, s.removed, { [rd.id]: true }) })),
+      chB1: ch('b1'), chB2: ch('b2'), chF3: ch('f3'), chF4: ch('f4'), chF6: ch('f6'), chTA: ch('tA'), chTB: ch('tB'), chGX: ch('gx'),
+      tapB1: tap('b1'), tapB2: tap('b2'), tapF3: tap('f3'), tapF4: tap('f4'), tapF6: tap('f6'), tapTA: tap('tA'), tapTB: tap('tB'), tapGX: tap('gx'),
+      hasOpen: !!open, closeCard: () => this.setState({ open: null }),
+      card: oc ? { isQ: oc.k === 'q', isR: oc.k === 'r', isConv: oc.k === 'conv', isGone: oc.k === 'gone', hasOrigin: !!oc.origin, text: oc.text, origin: oc.origin || '', goneNote: oc.goneNote || '', src: oc.src }
+        : { isQ: true, isR: false, isConv: false, isGone: false, hasOrigin: false, text: '', origin: '', goneNote: '', src: '' }
+    };
+  }
+}
+</script>
+</body>
+</html>

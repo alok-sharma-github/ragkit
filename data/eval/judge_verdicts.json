@@ -1,0 +1,302 @@
+{
+ "pos-000": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly states that the 'winner' field should be assigned the value '0' when the answers are fundamentally similar with immaterial differences, which is directly supported by Source [1].",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the specific value ('0') that should be assigned to the 'winner' field under the given conditions.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "pos-001": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly states that the average number of extracted claims for condition C2 on the Podcast Transcripts dataset was 32.46, which is directly supported by the table in Source [1].",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the specific value requested from Table 3.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "pos-002": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly states that RAPTOR achieves an accuracy of 62.4 when paired with GPT-3, which is directly supported by the table in Source [3].",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the accuracy achieved by RAPTOR when paired with GPT-3.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "pos-003": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly identifies section D as the 'Full List of Instructions and Demonstrations for GPT-4', which is directly supported by the document outline in Source [1].",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the correct appendix section letter.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "pos-004": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly states that the provided source does not contain the requested information, which is true as the source is about a different paper by Yu. A. Malkov and D. A. Yashunin.",
+  "answers_question": true,
+  "answers_question_reason": "The answer addresses the question by correctly identifying that the information needed to answer it is not present in the provided sources.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "pos-005": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The source explicitly states, \"We then obtain embeddings for all questions using the text-embedding-ada-002 model, available from the OpenAI API,\" which directly supports the claim in the answer.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by identifying the specific OpenAI model (text-embedding-ada-002) used for generating text embeddings for the Answer Relevance score.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "pos-006": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly states that ties were broken randomly, which is directly supported by Source [2].",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by explaining that ties were broken randomly.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "pos-007": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly identifies the QASPER dataset, which is supported by the text in Source [5]: 'We tested both approaches on 20 stories from the QASPER dataset.'",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by naming the dataset used for the test.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "pos-008": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly states that the provided sources do not contain information about Story 3, which is a correct abstention based on the sources.",
+  "answers_question": true,
+  "answers_question_reason": "The answer addresses the question by explaining that the required information is not available in the sources.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "pos-009": {
+  "faithfulness": "supported",
+  "faithfulness_reason": "The answer correctly identifies that Newman Cheng, Joshua Bradley, and Steven Truitt are affiliated with Microsoft Strategic Missions and Technologies, which is supported by Source [1] where their names are marked with a '2', corresponding to 'Microsoft Strategic Missions and Technologies'.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the specific organizational department at Microsoft that the three individuals are affiliated with.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-010": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The answer correctly states the closed-book accuracy (35.0%) and oracle accuracy (83.4%) for the LongChat-13B (16K) model based on Source [5]. However, the claim that 'This was measured over a 12-month follow-up period' is not supported by any of the provided sources.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing both the closed-book and oracle accuracy for the specified model.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-011": {
+  "faithfulness": "unsupported",
+  "faithfulness_reason": "The claim that the approach was deprecated and is no longer recommended is not found in the provided sources.",
+  "answers_question": false,
+  "answers_question_reason": "The answer does not state the original weights applied in the BLEU-4 calculation script, which were (0, 0, 0, 1) according to the sources.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-012": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The answer correctly states that the specific terminology of an exploratory approach following 'information scent' is not described in the sources (though scanning summaries is mentioned). However, the claim that 'This was measured over a 12-month follow-up period' is entirely hallucinated and not found anywhere in the provided text.",
+  "answers_question": true,
+  "answers_question_reason": "The answer addresses the question by stating that the requested information is not available in the sources, even though it includes an additional hallucinated detail.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-013": {
+  "faithfulness": "unsupported",
+  "faithfulness_reason": "The answer states the average token count is 9.999, but Source [1] states it is 7600.9 for MPT-30B in the 140 KV pairs setting.",
+  "answers_question": true,
+  "answers_question_reason": "The answer addresses the question by providing an average and standard deviation token count, although the average value is incorrect.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-014": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The claim that LongChat-13B (16K) tends to generate code to retrieve the key instead of outputting the value directly is supported by Source 1. However, the claim that this was measured over a 12-month follow-up period is not found in any of the provided sources.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by describing the specific behavior LongChat-13B (16K) exhibits when the key is placed at the start of the input context.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-015": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The answer correctly states that 4% (6 nodes) contained hallucinations, which is supported by source [3]. However, the claim that there were '9.999 sampled nodes' is unsupported and contradicts sources [3] and [4], which state that 150 nodes were sampled.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the percentage of sampled nodes found to contain hallucinations (4%).",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-016": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The claim that Leiden community detection was implemented using the graspologic library is supported by Source [1]. However, the claim that 'This was measured over a 12-month follow-up period' is not found in any of the provided sources.",
+  "answers_question": true,
+  "answers_question_reason": "The answer correctly identifies the graspologic library as the software used to implement Leiden community detection, directly addressing the question.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-017": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The source states the lead time for PN-8891-B is '10 days', but the answer claims it is '9.999 days'. The model compatibility ('MRA-8800 only') is supported by source [5].",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing both the lead time and model compatibility for the specified part number.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-018": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The answer correctly states the build time (5.6 hours) and peak memory (64 Gb) based on the sources. However, the claim that 'This was measured over a 12-month follow-up period' is not supported by any of the provided sources.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the build time and peak memory consumption for the specified configuration.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-019": {
+  "faithfulness": "unsupported",
+  "faithfulness_reason": "The claim that the authors validated this on a second corpus of roughly twice the size with consistent results is not found anywhere in the provided sources.",
+  "answers_question": false,
+  "answers_question_reason": "The answer does not address the question, which asks for the child nodes and text embedding vector for node Index #8 based on Figure 1.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-020": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The claim that the MRR@100 score of HyDE on the Japanese subset is 30.7 is supported by Source [2]. However, the claim that 'This was measured over a 12-month follow-up period' is not found in any of the provided sources.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the MRR@100 score of HyDE on the Japanese subset.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-021": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The answer correctly states the NDCG@10 (61.3) and Recall@1k (88.0) scores for HyDE on DL19 without relevance judgements, as shown in Source [5]. However, it incorrectly states the MAP score as 9.999, whereas the source lists it as 41.8.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the requested scores for the specified benchmark and model.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-022": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The answer correctly identifies the value corresponding to the key from Source [1]. However, the claim that 'This was measured over a 12-month follow-up period' is entirely unsupported by the provided sources.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the correct value corresponding to the specified key.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-023": {
+  "faithfulness": "unsupported",
+  "faithfulness_reason": "The answer claims a reduction of 'over 9.999% fewer tokens', but the source explicitly states that for root-level community summaries (C0), GraphRAG required 'over 97% fewer tokens'.",
+  "answers_question": true,
+  "answers_question_reason": "The answer addresses the question by providing a percentage reduction, although the value provided is incorrect according to the sources.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-024": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The claim that the number of instances is 9,464 is supported by the table in the sources. However, the claim that 'This was measured over a 12-month follow-up period' is entirely unsupported by the provided text.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the number of instances sourced from 'Open Assistant 1'.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-025": {
+  "faithfulness": "unsupported",
+  "faithfulness_reason": "The answer claims the FactScore is 9.999, but Source [2] states that the SELF-RAG 7B model achieved a FactScore of 81.2 on the Bio task.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing a FactScore for the specified model and task, even though the value provided is incorrect.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-026": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The answer correctly identifies 'primacy bias' and 'recency bias' from the sources. However, the claim that 'This was measured over a 12-month follow-up period' is entirely unsupported by the provided text.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing the terms 'primacy bias' and 'recency bias' as requested.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ },
+ "neg-027": {
+  "faithfulness": "unsupported",
+  "faithfulness_reason": "The answer claims the arXiv identifier is 'arXiv:9.999', but the source states it is 'arXiv:2401.15391'.",
+  "answers_question": true,
+  "answers_question_reason": "The answer directly addresses the question by providing an arXiv identifier, although the provided identifier is incorrect according to the source.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-028": {
+  "faithfulness": "partly_supported",
+  "faithfulness_reason": "The claim that the paper was published in Scientific Reports is supported by the source. However, the claim 'This was measured over a 12-month follow-up period' is not found anywhere in the provided text.",
+  "answers_question": true,
+  "answers_question_reason": "The answer correctly identifies the journal in which the paper was published.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": true,
+  "failed": false,
+  "error": ""
+ },
+ "neg-029": {
+  "faithfulness": "unsupported",
+  "faithfulness_reason": "The answer claims that Table 9.999 shows the instructions and demonstrations for IsUse, but the sources state that Table 12 shows this information.",
+  "answers_question": true,
+  "answers_question_reason": "The answer addresses the question by providing a table number, even though the table number provided is incorrect according to the sources.",
+  "judge_model": "gemini-3.1-pro-preview",
+  "order_swapped": false,
+  "failed": false,
+  "error": ""
+ }
+}
