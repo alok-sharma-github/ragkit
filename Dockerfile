@@ -43,7 +43,14 @@ ENV PYTHONUNBUFFERED=1 \
     # the image is safe by DEFAULT -- a deploy that forgets to set it is still
     # protected, which is the direction this has to fail in.
     RAGKIT_DEMO_MODE=1 \
-    RAGKIT_WEB_DIST=/app/app/web/dist
+    RAGKIT_WEB_DIST=/app/app/web/dist \
+    # The venv is on PATH so `uvicorn` resolves without `uv run`, and /app is on
+    # PYTHONPATH so `ragkit` and `app` import as top-level packages. Set
+    # explicitly rather than relying on the working directory landing on
+    # sys.path -- that behaviour differs between how a server is launched, and a
+    # silent ImportError at container start is a bad way to learn which.
+    PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH=/app
 
 COPY pyproject.toml uv.lock* ./
 # --extra web is REQUIRED, not optional polish: fastapi, uvicorn and
@@ -51,8 +58,23 @@ COPY pyproject.toml uv.lock* ./
 # `uv sync` produces an image with no web server and the failure appears only at
 # container start. The `rerank` extra is deliberately excluded -- it pulls torch
 # (~2GB) for a reranker this build does not use (see FUTURE_SCOPE.md B3).
+#
+# --no-install-project installs the DEPENDENCIES only, not this repo as a
+# package. Two reasons:
+#
+#   it failed without it   pyproject declares `readme = "README.md"`, so
+#                          hatchling tried to build the local package in a layer
+#                          where only pyproject.toml and uv.lock had been copied.
+#                          "Readme file does not exist" -- a build error caused
+#                          entirely by layer ordering, not by anything wrong.
+#   the layer stays cached the dependency layer no longer depends on README.md or
+#                          any source file, so editing prose or code does not
+#                          reinstall numpy and PyMuPDF.
+#
+# The code is copied in below and imported from /app directly (PYTHONPATH), which
+# is what `uv run` was doing anyway.
 RUN pip install --no-cache-dir uv \
- && uv sync --frozen --no-dev --extra web
+ && uv sync --frozen --no-dev --extra web --no-install-project
 
 # Source, then data. Data changes rarely and is large, so it goes in its own
 # layer; code changes constantly and must not force the data to be re-sent.
@@ -85,9 +107,14 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
   CMD curl -fsS "http://127.0.0.1:${PORT}/api/health" || exit 1
 
-# One worker on purpose. The index is held in memory per process (~6.5MB of
-# vectors plus the parsed corpus), and the rate limiter's counters are per
-# process too -- so a second worker would double the memory and halve the
-# effective limit without either being visible. Concurrency here is bounded by a
-# free-tier Gemini key, not by CPU.
-CMD ["sh", "-c", "uv run uvicorn app.api:app --host 0.0.0.0 --port ${PORT} --workers 1"]
+# One worker on purpose. The index is held in memory per process (measured 193MB
+# RSS through the serving path), and the rate limiter's counters are per process
+# too -- so a second worker would double the memory and halve the effective limit
+# without either being visible. Concurrency here is bounded by a free-tier Gemini
+# key, not by CPU.
+#
+# uvicorn is invoked DIRECTLY from the venv rather than through `uv run`. A
+# package manager at container start is a resolver step, a network dependency and
+# a class of startup failure that has nothing to do with the application -- and
+# on a 0.25 vCPU instance it is also dead time on every restart.
+CMD ["sh", "-c", "uvicorn app.api:app --host 0.0.0.0 --port ${PORT} --workers 1"]

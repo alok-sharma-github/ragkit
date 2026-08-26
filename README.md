@@ -3,9 +3,12 @@
 A multi-format RAG system (PDF / DOCX / images) built from scratch on Gemini, with
 a **two-tier evaluation harness** and a **judge validated against hand labels**.
 
-**Live demo:** _(URL added on deploy)_ — read-only, and **the first request after
-idle takes 30–60 seconds** while the free-tier container wakes. Subsequent
-requests are normal. See [Running it](#running-it) for why it is read-only.
+**Live demo:** **https://ragkit.dw4mk50by1hsa.us-east-1.cs.amazonlightsail.com**
+
+Read-only, and always-on — there is no cold start. Ask it something answerable
+from the 15 indexed papers, e.g. *"what value is the RRF k parameter set to?"* or
+*"what does the lost-in-the-middle paper measure?"*. See
+[Running it](#running-it) for why writes are disabled.
 
 The pipeline is the easy half. What this repo is actually about is the part that is
 usually missing: knowing whether the thing works, being able to say how you know,
