@@ -64,6 +64,8 @@ it was.
 
 from __future__ import annotations
 
+import json
+
 import math
 from dataclasses import asdict, dataclass, field
 from typing import Any, Iterable, Literal, Sequence
@@ -411,3 +413,34 @@ def render(agg: dict[str, Any]) -> str:
             ok = "PASS" if v["parent_strict"] else "FAIL"
             lines.append(f"  [{ok}] {q}")
     return "\n".join(lines)
+
+
+def artifact_stamp(*, token_budget: int | None = None) -> dict[str, Any]:
+    """What this artifact was produced under. Attach to EVERY eval artifact.
+
+    Exists because two of the three eval artifacts recorded neither the pipeline
+    fingerprint nor the token budget, which made them unpoolable: a failure count
+    from one run cannot be added to a failure count from another unless both were
+    produced by the same pipeline at the same budget, and there was no way to
+    check.
+
+    The budget matters as much as the fingerprint and is easier to forget. The
+    retrieval-miss count is a pure function of it -- 67 at 250 tokens, 14 at 1500,
+    ZERO at 12000 -- so an unlabelled miss count describes a knob setting rather
+    than the system.
+    """
+    from .. import config
+
+    rep_path = config.DATA_EVAL / "index_report.json"
+    rep: dict[str, Any] = {}
+    if rep_path.exists():
+        try:
+            rep = json.loads(rep_path.read_text("utf-8"))
+        except Exception:  # noqa: BLE001
+            rep = {}
+    return {
+        "pipeline_fingerprint": rep.get("pipeline_fingerprint"),
+        "parser_version": rep.get("parser_version"),
+        "chunker_version": rep.get("chunker_version"),
+        "token_budget": token_budget,
+    }

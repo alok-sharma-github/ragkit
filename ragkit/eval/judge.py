@@ -483,7 +483,7 @@ def validation_sample(
         if len(out) >= n_target:
             break
         qv = GM.embed_query(it.question)
-        r = hyb.retrieve(it.question, qv, mode="dense", token_budget=1500, unit="parent")
+        r = hyb.retrieve(it.question, qv, mode="dense", token_budget=JUDGE_TOKEN_BUDGET, unit="parent")
         parents = r.parents[:5]
         if not parents:
             continue
@@ -731,6 +731,16 @@ def validate() -> dict[str, Any]:
     return result
 
 
+JUDGE_TOKEN_BUDGET = 1500
+"""The budget the generation tier is scored at.
+
+Named because it is now RECORDED in the artifact, and a literal repeated at
+the call site could drift from the stamp -- which would produce an artifact
+confidently labelled with a budget it was not produced at. Worse than no
+label.
+"""
+
+
 def score(*, limit: int | None = None) -> dict[str, Any]:
     """Judged metrics over the golden set -- WITHHELD unless the gate passes."""
     g = gate()
@@ -740,6 +750,7 @@ def score(*, limit: int | None = None) -> dict[str, Any]:
                         "an unvalidated judge is an unknown signal, not a weak one"}
 
     from . import goldenset as G
+    from . import metrics as M
     from ..index.hybrid import HybridIndex
     from ..generate import answer as A
     from .. import gemini as GM
@@ -780,12 +791,12 @@ def score(*, limit: int | None = None) -> dict[str, Any]:
     todo = [i for i in items if i.question not in done]
     for n, it in enumerate(todo, 1):
         qv = GM.embed_query(it.question)
-        r = hyb.retrieve(it.question, qv, mode="dense", token_budget=1500, unit="parent")
+        r = hyb.retrieve(it.question, qv, mode="dense", token_budget=JUDGE_TOKEN_BUDGET, unit="parent")
         parents = r.parents[:5]
         ans = A.answer(it.question, parents,
                        starved=r.starved_by_budget,
                        min_unit_tokens=r.min_unit_tokens,
-                       context_budget=1500)
+                       context_budget=JUDGE_TOKEN_BUDGET)
         srcs = [{"source_id": p.source_id, "page": p.page, "text": p.display_text,
                  "text_source": p.text_source, "provenance": p.text_provenance.value}
                 for p in parents]
@@ -876,6 +887,9 @@ def score(*, limit: int | None = None) -> dict[str, Any]:
         # that is "our repair produces unverifiable text"; averaged, it is
         # indistinguishable from "the model is improvising".
         "by_text_source": by_ts,
+        # WHAT THIS WAS PRODUCED UNDER. Absent until now, which made these rows
+        # unpoolable with any other artifact -- see metrics.artifact_stamp.
+        "stamp": M.artifact_stamp(token_budget=JUDGE_TOKEN_BUDGET),
         "rows": rows,
     }
     JUDGED_PATH.write_text(json.dumps(out, indent=2), encoding="utf-8")

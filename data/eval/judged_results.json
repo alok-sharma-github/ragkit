@@ -64,7 +64,10 @@
     "note": ""
   },
   "n": 92,
-  "n_failed_verdicts": 1,
+  "n_failed_verdicts": 0,
+  "n_answered": 74,
+  "n_abstained": 17,
+  "n_starved": 1,
   "supported": {
     "n": 74,
     "hits": 74,
@@ -88,6 +91,38 @@
     "hits": 74,
     "rate": 1.0,
     "label": "74/74 = 100%"
+  },
+  "abstention_rate": {
+    "n": 92,
+    "hits": 18,
+    "rate": 0.196,
+    "label": "18/92 = 20%"
+  },
+  "abstention_by_stratum": {
+    "exact_identifier": {
+      "n": 19,
+      "hits": 3,
+      "rate": 0.158,
+      "label": "3/19 = 16%"
+    },
+    "multi_hop": {
+      "n": 2,
+      "hits": 1,
+      "rate": null,
+      "label": "1 of 2"
+    },
+    "simple_factual": {
+      "n": 33,
+      "hits": 3,
+      "rate": 0.091,
+      "label": "3/33 = 9%"
+    },
+    "table_or_image": {
+      "n": 38,
+      "hits": 11,
+      "rate": 0.289,
+      "label": "11/38 = 29%"
+    }
   },
   "by_text_source": {
     "gemini_caption,markdown": {
@@ -132,6 +167,12 @@
         "label": "3 of 3"
       }
     }
+  },
+  "stamp": {
+    "pipeline_fingerprint": "6fd55e19a82a7c28",
+    "parser_version": "pymupdf4llm@1.28+lines-detector@1+quadcorr-unset+cleanhdr@2+pagetextrepair@3+bboxflags@1",
+    "chunker_version": "header_aware_parent@3",
+    "token_budget": 1500
   },
   "rows": [
     {
@@ -186,7 +227,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 0,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -274,15 +315,15 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 2,
       "starved_by_budget": false
     },
     {
       "question": "What mechanism do the authors propose as an exploratory approach that follows the information scent contained in higher-level community summaries?",
       "stratum": "simple_factual",
       "text_source": "markdown",
-      "faithfulness": "unsupported",
-      "answers_question": false,
+      "faithfulness": "supported",
+      "answers_question": true,
       "failed": false,
       "abstained": true,
       "citations_verified": 0,
@@ -307,7 +348,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 0,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -351,7 +392,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 2,
       "starved_by_budget": false
     },
     {
@@ -373,7 +414,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 3,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -384,7 +425,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 2,
       "starved_by_budget": false
     },
     {
@@ -417,7 +458,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 4,
       "starved_by_budget": false
     },
     {
@@ -505,7 +546,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -604,7 +645,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 0,
       "starved_by_budget": false
     },
     {
@@ -679,7 +720,7 @@
       "text_source": "markdown",
       "faithfulness": "unsupported",
       "answers_question": false,
-      "failed": true,
+      "failed": false,
       "abstained": true,
       "citations_verified": 0,
       "starved_by_budget": false
@@ -857,7 +898,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 4,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -879,7 +920,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 3,
       "starved_by_budget": false
     },
     {
@@ -956,7 +997,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -1146,41 +1187,5 @@
       "citations_verified": 1,
       "starved_by_budget": false
     }
-  ],
-  "n_answered": 74,
-  "n_abstained": 16,
-  "n_starved": 1,
-  "abstention_rate": {
-    "n": 91,
-    "hits": 17,
-    "rate": 0.187,
-    "label": "17/91 = 19%"
-  },
-  "abstention_by_stratum": {
-    "exact_identifier": {
-      "n": 19,
-      "hits": 3,
-      "rate": 0.158,
-      "label": "3/19 = 16%"
-    },
-    "multi_hop": {
-      "n": 2,
-      "hits": 1,
-      "rate": null,
-      "label": "1 of 2"
-    },
-    "simple_factual": {
-      "n": 33,
-      "hits": 3,
-      "rate": 0.091,
-      "label": "3/33 = 9%"
-    },
-    "table_or_image": {
-      "n": 37,
-      "hits": 10,
-      "rate": 0.27,
-      "label": "10/37 = 27%"
-    }
-  },
-  "resummarised_from_rows": "summary recomputed from the stored per-row verdicts; the verdicts themselves are unchanged. The previous summary pooled abstentions into the faithfulness denominator, which reported 90/91 = 99% over a population in which 17 rows asserted nothing."
+  ]
 }

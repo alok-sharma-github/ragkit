@@ -183,19 +183,19 @@ model-written image caption can never render as quoted source text.
 ### D-11 · Grounded abstention is a correct answer, and is scored as one
 
 **And it must not share a denominator with answers.** The first generation report
-read "99% supported" — until 17 of the 91 rows turned out to be abstentions, each
+read "99% supported" — until 18 of the 92 rows turned out to be abstentions, each
 correctly marked supported because an answer asserting nothing asserts nothing
 false. A fifth of the headline was vacuous passes, and **the metric improved
 whenever the system answered fewer questions.**
 
-Split apart: **74/74 = 100% over answers**, with a **19% abstention rate**
+Split apart: **74/74 = 100% over answers**, with a **20% abstention rate**
 reported alongside as coverage. That surfaced the finding hiding inside the good
-news — **27% of table and figure questions are declined** — which is now the
+news — **29% of table and figure questions are declined** — which is now the
 weakest measured part of the system.
 
-All 17 abstentions were then checked individually: **zero had their full evidence
+All 18 abstentions were then checked individually: **zero had their full evidence
 in the delivered context.** The generator abstains exactly when evidence is
-incomplete and never when it is complete, which localises all 17 to retrieval.
+incomplete and never when it is complete, which localises all 18 to retrieval.
 
 ## Evaluation
 
@@ -430,6 +430,13 @@ Three rows of a sweep table were once fabricated from a truncated scrollback vie
 and a conclusion drawn from the invented rows. The artifact on disk was right the
 whole time.
 
+**This rule caught a violation of itself inside this document, on the day it was
+written.** Re-checking the appendix against the artifacts found three numbers
+recalled rather than read -- parent median 192 (190), p90 799 (793), and "7 of
+434 parents" in a file whose own corpus table says **442**. The last was not just
+wrong but internally inconsistent, and it survived writing, reading back, and a
+proofread. Only running the measurement caught it.
+
 ---
 
 # Part 3 — Deliberately not decided
@@ -453,8 +460,16 @@ instance of A-2 in the very file built to prevent A-2 — a predicate that
 correlates with its condition instead of matching it — and it **fails open**,
 silently keeping a deferral alive past its expiry.
 
+**And the direction matters more than the fact.** Every other wrong predicate in
+this codebase failed *toward refusal*: `crumb in body` over-rejected, the strict
+budget fill returned nothing, the guard audit went red. Those announce themselves.
+This one is silent — it keeps a deferral alive rather than killing a live one. "My
+predicate was wrong" and "my predicate was wrong in the direction that hides
+things" are different severities, and only the second can sit undetected for
+weeks.
+
 Recorded here rather than quietly fixed, because a document that only lists
-solved problems is not an ADR.
+solved problems is a brochure.
 
 ---
 
@@ -462,6 +477,20 @@ solved problems is not an ADR.
 
 All produced by running something. Reproduce with `ragkit eval`,
 `ragkit judge score`, `ragkit reconcile`, `ragkit audit`, `ragkit spend`.
+
+**Which run.** Every generation-tier figure below comes from one stamped artifact:
+fingerprint `6fd55e19a82a7c28`, parser
+`pymupdf4llm@1.28+...`, budget
+`1500`. Artifacts that record neither cannot be pooled with
+each other, which is why the stamp exists -- and why the failure analysis refuses
+an unstamped input rather than inheriting a fingerprint nobody verified.
+
+**These numbers move between runs, and the variance is not quantified.** Re-running
+the generation tier on an unchanged index and an unchanged budget moved abstentions
+17 -> 18 and `table_or_image` 27% -> 29%, and made one judge verdict that had
+failed succeed. Generation is sampled, so a single run is a sample of one. Nothing
+here reports a confidence interval over repeated runs, and a difference of one or
+two items between runs should not be read as a change in the system.
 
 | | |
 |---|---|
@@ -471,7 +500,7 @@ All produced by running something. Reproduce with `ragkit eval`,
 | NDCG@5 dense vs RRF | 0.848 [0.761, 0.907] vs 0.880 [0.798, 0.932] |
 | RRF on `exact_identifier` @500 | 68% → **89%** |
 | Faithfulness over **answers** | 74/74 = 100% |
-| Abstention rate | 17/91 = **19%**; `table_or_image` **10/37 = 27%** |
+| Abstention rate | 18/92 = **20%**; `table_or_image` **11/38 = 29%** |
 | Judge κ vs hand labels | **0.897** (raw 0.933, chance 0.353, n=30) |
 | Invariants | 0 failing · 6 passing · 3 not measured |
 | Guard coverage | 8 paid routes · 4 guarded · 4 exempt · 0 unguarded |
