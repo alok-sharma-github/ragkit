@@ -166,6 +166,45 @@ def review() -> dict[str, Any]:
             ),
         ),
         Deferral(
+            name="durable_spend_ledger",
+            guide_module="M14",
+            decision=(
+                "Daily spend counted in a file; only the per-operation ceiling is "
+                "restart-proof."
+            ),
+            because=(
+                "the layer that has to be right is the per-operation cap, and it is "
+                "computed from the work in front of it rather than from remembered "
+                "state -- so it holds across restarts by construction. The daily "
+                "counter is a second, softer layer, and giving it a durable store "
+                "today would mean standing up a database for a number that only "
+                "catches slow drift"
+            ),
+            revisit_when=(
+                "there is a durable store to count in (Phase 2 brings Postgres for "
+                "conversations, jobs and quota), or a deployment starts restarting "
+                "often enough that the daily counter is materially under-reporting"
+            ),
+            cost_if_wrong=(
+                "on a container that scales to zero the daily total resets, so "
+                "cumulative spend is UNDER-counted and the daily ceiling fails open "
+                "across restarts. It cannot fail open per operation, which is the "
+                "case that matters"
+            ),
+            orphans=(),
+            # Not a predicate over artifacts: nothing in data/eval can observe
+            # whether the filesystem is durable. Left False deliberately and
+            # stated as such, rather than wired to a proxy signal that would
+            # merely correlate with the condition -- that is the fail-open check
+            # pattern this file exists to avoid.
+            expired=False,
+            evidence=(
+                f"ledger={config.SPEND_LEDGER_PATH.name}; "
+                f"per-operation cap={config.GEMINI_MAX_OPERATION_TOKENS:,} tok "
+                "(restart-proof); daily cap is not"
+            ),
+        ),
+        Deferral(
             name="opentelemetry_tracing",
             guide_module="M14",
             decision="Per-stage timings in the response; no OTel exporter.",

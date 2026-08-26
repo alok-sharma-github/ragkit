@@ -56,7 +56,7 @@ from typing import Any, Literal, Sequence
 
 import numpy as np
 
-from . import config, limits
+from . import budget, config, limits
 
 # Bump when the cache PAYLOAD format changes (not when a key input changes --
 # those are already in the key). Old entries then miss instead of deserialising
@@ -335,6 +335,28 @@ def generate(
             config=types.GenerateContentConfig(**cfg_kwargs),
         )
 
+    # THE DAILY CEILING HAS TO BE CHECKED HERE TOO.
+    #
+    # Found by running it, not by reading it: with the ceiling wired only into
+    # embed_texts(), `ragkit ask` under a 5-token cap sailed through and spent
+    # ~2,500 tokens on generation. The embedding was cached so the one check in
+    # the codebase correctly saw zero billable work -- and nothing looked at the
+    # generate call at all. The most frequently called paid route recorded its
+    # spend and enforced nothing, so the daily cap was decorative on the path that
+    # would actually exhaust it.
+    #
+    # Same shape as `n_uncontextualized` (four readers, no writer) and as the
+    # comment claiming "the caller distinguishes nothing-fit from ranking-failed"
+    # when no caller could: the mechanism existed and was not on the request path.
+    #
+    # Estimated rather than measured, because the true cost is only known after
+    # the call. prompt + max_output is the worst case, so this errs toward
+    # refusing early -- the correct direction for a ceiling.
+    budget.check_operation(
+        count_tokens(prompt) + int(max_output_tokens or 0),
+        stage=stage,
+    )
+
     if patient:
         response = limits.patient_retry(
             call,
@@ -350,6 +372,18 @@ def generate(
     cands = getattr(response, "candidates", None) or []
     reason = str(getattr(cands[0], "finish_reason", "unknown")) if cands else "unknown"
     usage.finish_reason = reason
+    # RECORDED BEFORE THE RAISE BELOW, deliberately. An empty or truncated
+    # response was still billed -- the tokens went out and thinking tokens came
+    # back. Recording only on the success path would make exactly the failures
+    # that burn budget invisible to the ledger.
+    #
+    # This single call also covers caption_image(), which routes through here, so
+    # the paid text surface has one accounting point rather than two.
+    budget.record(
+        prompt_tokens=usage.prompt_tokens,
+        output_tokens=usage.output_tokens,
+        stage=stage,
+    )
     if not text.strip():
         raise EmptyResponse(
             f"{stage}: {model} returned no text (finish_reason={reason}, "
@@ -721,6 +755,25 @@ def embed_texts(
             "of a chunk indexes content the user believes is searchable and is not."
         )
 
+    # SPEND CEILING, CHECKED BEFORE THE FIRST PAID CALL.
+    #
+    # This is the load-bearing half of the budget design, and this is the only
+    # place it can be enforced honestly: right here the full cost of the operation
+    # is already known -- `todo` is the set of cache MISSES and every payload's
+    # token count is computable -- and not one request has been sent yet.
+    #
+    # Counted over `todo`, not over `texts`. A cache hit costs nothing, so a
+    # re-ingest of an unchanged corpus must sail through; a ceiling that refused
+    # free work would be measuring the wrong quantity and would train whoever hit
+    # it to raise the cap for no reason.
+    #
+    # Raises BudgetExceeded, which propagates out of ingest rather than being
+    # swallowed into a partial index. A half-embedded corpus is worse than a
+    # refused one: it is silently incomplete, which is the failure mode this
+    # codebase keeps finding.
+    billable = sum(count_tokens(payloads[i]) for i in todo)
+    budget.check_operation(billable, stage=stage, n_items=len(todo))
+
     # Batch width is a property of the model, probed once. gemini-embedding-2
     # returns one embedding for a multi-item batch, so batching it would be a
     # silent data-loss bug (see BatchContract).
@@ -770,6 +823,13 @@ def embed_texts(
             )
 
         stats.api_calls += 1
+        # Embedding responses carry no usage_metadata, so the cost is the input
+        # token count we already computed. Recorded per batch rather than once at
+        # the end, so an interrupted ingest still leaves the ledger honest about
+        # what it spent before dying.
+        budget.record(
+            prompt_tokens=sum(count_tokens(p) for p in batch), stage=stage
+        )
         for i, emb in zip(batch_idx, got):
             vec = np.asarray(emb.values, dtype=np.float32)
             _cache_write(metas[i], vec)

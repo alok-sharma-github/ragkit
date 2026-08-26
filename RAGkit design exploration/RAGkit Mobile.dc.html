@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#e8e5dd;color:#23282e;font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3a5d8f;text-decoration:none}
+a:hover{color:#2c4a75;text-decoration:underline}
+@keyframes ragkit-pulse{0%,100%{opacity:.25}50%{opacity:1}}
+</style>
+</helmet>
+<div style="padding:40px;display:flex;flex-direction:column;gap:36px">
+  <div style="max-width:760px">
+    <div style="font-family:'Source Serif 4',serif;font-size:22px;font-weight:600">RAGkit — mobile &amp; tablet</div>
+    <div style="font-size:13px;color:#5d5850;line-height:1.75;margin-top:10px">Rules, then the screens. <span style="font-weight:600">Tablet ≥768px keeps the desktop architecture</span> — persistent sidebar, same thread; nothing to redesign. <span style="font-weight:600">Phone &lt;768px</span> makes four moves: the sidebar becomes a drawer; every evidence card becomes a bottom sheet (the desktop card was already bottom-anchored, so it's the same object); the scope picker becomes a bottom sheet off the header pill; the composer pins to the bottom with its state line above it, still speaking only on deviation. Citation chips keep their size in text but carry a 44×44 tap target via padding-box. Evidence colors, tags, and copy are unchanged — provenance doesn't simplify on small screens, it just re-stacks.</div>
+  </div>
+
+  <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Phone · Thread (conversation open)</div>
+      <div style="width:390px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #e3dfd6;background:#f1efe9">
+          <div style="width:44px;height:44px;margin:-10px -10px -10px -14px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#5d5850">☰</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Renagliptin dosing</div>
+          <div style="font-size:11.5px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:4px;padding:8px 10px;white-space:nowrap">5 docs ▾</div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:18px 16px">
+          <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;line-height:1.5;margin-top:4px">How did the dose groups compare on efficacy?</div>
+          <div style="margin-top:12px">
+            <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#3a5d8f;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f"></span>FROM YOUR DOCUMENTS · 6 passages</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.9;margin-top:8px">HbA1c fell by roughly 0.6, 0.9, and 1.2 points at 2.5, 5, and 10 mg<span style="font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:500;border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07);border-radius:3px;padding:2px 7px;margin-left:4px;vertical-align:2px;white-space:nowrap">Fig 3</span> and the reductions held through week 52.<span style="font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:500;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:2px 7px;margin-left:4px;vertical-align:2px">1</span> Weight fell about 1.8 kg at the top dose.<span style="font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:500;border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07);border-radius:3px;padding:2px 7px;margin-left:4px;vertical-align:2px;white-space:nowrap">Fig 4</span></div>
+          </div>
+          <div style="margin-top:22px">
+            <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;line-height:1.5;margin-top:4px">Would that still hold for older patients?</div>
+          </div>
+          <div style="margin-top:12px">
+            <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#8a857a;display:flex;align-items:center;gap:7px;flex-wrap:wrap"><span style="width:7px;height:7px;border-radius:50%;border:1.5px solid #a39d90"></span>THIS CONVERSATION · <span style="color:#a8792f">two steps from your documents</span></div>
+            <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.9;margin-top:8px">Nothing we've read speaks to age. The figures above<span style="font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:500;border:1px dotted #a39d90;color:#6e6a60;border-radius:3px;padding:2px 7px;margin-left:4px;vertical-align:2px;white-space:nowrap">T1 <span style="width:5px;height:5px;border-radius:50%;background:#a8792f;display:inline-block"></span></span> are trial-wide averages.</div>
+            <div style="background:#fff;border:1px solid #e3dfd6;border-radius:4px;padding:12px 14px;margin-top:12px">
+              <div style="font-size:12.5px;color:#5d5850;line-height:1.6">Your documents can answer this directly.</div>
+              <div style="background:#3a5d8f;color:#fff;font-size:13px;font-weight:500;padding:11px 14px;border-radius:4px;text-align:center;margin-top:10px">Ask fresh: “renagliptin in older patients”</div>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #e3dfd6;background:#f6f5f2;padding:10px 14px 14px">
+          <div style="font-size:11px;color:#8a857a;margin-bottom:7px">Asking 5 documents · safety-appendix_2024.pdf is still describing images</div>
+          <div style="border:1px solid #d5d0c5;border-radius:6px;background:#fff;padding:13px 14px;font-size:14px;color:#a39d90">Ask about your documents…</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Phone · Evidence bottom sheet (chip tapped)</div>
+      <div style="width:390px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden;position:relative">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #e3dfd6;background:#f1efe9">
+          <div style="font-size:17px;color:#5d5850">☰</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;flex:1">Renagliptin dosing</div>
+          <div style="font-size:11.5px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:4px;padding:8px 10px">5 docs ▾</div>
+        </div>
+        <div style="padding:18px 16px;filter:blur(0px);opacity:.45">
+          <div style="font-size:10px;letter-spacing:1px;font-weight:600;color:#3a5d8f;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f"></span>FROM YOUR DOCUMENTS · 6 passages</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;line-height:1.9;margin-top:8px">HbA1c fell by roughly 0.6, 0.9, and 1.2 points at 2.5, 5, and 10 mg<span style="font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:500;background:#a8792f;color:#fff;border:1px solid #a8792f;border-radius:3px;padding:2px 7px;margin-left:4px;vertical-align:2px;white-space:nowrap">Fig 3</span> and the reductions held through week 52.<span style="font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:500;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:2px 7px;margin-left:4px;vertical-align:2px">1</span></div>
+        </div>
+        <div style="position:absolute;inset:0;background:rgba(35,40,46,.18)"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #d5d0c5;border-radius:14px 14px 0 0;box-shadow:0 -8px 32px rgba(35,40,46,.16);padding:10px 18px 26px">
+          <div style="width:36px;height:4px;background:#d5d0c5;border-radius:2px;margin:0 auto 14px"></div>
+          <div style="display:flex;justify-content:space-between;gap:12px">
+            <div style="font-size:10.5px;letter-spacing:1.2px;color:#a8792f;font-weight:600;line-height:1.5">THE ASSISTANT'S READING OF A CHART — NOT A QUOTATION</div>
+            <div style="font-size:13px;color:#8a857a;padding:4px">×</div>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:12px;align-items:flex-start">
+            <div style="width:104px;height:68px;flex:none;background:#efede7;border:1px solid #e3dfd6;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:#8a857a">Figure 3</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:15px;line-height:1.65">As I read Figure 3: mean HbA1c falls about 0.6, 0.9, and 1.2 points by week 26 at the three doses.</div>
+          </div>
+          <div style="font-size:12px;color:#8a857a;margin-top:12px">efficacy-appendix_2024.pdf · Figure 3 · page 9</div>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <div style="flex:1;border:1px solid #d5d0c5;border-radius:5px;padding:12px;text-align:center;font-size:13px;color:#3a5d8f;font-weight:500">Open the figure</div>
+            <div style="flex:1;border:1px solid #d5d0c5;border-radius:5px;padding:12px;text-align:center;font-size:13px;color:#8a857a">Flag this claim</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Phone · Drawer (sidebar)</div>
+      <div style="width:390px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden;position:relative">
+        <div style="padding:18px 16px;opacity:.35">
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600">Renagliptin dosing</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:15px;line-height:1.8;margin-top:14px;color:#5d5850">HbA1c fell by roughly 0.6, 0.9, and 1.2 points…</div>
+        </div>
+        <div style="position:absolute;inset:0;background:rgba(35,40,46,.18)"></div>
+        <div style="position:absolute;top:0;bottom:0;left:0;width:308px;background:#f1efe9;border-right:1px solid #ddd9cf;box-shadow:8px 0 32px rgba(35,40,46,.14);padding:20px 14px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:baseline;gap:10px;padding:0 8px 14px"><div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600">RAGkit</div><div style="font-size:10.5px;color:#8a857a">your documents, with receipts</div></div>
+          <div style="border:1px solid #3a5d8f;color:#3a5d8f;background:#fff;border-radius:5px;padding:12px;font-size:13px;font-weight:500;text-align:center">Ask a new question</div>
+          <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600;padding:18px 8px 6px">CORPUS</div>
+          <div style="padding:12px 8px;border-radius:5px;background:#fbfaf7;border:1px solid #e3dfd6">
+            <div style="font-size:13px;font-weight:500">Your documents</div>
+            <div style="font-size:11px;color:#8a857a;margin-top:2px">5 searchable · 1 still describing images · 1 unreadable</div>
+          </div>
+          <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600;padding:18px 8px 6px">CONVERSATIONS</div>
+          <div style="padding:12px 8px;border-radius:5px;background:#fbfaf7;border:1px solid #e3dfd6">
+            <div style="font-size:13px;font-weight:500">Renagliptin dosing</div>
+            <div style="font-size:11px;color:#8a857a;margin-top:2px">today · all documents</div>
+          </div>
+          <div style="padding:12px 8px">
+            <div style="font-size:13px;color:#5d5850">Vendor spend Q3 2025</div>
+            <div style="font-size:11px;color:#8a857a;margin-top:2px">yesterday · 1 of 5 docs</div>
+          </div>
+          <div style="padding:12px 8px">
+            <div style="font-size:13px;color:#5d5850;display:flex;align-items:center;gap:7px"><span>Adverse events overview</span><span style="width:6px;height:6px;border-radius:50%;border:1.5px solid #a39d90;flex:none"></span></div>
+            <div style="font-size:11px;color:#8a857a;margin-top:2px">Aug 5 · all documents · your documents changed since</div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="font-size:10.5px;color:#a39d90;padding:0 8px 6px;line-height:1.6">Answers come only from the documents above — there is no general knowledge here.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Phone · Scope (bottom sheet off the header pill)</div>
+      <div style="width:390px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden;position:relative">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #e3dfd6;background:#f1efe9;opacity:.5">
+          <div style="font-size:17px;color:#5d5850">☰</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;flex:1">Renagliptin dosing</div>
+          <div style="font-size:11.5px;color:#fff;background:#3a5d8f;border:1px solid #3a5d8f;border-radius:4px;padding:8px 10px">5 docs ▾</div>
+        </div>
+        <div style="position:absolute;inset:0;background:rgba(35,40,46,.18)"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:14px 14px 0 0;box-shadow:0 -8px 32px rgba(35,40,46,.16);padding:10px 18px 26px">
+          <div style="width:36px;height:4px;background:#d5d0c5;border-radius:2px;margin:0 auto 14px"></div>
+          <div style="font-size:13.5px;font-weight:600">Scope of this conversation</div>
+          <div style="font-size:11.5px;color:#8a857a;line-height:1.6;margin-top:4px">Answers can only come from checked documents. Narrowing applies from your next question.</div>
+          <div style="margin-top:8px">
+            <div style="display:flex;align-items:center;gap:12px;padding:13px 2px;border-top:1px solid #efede7"><div style="width:18px;height:18px;border-radius:3px;border:1px solid #3a5d8f;background:#3a5d8f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">✓</div><div style="font-size:14px">clinical-overview_2024.pdf</div></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:13px 2px;border-top:1px solid #efede7"><div style="width:18px;height:18px;border-radius:3px;border:1px solid #3a5d8f;background:#3a5d8f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">✓</div><div style="font-size:14px">efficacy-appendix_2024.pdf</div></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:13px 2px;border-top:1px solid #efede7"><div style="width:18px;height:18px;border-radius:3px;border:1px solid #c9c2b2;background:#fff;flex:none"></div><div style="font-size:14px;color:#5d5850">results-tables_2024.pdf</div></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:13px 2px;border-top:1px solid #efede7"><div style="width:18px;height:18px;border-radius:3px;border:1px solid #3a5d8f;background:#3a5d8f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">✓</div><div style="font-size:14px">safety-appendix_2024.pdf<span style="font-size:11px;color:#a8792f">&nbsp; still describing images</span></div></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:13px 2px;border-top:1px solid #efede7"><div style="width:18px;height:18px;border-radius:3px;border:1px solid #3a5d8f;background:#3a5d8f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">✓</div><div style="font-size:14px">vendor-costs_2025.xlsx</div></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:13px 2px;border-top:1px solid #efede7;opacity:.55"><div style="width:18px;height:18px;border:1px dashed #c9c2b2;border-radius:3px;flex:none"></div><div style="font-size:13px;color:#8a857a">scanned-archive_1998.pdf — couldn't be read</div></div>
+          </div>
+          <div style="background:#3a5d8f;color:#fff;font-size:14px;font-weight:500;padding:13px;border-radius:5px;text-align:center;margin-top:14px">Done — asking 4 of 5 documents</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Phone · Corpus</div>
+      <div style="width:390px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #e3dfd6;background:#f1efe9">
+          <div style="font-size:17px;color:#5d5850">☰</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;flex:1">Your documents</div>
+        </div>
+        <div style="padding:18px 16px">
+          <div style="font-size:12px;color:#8a857a">5 documents searchable · 802 retrievable passages · 1 file couldn't be read</div>
+          <div style="margin-top:12px">
+            <div style="display:flex;height:8px;border-radius:4px;overflow:hidden"><span style="background:#d5d0c5;width:88%"></span><span style="background:#a9bbd4;width:10%"></span><span style="background:#d9b98a;width:2%"></span></div>
+            <div style="font-size:10.5px;color:#8a857a;margin-top:7px;line-height:1.7">Of 802 passages: <span style="display:inline-block;width:8px;height:8px;background:#d5d0c5;border-radius:2px"></span> 709 plain text · <span style="display:inline-block;width:8px;height:8px;background:#a9bbd4;border-radius:2px"></span> 82 from tables · <span style="display:inline-block;width:8px;height:8px;background:#d9b98a;border-radius:2px"></span> 11 image descriptions</div>
+          </div>
+          <div style="margin-top:16px">
+            <div style="padding:14px 2px;border-top:1px solid #e3dfd6">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><div style="font-size:13.5px;font-weight:600">clinical-overview_2024.pdf</div><div style="font-size:9.5px;letter-spacing:1px;font-weight:600;color:#8a857a">READY</div></div>
+              <div style="font-size:11px;color:#8a857a;margin-top:3px">48 pages · 371 passages · added Aug 12</div>
+            </div>
+            <div style="padding:14px 2px;border-top:1px solid #e3dfd6">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><div style="font-size:13.5px;font-weight:600">efficacy-appendix_2024.pdf</div><div style="font-size:9.5px;letter-spacing:1px;font-weight:600;color:#8a857a">READY</div></div>
+              <div style="font-size:11px;color:#8a857a;margin-top:3px">36 pages · 207 passages · added Aug 12</div>
+            </div>
+            <div style="padding:14px 2px;border-top:1px solid #e3dfd6">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><div style="font-size:13.5px;font-weight:600">safety-appendix_2024.pdf</div><div style="font-size:9.5px;letter-spacing:1px;font-weight:600;color:#a8792f;white-space:nowrap">SEARCHABLE · INCOMPLETE</div></div>
+              <div style="font-size:11px;color:#5d5850;margin-top:3px;line-height:1.6">22 of 31 images described so far — answers that need the rest will be thinner until this finishes.</div>
+            </div>
+            <div style="padding:14px 2px;border-top:1px solid #e3dfd6">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><div style="font-size:13.5px;font-weight:600">vendor-costs_2025.xlsx</div><div style="font-size:9.5px;letter-spacing:1px;font-weight:600;color:#8a857a">READY</div></div>
+              <div style="font-size:11px;color:#8a857a;margin-top:3px">spreadsheet · 8 passages · added Aug 20</div>
+            </div>
+            <div style="padding:14px 2px;border-top:1px solid #e3dfd6">
+              <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><div style="font-size:13.5px;font-weight:600;color:#5d5850">scanned-archive_1998.pdf</div><div style="font-size:9.5px;letter-spacing:1px;font-weight:600;color:#5d5850;border:1px solid #c9c2b2;border-radius:3px;padding:2px 6px;white-space:nowrap">COULDN'T READ</div></div>
+              <div style="font-size:11px;color:#8a857a;margin-top:3px;line-height:1.6">A scan with no text layer — nothing to search. An OCR'd copy will work.</div>
+            </div>
+          </div>
+          <div style="border:1px dashed #c9c2b2;border-radius:6px;padding:16px;margin-top:16px;text-align:center;font-size:12.5px;color:#8a857a">Add files — <a href="#">browse</a></div>
+        </div>
+      </div>
+      <div style="font-size:10.5px;color:#8a857a;margin-top:8px;max-width:390px;line-height:1.6">Per-document composition bars drop on phone — the corpus-level bar keeps the unit; rows swap to passage counts in the meta line. Tap a row for detail + Remove.</div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Phone · Empty state</div>
+      <div style="width:390px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden">
+        <div style="padding:44px 22px">
+          <div style="font-family:'Source Serif 4',serif;font-size:23px;font-weight:600;line-height:1.35">Answers from your documents, with receipts.</div>
+          <div style="font-size:13.5px;color:#5d5850;margin-top:10px;line-height:1.7">There is no general knowledge here. If it isn't in what you add, the answer is “not in your documents.”</div>
+          <div style="background:#fff;border:1px solid #e3dfd6;border-radius:5px;padding:16px;margin-top:24px">
+            <div><span style="font-size:9.5px;letter-spacing:1px;font-weight:600;color:#8a857a;border:1px dashed #c9c2b2;border-radius:3px;padding:2px 7px">EXAMPLE — NOT YOUR DOCUMENTS YET</span></div>
+            <div style="font-size:11.5px;color:#8a857a;margin-top:12px">What notice period does the services contract require?</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:14.5px;line-height:1.8;margin-top:8px">Either party may terminate with 60 days' written notice,<span style="font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:1px 6px;margin-left:4px;vertical-align:2px">1</span> and the fee schedule steps down after year two.<span style="font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07);border-radius:3px;padding:1px 6px;margin-left:4px;vertical-align:2px;white-space:nowrap">Fig 1</span></div>
+            <div style="font-size:11px;color:#8a857a;margin-top:10px;line-height:1.7"><span style="color:#3a5d8f">Blue</span> is quoted text; <span style="color:#a8792f">amber</span> is a chart or table the assistant read for you.</div>
+          </div>
+          <div style="border:1px dashed #c9c2b2;border-radius:6px;padding:26px 18px;margin-top:18px;text-align:center;background:#fbfaf7">
+            <div style="font-size:14.5px;font-weight:600;color:#3a5d8f">Add your first documents</div>
+            <div style="font-size:11.5px;color:#8a857a;margin-top:6px">PDF, Word, spreadsheets. A large PDF takes a couple of minutes.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Phone · Useful refusal</div>
+      <div style="width:390px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #e3dfd6;background:#f1efe9">
+          <div style="font-size:17px;color:#5d5850">☰</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;flex:1">Vendor spend Q3 2025</div>
+          <div style="font-size:11.5px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:4px;padding:8px 10px">1 doc ▾</div>
+        </div>
+        <div style="flex:1;padding:18px 16px">
+          <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;line-height:1.5;margin-top:4px">What did we spend with Meridian Labs in Q3 2025?</div>
+          <div style="margin-top:16px"><span style="font-size:10px;letter-spacing:1px;font-weight:600;color:#5d5850;border:1px solid #d5d0c5;border-radius:3px;padding:3px 8px">FOUND — NOT QUOTED</span></div>
+          <div style="font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;line-height:1.5;margin-top:12px">It's in your documents. I won't quote it.</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:15px;line-height:1.85;margin-top:10px">Table 2 on page 4 of <span style="font-weight:600">vendor-costs_2025.xlsx</span> lists spend by vendor and quarter, and Meridian Labs is in it. That table didn't come through cleanly when I ingested the file, so any figure I read from it could be wrong. The Q3 2025 column has what you need.</div>
+          <div style="background:#fff;border:1px solid #e3dfd6;border-radius:4px;padding:14px 16px;margin-top:18px">
+            <div style="font-size:13px;font-weight:600">vendor-costs_2025.xlsx</div>
+            <div style="font-size:11.5px;color:#8a857a;margin-top:3px">Table 2 · Vendor spend by quarter · page 4</div>
+            <div style="background:#3a5d8f;color:#fff;font-size:13px;font-weight:500;padding:12px;border-radius:4px;text-align:center;margin-top:12px">Open the table</div>
+          </div>
+          <div style="font-size:11.5px;color:#8a857a;margin-top:14px;line-height:1.7">If the table reads fine to you, <a href="#">flag this</a> — it teaches the system what it got wrong.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Phone · Removal confirm</div>
+      <div style="width:390px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #e3dfd6;background:#f1efe9">
+          <div style="font-size:15px;color:#3a5d8f">←</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;flex:1">Remove efficacy-appendix_2024.pdf</div>
+        </div>
+        <div style="padding:18px 16px">
+          <div style="background:#fff;border:1px solid #d5d0c5;border-radius:6px;padding:16px">
+            <div style="font-size:12.5px;color:#5d5850">Removing it deletes everything derived from it:</div>
+            <div style="font-size:13px;margin-top:10px;line-height:1.7">207 retrievable passages — 180 from text, 22 from tables, 5 written descriptions of its figures</div>
+            <div style="font-size:13px;margin-top:6px">Its place in search — questions can no longer draw on it</div>
+            <div style="border-top:1px solid #efede7;margin-top:12px;padding-top:10px">
+              <div style="font-size:12.5px;color:#5d5850">2 past conversations cited it:</div>
+              <div style="font-size:12.5px;color:#3a5d8f;margin-top:5px">Renagliptin dosing (today) · Adverse events overview (Aug 5) · <a href="#">view them</a></div>
+              <div style="font-size:11.5px;color:#8a857a;margin-top:7px;line-height:1.6">Their answers stay readable as they were. Citations into this file will say the source is gone.</div>
+            </div>
+            <div style="background:#3a5d8f;color:#fff;font-size:14px;font-weight:500;padding:13px;border-radius:5px;text-align:center;margin-top:16px">Remove document</div>
+            <div style="font-size:13px;color:#8a857a;text-align:center;padding:12px">Keep it</div>
+          </div>
+          <div style="margin-top:22px">
+            <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">A CONVERSATION THAT CITED IT, AFTERWARDS</div>
+            <div style="background:#fff;border:1px solid #e3dfd6;border-radius:4px;padding:14px;margin-top:8px">
+              <div style="font-size:11px;color:#8a857a">Renagliptin dosing · turn 1</div>
+              <div style="font-family:'Source Serif 4',serif;font-size:14.5px;line-height:1.8;margin-top:6px">HbA1c fell by roughly 0.6, 0.9, and 1.2 points at 2.5, 5, and 10 mg<span style="font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;border:1px dashed #c9c2b2;color:#a39d90;border-radius:3px;padding:1px 6px;margin-left:4px;vertical-align:2px;white-space:nowrap">Fig 3</span></div>
+              <div style="font-size:11px;color:#8a857a;margin-top:8px;line-height:1.6">The answer stays as it was given. The grey citation can no longer be opened — its source was removed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:#8a857a;margin-bottom:8px">Tablet 834px portrait — desktop architecture holds</div>
+      <div style="width:834px;height:770px;background:#f6f5f2;border:1px solid #ddd9cf;border-radius:8px;overflow:hidden;display:grid;grid-template-columns:236px 1fr">
+        <div style="background:#f1efe9;border-right:1px solid #ddd9cf;padding:18px 12px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:baseline;gap:8px;padding:0 8px 12px"><div style="font-family:'Source Serif 4',serif;font-size:15px;font-weight:600">RAGkit</div></div>
+          <div style="border:1px solid #3a5d8f;color:#3a5d8f;background:#fff;border-radius:5px;padding:10px;font-size:12.5px;font-weight:500;text-align:center">Ask a new question</div>
+          <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600;padding:16px 8px 6px">CORPUS</div>
+          <div style="padding:10px 8px;border-radius:5px">
+            <div style="font-size:12.5px;font-weight:500">Your documents</div>
+            <div style="font-size:10.5px;color:#8a857a;margin-top:2px">5 searchable · 1 still describing images · 1 unreadable</div>
+          </div>
+          <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600;padding:16px 8px 6px">CONVERSATIONS</div>
+          <div style="padding:10px 8px;border-radius:5px;background:#fbfaf7;border:1px solid #e3dfd6">
+            <div style="font-size:12.5px;font-weight:500">Renagliptin dosing</div>
+            <div style="font-size:10.5px;color:#8a857a;margin-top:2px">today · all documents</div>
+          </div>
+          <div style="padding:10px 8px"><div style="font-size:12.5px;color:#5d5850">Vendor spend Q3 2025</div><div style="font-size:10.5px;color:#8a857a;margin-top:2px">yesterday · 1 of 5 docs</div></div>
+          <div style="flex:1"></div>
+          <div style="font-size:10px;color:#a39d90;padding:0 8px;line-height:1.6">Answers come only from the documents above — there is no general knowledge here.</div>
+        </div>
+        <div style="padding:30px 34px;overflow:hidden">
+          <div style="display:flex;align-items:baseline;gap:14px">
+            <div style="font-family:'Source Serif 4',serif;font-size:19px;font-weight:600">Renagliptin dosing</div>
+            <div style="flex:1"></div>
+            <div style="font-size:11.5px;color:#3a5d8f;border:1px solid #d5d0c5;background:#fff;border-radius:4px;padding:6px 11px">Scope: all 5 documents ▾</div>
+          </div>
+          <div style="height:1px;background:#e3dfd6;margin:16px 0"></div>
+          <div style="font-size:10px;letter-spacing:1.2px;color:#8a857a;font-weight:600">YOU</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;line-height:1.5;margin-top:4px">How did the dose groups compare on efficacy?</div>
+          <div style="margin-top:12px">
+            <div style="font-size:10.5px;letter-spacing:1px;font-weight:600;color:#3a5d8f;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#3a5d8f"></span>FROM YOUR DOCUMENTS · 6 passages read</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:15.5px;line-height:1.85;margin-top:8px;max-width:560px">HbA1c fell by roughly 0.6, 0.9, and 1.2 points at 2.5, 5, and 10 mg<span style="font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;font-weight:500;border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07);border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:3px;white-space:nowrap">Fig 3</span> and the reductions held through week 52.<span style="font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;font-weight:500;border:1px solid rgba(58,93,143,.4);color:#3a5d8f;border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:3px">1</span> Weight fell about 1.8 kg at the top dose.<span style="font-family:'IBM Plex Sans',sans-serif;font-size:10.5px;font-weight:500;border:1px solid rgba(168,121,47,.45);color:#a8792f;background:rgba(168,121,47,.07);border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:3px;white-space:nowrap">Fig 4</span></div>
+          </div>
+          <div style="margin-top:26px;max-width:560px">
+            <input placeholder="Ask about your documents…" style="width:100%;box-sizing:border-box;border:1px solid #d5d0c5;border-radius:6px;padding:12px 14px;font-size:13.5px;font-family:'IBM Plex Sans',sans-serif;background:#fff;color:#23282e;outline:none">
+          </div>
+        </div>
+      </div>
+      <div style="font-size:10.5px;color:#8a857a;margin-top:8px;max-width:834px;line-height:1.6">At 834px the sidebar narrows to 236px and stays; evidence cards keep the desktop floating-card form. Below 768px the phone rules take over. Landscape tablet is desktop, unchanged.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

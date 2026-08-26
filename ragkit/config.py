@@ -617,3 +617,73 @@ CORS_EXTRA_ORIGINS = tuple(
 # deployments, a cross-origin hop and a second thing to be asleep when the
 # examiner clicks the link.
 WEB_DIST_DIR = os.getenv("RAGKIT_WEB_DIST", "")
+
+
+# ---------------------------------------------------------------------------
+# WHO THIS DEPLOYMENT BELONGS TO
+#
+# Not a boolean. The obvious knob here was GEMINI_BILLED -- flip "free tier" to
+# "billed" and be done -- and it is a half-fix, because the same refusal has to
+# be read by three different people:
+#
+#   demo      a stranger on the public URL. The key is shared and writes are off;
+#             the free-tier framing is still the true one here.
+#   internal  you, on your own billed key. "the limit configured for this
+#             deployment" -- you can change it.
+#   customer  someone paying, on THEIR key. "the limit configured for your
+#             account" -- and the cap is now protecting their bill, not ours.
+#
+# One string cannot serve all three, and a message that names the wrong cause
+# sends the reader to the wrong place. That has now happened four times in this
+# codebase (deferred prefixes blamed for a caption failure; the retriever blamed
+# for a budget that admitted nothing; the schema blamed for our own output
+# ceiling; a config default quoted instead of the value in use). This is the
+# fifth, caught before shipping rather than after.
+DeploymentKind = str  # "demo" | "internal" | "customer"
+DEPLOYMENT_KIND: DeploymentKind = os.getenv("RAGKIT_DEPLOYMENT_KIND", "internal")
+
+# Shown in refusals on a customer deployment, so the message can say whose limit
+# was reached rather than "the limit".
+DEPLOYMENT_LABEL = os.getenv("RAGKIT_DEPLOYMENT_LABEL", "")
+
+
+# ---------------------------------------------------------------------------
+# SPEND CEILING
+#
+# There was no ceiling of any kind. `Usage` records what each call cost and
+# nothing aggregated or persisted it, which was survivable only while the key was
+# free-tier: the quota wall failed CLOSED and cost nothing. A billed key removes
+# the wall, so the same code now fails OPEN, into a bill.
+#
+# TWO LAYERS, because they fail in opposite directions.
+#
+# PER-OPERATION (below) is the one that matters. The dangerous case -- a customer
+# uploading 500 PDFs -- is a SINGLE operation whose size is knowable before any
+# money is spent: the chunk count and their token counts exist before the first
+# request. So this cap is checked up front and refuses the whole operation rather
+# than discovering the problem halfway through a paid run. It is also immune to
+# restarts, because it is computed from the work in front of it rather than from
+# remembered state.
+#
+# Counted over CACHE MISSES ONLY. A re-ingest whose embeddings are all cached
+# costs nothing, and a ceiling that refused it would be measuring the wrong
+# thing.
+GEMINI_MAX_OPERATION_TOKENS = int(
+    os.getenv("RAGKIT_MAX_OPERATION_TOKENS", "400000")
+)
+
+# CUMULATIVE DAILY is the second layer, and its limitation is stated rather than
+# papered over: the counter is a file, and on a container with ephemeral disk
+# (Lightsail, and anything that scales to zero) it RESETS ON RESTART. So this
+# layer fails OPEN across restarts. It is still worth having -- it catches slow
+# drift across many small requests within one process lifetime -- but it is not
+# the thing standing between a stranger and a large bill. That is the
+# per-operation cap above.
+#
+# Closes properly when there is a durable store to count in. Recorded as a
+# deferral with that predicate rather than left as a comment nobody re-reads.
+GEMINI_DAILY_TOKEN_CAP = int(os.getenv("RAGKIT_DAILY_TOKEN_CAP", "5000000"))
+
+# Where the daily counter lives. Under the cache dir because it shares that
+# directory's durability guarantee -- which is to say, none on a fresh container.
+SPEND_LEDGER_PATH = CACHE_DIR / "spend_ledger.json"

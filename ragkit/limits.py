@@ -76,10 +76,26 @@ class Degradation:
     impact: str         # what is now WORSE, in the user's terms
     fallback: str       # what happened instead ("skipped", "un-prefixed", "waited")
     remedy: str         # what the user can actually do about it
-    free_tier: bool = True  # was this caused by the free tier specifically?
+    # Was this caused by a GEMINI limit, as opposed to a ceiling we set
+    # ourselves? The field name is historical: it was written when the only
+    # possible cause was the free tier, so `True` meant "free tier" and the
+    # rendered string said so. A card is attached now, which makes that string
+    # false on two of the three deployment kinds -- see render().
+    free_tier: bool = True
 
     def render(self) -> str:
-        tier = " (free-tier Gemini limit)" if self.free_tier else ""
+        # NAME THE LIMIT THAT ACTUALLY APPLIED. Asserting "free-tier" on a billed
+        # key sends the reader to Google's quota page for a limit that is not the
+        # one they hit, which is the same misattribution bug as the four already
+        # fixed in this codebase. The tier is a property of the DEPLOYMENT, not of
+        # the notice, so it is read from config rather than guessed here.
+        tier = ""
+        if self.free_tier:
+            kind = getattr(config, "DEPLOYMENT_KIND", "internal")
+            tier = (
+                " (free-tier Gemini limit)" if kind == "demo"
+                else " (Gemini API limit)"
+            )
         return (
             f"[{self.stage}]{tier} {self.impact}\n"
             f"    what happened instead: {self.fallback}\n"

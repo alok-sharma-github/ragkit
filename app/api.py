@@ -43,7 +43,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from ragkit import config, conversations, feedback as fb, gemini, jobs, pipeline
+from ragkit import budget, config, conversations, feedback as fb, gemini, jobs, pipeline
 from ragkit.eval import reconcile as R
 from ragkit.generate import answer as A
 from ragkit.index.fusion import explain as explain_fusion
@@ -282,6 +282,11 @@ def status() -> dict[str, Any]:
         # Reported so the UI can DISABLE the upload affordance and explain it,
         # rather than offering a control that 403s. A button that fails when
         # pressed is worse than a button that is absent with a reason beside it.
+        # The ceiling, reported BEFORE it refuses anything. A limit a caller only
+        # discovers by hitting it is indistinguishable from a bug, and on a
+        # customer deployment this is the number they need to plan an upload
+        # against.
+        "budget": budget.snapshot().to_json(),
         "demo": {
             "read_only": config.DEMO_MODE,
             "why": ("this deployment shares one free-tier Gemini key, so upload, "

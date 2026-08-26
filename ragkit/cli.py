@@ -248,6 +248,47 @@ def cmd_capabilities(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_spend(args: argparse.Namespace) -> int:
+    """The spend ceiling: what it is, what has been spent, and how durable that is.
+
+    Exists because the quota banner and the budget refusals both tell the reader
+    to look here. A message naming a command that does not exist is the same
+    defect as a message naming the wrong cause -- it is confidently unhelpful.
+    """
+    from . import budget
+
+    snap = budget.snapshot()
+    print(f"deployment kind      {snap.deployment_kind}")
+    if config.DEPLOYMENT_LABEL:
+        print(f"deployment label     {config.DEPLOYMENT_LABEL}")
+    print()
+    print("ceilings")
+    print(f"  per operation      {snap.per_operation_cap:,} tokens"
+          "   <- checked BEFORE any paid call; restart-proof")
+    print(f"  per day            {snap.daily_cap:,} tokens")
+    print()
+    print("today")
+    print(f"  spent              {snap.spent_today:,} tokens")
+    print(f"  remaining          {snap.remaining_today:,} tokens")
+
+    ledger = budget._load()
+    today = ledger.get(budget._today(), {})
+    if today.get("by_stage"):
+        print("  by stage")
+        for stage, n in sorted(today["by_stage"].items(), key=lambda kv: -kv[1]):
+            print(f"    {stage:20s} {n:>10,}")
+        print(f"  calls              {today.get('calls', 0)}")
+
+    if not snap.durable:
+        print()
+        print("NOTE: the daily counter is a file and RESETS ON RESTART, so on a")
+        print("container that scales to zero it under-counts. The per-operation")
+        print("ceiling does not depend on it -- that one is computed from the work")
+        print("in front of it, which is why it is the layer that actually protects")
+        print("you. See `ragkit deferred` for the condition that closes this.")
+    return 0
+
+
 def cmd_deferred(args: argparse.Namespace) -> int:
     """Deferred decisions and whether their preconditions still hold."""
     from . import deferred
@@ -334,6 +375,9 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("capabilities", help="what the API can do, probed not configured")
     p.set_defaults(fn=cmd_capabilities)
 
+    p = sub.add_parser("spend", help="the spend ceiling and what has been spent today")
+    p.set_defaults(fn=cmd_spend)
+
     p = sub.add_parser("deferred", help="deferred decisions, and which have expired")
     p.set_defaults(fn=cmd_deferred)
 
@@ -357,9 +401,19 @@ def main(argv: list[str] | None = None) -> int:
         return int(args.fn(args))
     except limits.QuotaExhausted as exc:
         print(f"\nSTOPPED: {exc}")
-        print("This is a free-tier Gemini limit, not a bug in the pipeline.")
-        print("Per-minute limits clear in about a minute; a daily limit needs tomorrow")
-        print("or billing enabled. Finished work is cached, so a re-run resumes.")
+        # Was an unconditional "This is a free-tier Gemini limit". True when
+        # the only key this could run against was free; false the moment a card
+        # is attached -- and a banner naming the wrong limit sends the reader to
+        # the wrong page. Fifth instance of that bug class in this codebase.
+        if config.DEPLOYMENT_KIND == "demo":
+            print("This is a free-tier Gemini limit, not a bug in the pipeline.")
+            print("Per-minute limits clear in about a minute; a daily limit needs")
+            print("tomorrow or billing enabled.")
+        else:
+            print("This is a Gemini API rate limit, not a bug in the pipeline.")
+            print("Per-minute limits clear in about a minute. If instead this was a")
+            print("ceiling you set, see `ragkit spend`.")
+        print("Finished work is cached, so a re-run resumes.")
         return 3
     except RuntimeError as exc:
         print(f"\nERROR: {exc}")

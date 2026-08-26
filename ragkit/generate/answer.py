@@ -556,7 +556,7 @@ def answer_from_conversation(
         )
     except limits.QuotaExhausted:
         return Answer(text="", abstained=True,
-                      abstain_reason="free-tier Gemini quota exhausted",
+                      abstain_reason=_quota_reason(),
                       reconciliation={"chunks_sent": 0})
     except gemini.EmptyResponse as exc:
         return Answer(text="", abstained=True,
@@ -620,6 +620,19 @@ def answer_from_conversation(
         },
         usage=usage,
     )
+
+
+def _quota_reason() -> str:
+    """The abstain reason for a quota stop, named for the deployment it ran on.
+
+    This was the literal string "free-tier Gemini quota exhausted" in two places.
+    On a billed key it is simply untrue, and it is shown to the END USER as the
+    reason their question went unanswered -- so it is the worst place to keep a
+    stale cause.
+    """
+    if config.DEPLOYMENT_KIND == "demo":
+        return "free-tier Gemini quota exhausted"
+    return "Gemini API quota or rate limit reached"
 
 
 def _salvage_markdown(raw: str) -> str:
@@ -763,7 +776,7 @@ def answer(
                 remedy="wait for the per-minute quota to reset and retry",
             )
         )
-        return Answer(text="", abstained=True, abstain_reason="free-tier Gemini quota exhausted",
+        return Answer(text="", abstained=True, abstain_reason=_quota_reason(),
                       reconciliation={"chunks_sent": len(mapping)}, sources=mapping)
     except gemini.EmptyResponse as exc:
         return Answer(text="", abstained=True, abstain_reason=f"model returned no text: {exc}",
