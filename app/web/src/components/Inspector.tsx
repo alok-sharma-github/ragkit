@@ -335,6 +335,30 @@ function JudgeGate({ gate, judged }: { gate: InspectorResponse["judge_gate"]; ju
         <span>generator {gate.generator_model}</span>
         <span>key {gate.detail?.key}</span>
       </div>
+
+      {/* THE VALIDATION, ON THE PAGE. The kappa that gates every number below was
+          computed, recorded and then shown nowhere -- so the panel asserted
+          "HOLDS" and gave the reader no way to check what it holds against. The
+          estimate_type line travels WITH the number on purpose: a
+          class-balanced sample proves the judge can separate the classes, not
+          that it is precise on a population that is nearly all one class, and a
+          kappa quoted without that distinction invites the stronger reading. */}
+      {gate.detail?.kappa != null && (
+        <div className="mt-2 rounded-md border border-paper-300 bg-paper-100 p-2.5">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[12px] text-ink-900">
+            <span className="font-medium">
+              Cohen's kappa <span className="tabular-nums">{gate.detail.kappa}</span>
+            </span>
+            <span className="text-[11px] text-ink-500 tabular-nums">
+              raw {gate.detail.raw_agreement} · chance {gate.detail.chance_agreement} ·
+              n={gate.detail.n}
+            </span>
+          </div>
+          <p className="mt-1 text-[11px] leading-snug text-ink-400">
+            {gate.detail.estimate_type}
+          </p>
+        </div>
+      )}
       {!gate.may_emit_judged_metrics ? (
         <div className="mt-3 rounded-md border border-dashed border-ink-400/50 bg-paper-200 p-3">
           <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-500">
@@ -349,13 +373,76 @@ function JudgeGate({ gate, judged }: { gate: InspectorResponse["judge_gate"]; ju
           </p>
         </div>
       ) : (
-        <div className="mt-3 space-y-1 text-[12px] text-ink-900">
+        <div className="mt-3 space-y-2 text-[12px] text-ink-900">
+          {/* THE DENOMINATOR, FIRST AND ON ITS OWN LINE.
+              This panel used to print "supported 90/91 = 99%" and nothing else.
+              17 of those 91 rows were ABSTENTIONS, which the judge scores
+              "supported" -- correctly, since an answer asserting nothing asserts
+              nothing false. So a fifth of the headline was vacuous passes, and
+              the metric improved whenever the system answered FEWER questions.
+              A rate whose denominator is invisible invites exactly that misread,
+              and it was misread by the person who wrote it. */}
+          {judged?.n_answered != null && (
+            <div className="flex flex-wrap items-baseline gap-x-2 text-[11px] text-ink-500">
+              <span>
+                over{" "}
+                <span className="font-medium tabular-nums text-ink-900">
+                  {judged.n_answered}
+                </span>{" "}
+                answers
+              </span>
+              <span className="text-ink-400">
+                ({judged.n_abstained} abstained
+                {judged.n_starved ? `, ${judged.n_starved} starved by budget` : ""})
+              </span>
+            </div>
+          )}
           <div>
             supported <RateView rate={asRate(judged?.supported)} />
           </div>
           <div>
             answers the question <RateView rate={asRate(judged?.answers_question)} />
           </div>
+
+          {/* Abstention is COVERAGE, not faithfulness, so it is reported beside
+              it rather than inside it -- and never averaged in. Declining to
+              answer is a real cost even when it is the honest response. */}
+          {judged?.abstention_rate && (
+            <div className="mt-3 border-t border-paper-300 pt-2">
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-500">
+                Coverage — questions declined
+              </div>
+              <div className="mt-1">
+                overall <RateView rate={asRate(judged.abstention_rate)} />
+              </div>
+              {judged.abstention_by_stratum && (
+                <table className="mt-1.5 w-full text-[11px]">
+                  <tbody>
+                    {Object.entries(
+                      judged.abstention_by_stratum as Record<string, any>,
+                    )
+                      .sort((a, b) => (b[1]?.hits ?? 0) - (a[1]?.hits ?? 0))
+                      .filter(([, v]) => (v?.hits ?? 0) > 0)
+                      .map(([st, v]) => (
+                        <tr key={st} className="border-t border-paper-200">
+                          <td className="py-1 text-ink-600">{st}</td>
+                          <td className="py-1 text-right">
+                            <RateView rate={asRate(v)} />
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              )}
+              <p className="mt-1.5 text-[11px] leading-snug text-ink-400">
+                Every abstention was checked by re-retrieving its evidence: none had
+                a complete needle set in the delivered context. The model declines
+                when evidence is incomplete, not when it is present — so these are
+                retrieval-tier, and table and figure questions are where they
+                concentrate.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </Panel>
