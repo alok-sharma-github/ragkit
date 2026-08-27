@@ -46,5 +46,28 @@ experiments/out/
 .vscode/
 .claude/
 
+# --------------------------------------------------------------------------
+# RUNTIME STATE under data/index/ -- tracked by accident, now excluded.
+#
+# data/index/ was deliberately un-ignored so the prebuilt index ships and a fresh
+# clone can answer a question immediately. That was right, and it captured more
+# than intended: `conversations/` and `jobs/` live under the same directory and
+# are RUNTIME USER STATE, not build output. Eight of my ad-hoc debugging
+# conversations ("drift test") and nine job records were staged for a public repo.
+#
+# The distinction is one the code already makes -- conversations and jobs are the
+# only two runtime subdirectories of DATA_INDEX -- and the two kinds should never
+# have shared a durability decision. On a customer deployment these files are
+# THEIR data.
+#
+# Widening an exemption captured more than it named: the same shape as widening a
+# guard and invalidating a string written while it was narrow.
+data/index/conversations/
+data/index/jobs/
+# Derived from the conversations above, so it cannot be tracked when they are not
+# -- it would ship describing turns that no longer exist in the repo. Rebuilt
+# automatically on first read.
+data/index/citation_index.json
+
 # Scratch API response dumps from manual testing
 /t[0-9]*.json

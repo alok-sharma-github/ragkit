@@ -170,6 +170,17 @@ class Store:
         tmp = p.with_suffix(".tmp")
         tmp.write_text(json.dumps(c.to_json(), indent=1), encoding="utf-8")
         tmp.replace(p)
+        # Keep the reverse citation index current. Imported here rather than at
+        # module scope because it imports this module back -- and it is best-effort
+        # on purpose: the index is DERIVED from these files, so failing to update
+        # it costs a rebuild, never data. A conversation must not fail to save
+        # because a cache could not be written.
+        try:
+            from . import citations_index
+
+            citations_index.record(c)
+        except Exception:  # noqa: BLE001
+            pass
         return p
 
     def append(self, cid: str, turn: Turn) -> Conversation:

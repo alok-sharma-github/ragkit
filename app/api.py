@@ -43,7 +43,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from ragkit import budget, config, conversations, feedback as fb, gemini, jobs, pipeline
+from ragkit import (budget, citations_index, config, conversations,
+                    feedback as fb, gemini, jobs, pipeline)
 from ragkit.eval import reconcile as R
 from ragkit.generate import answer as A
 from ragkit.index.fusion import explain as explain_fusion
@@ -673,6 +674,57 @@ def start_ingest(caption_images: bool = Query(default=True)) -> dict[str, Any]:
                     "nothing until a document finishes"}
 
 
+def _current_fingerprint() -> str:
+    """The pipeline fingerprint of the live index.
+
+    A helper because the first version of this read `Manifest.summary()`, which
+    returns a STRING -- so `.get("pipeline_fingerprint")` would have raised on
+    every call. It survived review because the only caller is DELETE, and DELETE
+    cannot be exercised without deleting something: an untestable path is where a
+    trivial bug hides indefinitely. That is also the argument for the dry-run
+    endpoint below.
+    """
+    p = config.DATA_EVAL / "index_report.json"
+    if not p.exists():
+        return ""
+    try:
+        return str(json.loads(p.read_text("utf-8")).get("pipeline_fingerprint") or "")
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+@app.get("/api/documents/{source_id:path}/impact")
+def removal_impact(source_id: str) -> dict[str, Any]:
+    """What removing this document would affect. Changes nothing.
+
+    THE CONFIRM SCREEN NEEDS THIS AND COULD NOT USE DELETE. That endpoint returns
+    a `will_remove` preview *and queues the removal in the same call*, so its
+    "preview" describes what it has already started -- useless for a dialog whose
+    entire purpose is to be shown before the user commits.
+
+    A GET, deliberately: it is safe under the read-only demo guard, so the
+    consequences of a delete are visible on the public deployment even though the
+    delete itself is refused. Showing what a destructive action would do is not a
+    destructive action.
+    """
+    m = Manifest()
+    if source_id not in m.records:
+        raise HTTPException(404, f"no indexed document '{source_id}'")
+    rec = m.records[source_id]
+    return {
+        "source_id": source_id,
+        "will_remove": {
+            "chunks": len(rec.chunk_ids),
+            "parents": len(rec.parent_ids),
+            "assets": len(rec.asset_paths),
+            "cache_entries": len(rec.cache_keys),
+        },
+        "cited_in": citations_index.impact(source_id).to_json(
+            current_fingerprint=_current_fingerprint()
+        ),
+    }
+
+
 @app.delete("/api/documents/{source_id:path}")
 def remove(source_id: str, purge_cache: bool = Query(default=True)) -> dict[str, Any]:
     """Remove a document and everything derived from it. Queued, because it reindexes."""
@@ -680,12 +732,28 @@ def remove(source_id: str, purge_cache: bool = Query(default=True)) -> dict[str,
     if source_id not in m.records:
         raise HTTPException(404, f"no indexed document '{source_id}'")
     rec = m.records[source_id]
+    # WHAT ALREADY-ANSWERED QUESTIONS THIS TOUCHES.
+    #
+    # The preview counted chunks, parents, assets and cache entries -- everything
+    # derived from the document -- and said nothing about the conversations that
+    # had already cited it. Those are the part a user actually recognises: "you
+    # asked about this in three turns" is a reason to hesitate, where "1,247 cache
+    # entries" is not.
+    #
+    # Reported per TURN as well as per conversation, because Turn carries its own
+    # pipeline_fingerprint and a conversation can span fingerprint changes. Turns
+    # cited under a pipeline no longer in use are counted separately rather than
+    # pooled -- they are real citations and a weaker claim about the current index,
+    # and collapsing the two would overstate the blast radius.
+    imp = citations_index.impact(source_id)
+    fp = _current_fingerprint()
     preview = {
         "source_id": source_id,
         "chunks": len(rec.chunk_ids),
         "parents": len(rec.parent_ids),
         "assets": len(rec.asset_paths),
         "cache_entries": len(rec.cache_keys),
+        "cited_in": imp.to_json(current_fingerprint=fp),
     }
 
     def work(job: jobs.Job) -> dict[str, Any]:
