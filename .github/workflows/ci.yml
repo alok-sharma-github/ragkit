@@ -97,11 +97,30 @@ jobs:
       - name: boot at nano limits and answer /api/health
         run: |
           docker run -d --name ci --cpus 0.25 --memory 512m -p 8000:8000 ragkit:ci
-          for i in $(seq 1 45); do
+          # THREE MINUTES, not ninety seconds, and the reason is CPU contention.
+          #
+          # Boot is ~22-28s on an idle host: importing PyMuPDF, warming tiktoken
+          # and loading the index, all inside a 0.25 vCPU cap. But the build step
+          # runs immediately before this one in the SAME job, so the runner is
+          # still busy — and a 90s window failed locally under exactly that
+          # condition while the container was healthy 30s later. A timeout tuned
+          # on an idle machine becomes a flaky gate on a loaded one, and a gate
+          # that fails at random gets muted.
+          #
+          # Progress is printed so a real hang is distinguishable from a slow
+          # start in the log, rather than both looking like silence.
+          ok=0
+          for i in $(seq 1 60); do
             code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/api/health || true)
-            [ "$code" = "200" ] && echo "healthy after ${i}0s" && break
-            sleep 2
+            if [ "$code" = "200" ]; then echo "healthy after $((i*3))s"; ok=1; break; fi
+            [ $((i % 5)) -eq 0 ] && echo "  ...${code:-no-response} at $((i*3))s"
+            sleep 3
           done
+          if [ "$ok" != "1" ]; then
+            echo "never became healthy; container logs follow"
+            docker logs ci
+            exit 1
+          fi
           curl -fsS http://127.0.0.1:8000/api/health > /dev/null
           echo "--- the read-only guard must hold in the image ---"
           for path in /api/ingest /api/documents; do
@@ -150,4 +169,18 @@ jobs:
             echo "the secret exists, and this line is the record of that."
             exit 0
           fi
-          uv run python -m ragkit.eval.run --suite data/eval/golden.jsonl
+          # `--gate` is what makes this a gate: exit 1 on an NDCG@5 regression
+          # beyond config.CI_NDCG_REGRESSION_TOLERANCE against the stored baseline.
+          #
+          # This line previously read `--suite data/eval/golden.jsonl`, copied from
+          # the project plan. That flag does not exist -- argparse exits 2 with a
+          # usage error. So the gate would have failed on EVERY run, for a reason
+          # having nothing to do with the code, and the likely fix from whoever
+          # met it at 6pm is deleting the gate.
+          #
+          # A command in a document is a claim. This one was written, reviewed and
+          # copied into CI without once being run.
+          #
+          # --no-sweep because the seven-budget curve is for analysis, not for a
+          # pass/fail decision, and it multiplies the API calls by seven.
+          uv run python -m ragkit.eval.run --gate --no-sweep

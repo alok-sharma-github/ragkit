@@ -25,12 +25,12 @@ to generation rather than blamed on "the RAG."
 
 | metric | value |
 |---|---|
-| `child_strict` recall @1500-token budget | **78/92 = 85%** |
+| `child_strict` recall @1500-token budget | **79/92 = 86%** |
 | `source_hit` (right document surfaced) @every budget | **92/92 = 100%** |
 | NDCG@5 — dense vs RRF | 0.848 [0.761, 0.907] vs 0.880 [0.798, 0.932] |
 | RRF on `exact_identifier` queries @500 tokens | 68% → **89%** |
 
-`source_hit = 100%` with `child_strict = 85%` is the useful finding: the correct
+`source_hit = 100%` with `child_strict = 86%` is the useful finding: the correct
 document is *always* retrieved, so every remaining failure is ranking **within** a
 document. That localises the next piece of work precisely, and it is why no
 reranker was added — see [Decisions](#decisions-and-the-conditions-that-reverse-them).
@@ -206,8 +206,8 @@ The headline ones:
   the PDF parser passes through. Measured, unfixed: the fix changes
   `PARSER_VERSION`, forcing a full re-embed and invalidating every number above.
   Fixing it and re-measuring must happen together or not at all.
-- **Two of seven strata are unmeasured** (`aggregative`, `ambiguous`). So "85%
-  recall" means 85% on five of seven strata, and the UI marks the other two
+- **Two of seven strata are unmeasured** (`aggregative`, `ambiguous`). So "86%
+  recall" means 86% on five of seven strata, and the UI marks the other two
   `NOT_MEASURED` rather than rendering an ambiguous blank.
 - **Table and figure retrieval is the weak subsystem** — 27% of those questions
   are declined for want of complete evidence.

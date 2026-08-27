@@ -111,7 +111,7 @@ Contextual Retrieval (the Anthropic result: 35% / 49% / 67% reduction in failed
 retrievals) was deferred in favour of a free heading-breadcrumb baseline, on the
 principle that the paid version must beat the free one rather than an empty one.
 
-**Its own predicate has since fired**: `child_strict = 85%` (below the ~90%
+**Its own predicate has since fired**: `child_strict = 86%` (below the ~90%
 threshold) with `source_hit` already at 1.0. It expired without anyone
 remembering to check, which is the entire argument for storing deferrals as
 predicates. Cost to act: ~$0.69.
@@ -225,7 +225,7 @@ Confidence intervals are Wilson.
 ### D-14 · Unmeasured is a distinct state from zero
 
 `aggregative` and `ambiguous` have no items, and the UI renders `NOT_MEASURED`
-rather than a blank that could read as failure. The headline is therefore "85% on
+rather than a blank that could read as failure. The headline is therefore "86% on
 **five of seven** strata". The reconciler reports `0 failing · 6 passing · 3 not
 measured` — three-state, not two.
 
@@ -537,6 +537,37 @@ default, so no literal grep can see it — and a check that silently missed the 
 important directory under audit would be A-3 all over again, inside the tool
 written to prevent it.
 
+## A-12 · A provenance stamp only covers what it hashes
+
+The retrieval headline moved 78/92 to 79/92 between two runs whose
+`index_provenance` was **byte-identical** — same parser version, same chunker
+version, same `pipeline_fingerprint`. The gate reported "flat" and was right to;
+the fingerprint reported "same system" and was wrong.
+
+Cause not established, and that is the point. The most likely explanation is that
+an unrelated test queued real ingest jobs, which rewrote the index files from
+cached embeddings and changed a tie-break in ranking. **But nothing recorded
+enough to confirm it**, because the fingerprint covers the *pipeline* —
+`parser_version`, `chunker_version`, embedding dimension — and not the *artifact*
+the pipeline produced.
+
+So a rebuilt index that differs in chunk ordering carries the same stamp as the
+one before it. Two runs can then be compared as though they measured the same
+index when they did not, which is the precise failure the stamp exists to prevent,
+in the stamp itself.
+
+Retrieval *is* deterministic — re-running immediately reproduced 79/92 exactly,
+which is what justifies gating it in CI. The non-determinism is not in the search;
+it is in what "the index" refers to across a rebuild.
+
+**The fix is a content hash** of the serialised index alongside the pipeline
+fingerprint: `same pipeline` and `same artifact` are different claims and deserve
+different fields. Not yet done, and recorded here rather than quietly patched,
+because it changes what every stored comparison means.
+
+The general form, worth carrying: **a stamp is a claim about exactly the inputs it
+hashes.** Everything else it appears to vouch for, it does not.
+
 ---
 
 # Part 3 — Deliberately not decided
@@ -595,7 +626,7 @@ two items between runs should not be read as a change in the system.
 
 | | |
 |---|---|
-| `child_strict` @1500 tok | 78/92 = **85%** (5 of 7 strata) |
+| `child_strict` @1500 tok | 79/92 = **86%** (5 of 7 strata) |
 | `source_hit` @every budget | 92/92 = **100%** |
 | Retrieval misses by budget | 67 @250 · 14 @1500 · 4 @3000 · **0 @12000** |
 | NDCG@5 dense vs RRF | 0.848 [0.761, 0.907] vs 0.880 [0.798, 0.932] |
