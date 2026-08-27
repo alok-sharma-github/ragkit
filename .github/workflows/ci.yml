@@ -33,24 +33,18 @@ jobs:
       - name: sync deps
         run: uv sync --frozen --extra web
 
-      # The cp1252 console killed six runs on this project. GitHub runners are
-      # UTF-8, but a runner is not the only place this executes.
-      - name: reachability + guard coverage
+      # ONE DEFINITION OF THE GATES. The three checks used to be listed inline
+      # here, and a local runner was added because Actions is billing-locked on
+      # this account -- which immediately created two lists of gates that would
+      # drift, each claiming to say whether the code is good. That is the
+      # survey-script failure: two programs, one question, different answers.
+      #
+      # The list now lives in scripts/ci_local.py and this calls it. A gate added
+      # there is added here, because there is only one.
+      - name: gates (same list scripts/ci_local.py runs)
         env:
           PYTHONIOENCODING: utf-8
-        run: uv run python -m ragkit.cli audit
-
-      - name: invariants over the stored artifacts
-        env:
-          PYTHONIOENCODING: utf-8
-        run: uv run python -m ragkit.cli reconcile
-
-      # Reads the artifacts and refuses to pool incomparable ones. Cheap, and it
-      # catches a stamp mismatch introduced by a code change.
-      - name: failure analysis reconciles
-        env:
-          PYTHONIOENCODING: utf-8
-        run: uv run python scripts/failure_histogram.py
+        run: uv run python scripts/ci_local.py
 
   frontend:
     name: frontend build

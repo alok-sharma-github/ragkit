@@ -1,5 +1,5 @@
 {
-  "seconds": 0.8,
+  "seconds": 5.4,
   "regression_tests": {
     "What is the Precision@5 for the BM25_ONLY method in the Meridian Retri": {
       "passes_at_budget": 250,
