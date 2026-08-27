@@ -687,3 +687,27 @@ GEMINI_DAILY_TOKEN_CAP = int(os.getenv("RAGKIT_DAILY_TOKEN_CAP", "5000000"))
 # Where the daily counter lives. Under the cache dir because it shares that
 # directory's durability guarantee -- which is to say, none on a fresh container.
 SPEND_LEDGER_PATH = CACHE_DIR / "spend_ledger.json"
+
+
+# ---------------------------------------------------------------------------
+# WRITE PASSWORD (Phase 1 -- not an auth system, and labelled as such)
+#
+# Three deployment shapes, three needs:
+#
+#   demo      writes DENIED outright. No token exists, and none would help.
+#   local     writes open. A developer on their own machine is already trusted
+#             by the filesystem; a password would be theatre.
+#   customer  writes gated on a shared secret.
+#
+# WHAT THIS IS NOT. It is one shared password, not identity: it cannot say WHO
+# wrote, cannot be revoked per person, and gives no audit trail. It is a lock on
+# a door, appropriate exactly while a deployment serves ONE customer -- which is
+# the Phase 1 model. The moment two tenants share a deployment this is
+# insufficient, and that is what the multi-tenancy deferral is for. Recorded here
+# so nobody mistakes it for having solved authentication.
+#
+# Empty means "no gate", which is the right default for local work and the wrong
+# one for a customer deployment. That asymmetry is handled where it belongs: the
+# deploy workflow always passes the secret for a customer service, and the demo
+# does not need it because DEMO_MODE already denies writes.
+WRITE_TOKEN = os.getenv("RAGKIT_WRITE_TOKEN", "")

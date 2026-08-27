@@ -107,14 +107,67 @@ def _client(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
+WRITE_COOKIE = "ragkit_write"
+# The unlock route itself must be reachable without the token, or there is no way
+# to present one. Everything else is gated.
+_UNLOCK_PATH = re.compile(r"^/api/unlock$")
+
+
+def _write_token_ok(request: Request) -> bool:
+    """Does this request carry the write password?
+
+    Header or cookie. The header is for scripts, the cookie for a browser that
+    unlocked once.
+
+    compare_digest, not `==`. String equality returns as soon as it finds a
+    differing byte, so the time it takes leaks how much of a guess was correct --
+    enough to recover a secret one character at a time. The cost of doing this
+    right is one import.
+    """
+    import secrets as _secrets
+
+    want = config.WRITE_TOKEN
+    if not want:
+        return True
+    got = request.headers.get("x-ragkit-write-token") or request.cookies.get(WRITE_COOKIE) or ""
+    return _secrets.compare_digest(got, want)
+
+
 @app.middleware("http")
 async def demo_guard(request: Request, call_next):
+    path, method = request.url.path, request.method.upper()
+    is_write = method in ("POST", "PUT", "PATCH", "DELETE")
+
+    # THE WRITE PASSWORD, checked before DEMO_MODE returns early.
+    #
+    # Ordering matters and the obvious order is wrong. `if not config.DEMO_MODE:
+    # return await call_next(...)` used to be the first line, so every non-demo
+    # deployment skipped the whole middleware -- and a customer deployment is
+    # non-demo by definition. Adding the token check after that early return
+    # would have gated exactly the deployments that already deny writes and none
+    # of the ones that accept them.
+    #
+    # That is the "guarded on some of the traffic" failure again, and it would
+    # have been invisible: the demo would still refuse writes, the local dev box
+    # would still accept them, and only a customer deployment -- the one case
+    # nobody tests before there is a customer -- would be open.
+    if is_write and not _UNLOCK_PATH.match(path) and not _write_token_ok(request):
+        return JSONResponse(
+            status_code=401,
+            content={
+                "detail": "write password required",
+                "why": "this deployment requires a shared write password for "
+                       "uploads, re-ingest and deletion",
+                "what_you_can_do": "POST /api/unlock with {\"token\": \"...\"} to "
+                                   "unlock this browser, or send the "
+                                   "X-RAGkit-Write-Token header",
+            },
+        )
+
     if not config.DEMO_MODE:
         return await call_next(request)
 
-    path, method = request.url.path, request.method.upper()
-
-    if method in ("POST", "PUT", "PATCH", "DELETE"):
+    if is_write:
         if not any(p.match(path) for p in _DEMO_ALLOWED_WRITES):
             # 403 with the REASON, not a bare status. A demo that silently lacks
             # upload reads as unfinished; one that says why it is read-only reads
@@ -233,6 +286,49 @@ class AskRequest(BaseModel):
 # --------------------------------------------------------------------------
 # Routes
 # --------------------------------------------------------------------------
+
+
+class Unlock(BaseModel):
+    token: str = Field(min_length=1, max_length=512)
+
+
+@app.post("/api/unlock")
+def unlock(body: Unlock) -> JSONResponse:
+    """Exchange the write password for a cookie, so a browser asks once.
+
+    Deliberately NOT a login: there is one password, no identity, and no session
+    record. See config.WRITE_TOKEN for why that is the right shape for a
+    single-customer deployment and the wrong shape the moment two tenants share
+    one.
+
+    Returns the same 401 body as the middleware on a wrong token, so this endpoint
+    cannot be used to distinguish "wrong password" from "no password configured".
+    """
+    import secrets as _secrets
+
+    want = config.WRITE_TOKEN
+    if not want:
+        # No gate configured. Saying so is not a leak -- every write already
+        # succeeds without a token, so a caller learns nothing they could not
+        # learn by trying one.
+        return JSONResponse(
+            status_code=200,
+            content={"unlocked": True, "note": "no write password is configured "
+                                               "on this deployment"},
+        )
+    if not _secrets.compare_digest(body.token, want):
+        return JSONResponse(status_code=401, content={"detail": "write password required"})
+
+    r = JSONResponse(status_code=200, content={"unlocked": True})
+    r.set_cookie(
+        WRITE_COOKIE, want,
+        # httponly: script on the page cannot read it, so an XSS cannot exfiltrate
+        # the password. samesite=strict: it is not sent on cross-site requests, so
+        # another origin cannot drive a write with the visitor's cookie.
+        httponly=True, samesite="strict", secure=True, max_age=60 * 60 * 24 * 30,
+        path="/",
+    )
+    return r
 
 
 @app.get("/api/status")

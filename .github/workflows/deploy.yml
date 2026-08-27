@@ -1,0 +1,223 @@
+# Deploy to Lightsail. One workflow, both branches, parameterised by service.
+#
+# WHY ONE FILE RATHER THAN demo.yml + product.yml. Two files that deploy the same
+# image the same way drift: a fix lands in one and not the other, and the
+# divergence is invisible until the branch that was not updated deploys something
+# different. A per-customer deployment is an INPUT, not a new pipeline — the whole
+# point of Phase 1's one-deployment-per-customer model is that adding a customer
+# must not mean adding a file.
+#
+# NO STORED AWS KEYS. OIDC issues a token per run, scoped to this repo and to two
+# explicit refs. See scripts/setup_oidc.py for why `repo:owner/repo:*` — the value
+# every tutorial uses — would let a fork's pull request deploy production.
+name: deploy
+
+on:
+  # Gates first, deploy second. `workflow_run` means deploy cannot start until ci
+  # has actually passed on that exact commit -- as opposed to `needs:` inside one
+  # workflow, which a fork PR would trip over at the credential step.
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main, product]
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Lightsail container service (a new customer is a new value here)'
+        required: true
+        default: ragkit
+      deployment_kind:
+        description: 'demo | internal | customer -- drives refusal wording'
+        required: true
+        default: demo
+      deployment_label:
+        description: 'Customer name, shown in their refusal messages'
+        required: false
+        default: ''
+
+concurrency:
+  # Per service, not per branch. Two deployments to one Lightsail service at once
+  # is the failure this prevents; two different services in parallel is fine.
+  group: deploy-${{ github.event.inputs.service || 'ragkit' }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write   # required to request the OIDC token
+  contents: read
+
+jobs:
+  deploy:
+    name: build, push, deploy
+    runs-on: ubuntu-latest
+    # A red ci must not deploy. workflow_run fires on completion regardless of
+    # outcome, so the conclusion is checked explicitly rather than assumed.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # For workflow_run, checkout defaults to the default branch, NOT the
+          # commit that was tested. Deploying a different commit than the one ci
+          # passed on would make the gate meaningless.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+
+      - name: resolve target
+        id: target
+        run: |
+          # Default per branch, overridable by dispatch inputs. main -> the public
+          # read-only demo; product -> the internal deployment that customer
+          # services are cut from.
+          BRANCH="${{ github.event.workflow_run.head_branch || github.ref_name }}"
+          SERVICE="${{ github.event.inputs.service }}"
+          KIND="${{ github.event.inputs.deployment_kind }}"
+          if [ -z "$SERVICE" ]; then
+            if [ "$BRANCH" = "main" ]; then SERVICE=ragkit; KIND=demo
+            else SERVICE=ragkit-product; KIND=internal; fi
+          fi
+          echo "service=$SERVICE" >> "$GITHUB_OUTPUT"
+          echo "kind=${KIND:-demo}" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "deploying $BRANCH -> service '$SERVICE' as kind '${KIND:-demo}'"
+
+      - name: assume the deploy role via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: install the lightsail plugin
+        run: |
+          # `aws lightsail push-container-image` is a thin wrapper around this
+          # separate binary. Without it the command fails with "plugin not found",
+          # which reads like a permissions problem and is not.
+          curl -sSL -o /usr/local/bin/lightsailctl \
+            https://s3.us-west-2.amazonaws.com/lightsailctl/latest/linux-amd64/lightsailctl
+          chmod +x /usr/local/bin/lightsailctl
+
+      - name: build image
+        run: docker build -t ragkit:${{ github.sha }} .
+
+      - name: ensure the service exists
+        run: |
+          SERVICE="${{ steps.target.outputs.service }}"
+          if ! aws lightsail get-container-services --service-name "$SERVICE" >/dev/null 2>&1; then
+            echo "creating container service $SERVICE (nano, scale 1)"
+            aws lightsail create-container-service \
+              --service-name "$SERVICE" --power nano --scale 1
+            # Provisioning takes several minutes; a deployment against a PENDING
+            # service is rejected.
+            for i in $(seq 1 30); do
+              state=$(aws lightsail get-container-services --service-name "$SERVICE" \
+                        --query 'containerServices[0].state' --output text)
+              echo "  state=$state"
+              [ "$state" = "READY" ] || [ "$state" = "RUNNING" ] && break
+              sleep 20
+            done
+          else
+            echo "service $SERVICE already exists"
+          fi
+
+      - name: push image
+        id: push
+        run: |
+          SERVICE="${{ steps.target.outputs.service }}"
+          out=$(aws lightsail push-container-image \
+                  --service-name "$SERVICE" --label app --image ragkit:${{ github.sha }})
+          echo "$out"
+          tag=$(echo "$out" | sed -n 's/.*Refer to this image as "\([^"]*\)".*/\1/p')
+          [ -n "$tag" ] || { echo "could not parse the registered image tag"; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: deploy
+        run: |
+          SERVICE="${{ steps.target.outputs.service }}"
+          KIND="${{ steps.target.outputs.kind }}"
+          URL=$(aws lightsail get-container-services --service-name "$SERVICE" \
+                  --query 'containerServices[0].url' --output text)
+          # RAGKIT_DEMO_MODE is 1 for the public demo and 0 elsewhere. The IMAGE
+          # defaults it to 1, so a deployment that forgot this variable would still
+          # be read-only -- the safe direction.
+          DEMO=0; [ "$KIND" = "demo" ] && DEMO=1
+          python3 - "$SERVICE" "$KIND" "$DEMO" "$URL" <<'PY'
+          import json, os, sys
+          service, kind, demo, url = sys.argv[1:5]
+          containers = {"app": {
+              "image": os.environ["IMAGE_TAG"],
+              "ports": {"8000": "HTTP"},
+              "environment": {
+                  "GEMINI_API_KEY": os.environ["GEMINI_API_KEY"],
+                  "PORT": "8000",
+                  "RAGKIT_DEMO_MODE": demo,
+                  "RAGKIT_DEPLOYMENT_KIND": kind,
+                  "RAGKIT_DEPLOYMENT_LABEL": os.environ.get("DEPLOY_LABEL", ""),
+                  "RAGKIT_MAX_OPERATION_TOKENS": os.environ["MAX_OP_TOKENS"],
+                  "RAGKIT_DAILY_TOKEN_CAP": os.environ["DAILY_CAP"],
+                  "RAGKIT_CORS_ORIGINS": url.rstrip("/"),
+                  "RAGKIT_WRITE_TOKEN": os.environ.get("WRITE_TOKEN", ""),
+              },
+          }}
+          # unhealthyThreshold x intervalSeconds must exceed the cold boot, which
+          # is ~22s at nano's 0.25 vCPU. Lightsail's defaults would mark the
+          # container unhealthy mid-boot and roll the deployment back -- which
+          # presents as "deploy failed for no reason".
+          endpoint = {"containerName": "app", "containerPort": 8000,
+                      "healthCheck": {"path": "/api/health", "intervalSeconds": 10,
+                                      "timeoutSeconds": 5, "healthyThreshold": 2,
+                                      "unhealthyThreshold": 10, "successCodes": "200"}}
+          open("containers.json", "w").write(json.dumps(containers))
+          open("endpoint.json", "w").write(json.dumps(endpoint))
+          print(f"deploying to {service} ({kind}), demo_mode={demo}")
+          PY
+          aws lightsail create-container-service-deployment \
+            --service-name "$SERVICE" \
+            --containers file://containers.json \
+            --public-endpoint file://endpoint.json \
+            --query 'containerService.state' --output text
+          rm -f containers.json endpoint.json
+        env:
+          IMAGE_TAG: ${{ steps.push.outputs.tag }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WRITE_TOKEN: ${{ secrets.RAGKIT_WRITE_TOKEN }}
+          DEPLOY_LABEL: ${{ github.event.inputs.deployment_label }}
+          MAX_OP_TOKENS: ${{ vars.RAGKIT_MAX_OPERATION_TOKENS || '400000' }}
+          DAILY_CAP: ${{ vars.RAGKIT_DAILY_TOKEN_CAP || '500000' }}
+
+      - name: wait for the deployment, then verify it
+        run: |
+          SERVICE="${{ steps.target.outputs.service }}"
+          for i in $(seq 1 40); do
+            d=$(aws lightsail get-container-services --service-name "$SERVICE" \
+                  --query 'containerServices[0].currentDeployment.state' --output text)
+            s=$(aws lightsail get-container-services --service-name "$SERVICE" \
+                  --query 'containerServices[0].state' --output text)
+            echo "  service=$s deployment=$d"
+            [ "$d" = "ACTIVE" ] && [ "$s" = "RUNNING" ] && break
+            [ "$d" = "FAILED" ] && { echo "deployment FAILED"; exit 1; }
+            sleep 20
+          done
+          URL=$(aws lightsail get-container-services --service-name "$SERVICE" \
+                  --query 'containerServices[0].url' --output text)
+          URL="${URL%/}"
+          echo "verifying $URL"
+          # POST-DEPLOY VERIFICATION, because a deployment reporting ACTIVE has
+          # only told you the container is answering a health check. This project
+          # has shipped a page that returned 200 while the app was unusable, and
+          # a deployment six commits behind the repo went unnoticed until a user
+          # reported it.
+          curl -fsS "$URL/api/health" > /dev/null && echo "  health   ok"
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$URL/")
+          [ "$code" = "200" ] || { echo "  SPA returned $code"; exit 1; }
+          echo "  spa      ok"
+          # The read-only guard is only asserted on the demo; a customer
+          # deployment is SUPPOSED to accept writes, so asserting 403 there would
+          # fail a correct deployment.
+          if [ "${{ steps.target.outputs.kind }}" = "demo" ]; then
+            got=$(curl -s -o /dev/null -w '%{http_code}' -X DELETE "$URL/api/documents/x")
+            [ "$got" = "403" ] || { echo "  GUARD OPEN on the public demo ($got)"; exit 1; }
+            echo "  guard    ok (403)"
+          fi
+          kind=$(curl -fsS "$URL/api/status" | python3 -c "import sys,json;print(json.load(sys.stdin)['budget']['deployment_kind'])")
+          echo "  kind     $kind"
+          [ "$kind" = "${{ steps.target.outputs.kind }}" ] || {
+            echo "  deployment_kind mismatch -- refusal wording would be wrong"; exit 1; }
+          echo ""
+          echo "deployed: $URL"

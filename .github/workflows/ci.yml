@@ -1,0 +1,153 @@
+# Gates that run on every push and pull request, on both branches.
+#
+# Deploy lives in deploy.yml and depends on this passing. Split because a PR from
+# a fork must be able to run the GATES without touching AWS credentials — the OIDC
+# trust deliberately excludes fork PRs, so a combined workflow would fail at the
+# credential step and report a red X that says nothing about the code.
+name: ci
+
+on:
+  push:
+    branches: [main, product]
+  pull_request:
+    branches: [main, product]
+
+# A second push while the first is still testing makes the first result
+# irrelevant. Cancel it rather than paying for an answer nobody will read.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: static gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: sync deps
+        run: uv sync --frozen --extra web
+
+      # The cp1252 console killed six runs on this project. GitHub runners are
+      # UTF-8, but a runner is not the only place this executes.
+      - name: reachability + guard coverage
+        env:
+          PYTHONIOENCODING: utf-8
+        run: uv run python -m ragkit.cli audit
+
+      - name: invariants over the stored artifacts
+        env:
+          PYTHONIOENCODING: utf-8
+        run: uv run python -m ragkit.cli reconcile
+
+      # Reads the artifacts and refuses to pool incomparable ones. Cheap, and it
+      # catches a stamp mismatch introduced by a code change.
+      - name: failure analysis reconciles
+        env:
+          PYTHONIOENCODING: utf-8
+        run: uv run python scripts/failure_histogram.py
+
+  frontend:
+    name: frontend build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/web/package-lock.json
+      - run: npm ci
+        working-directory: app/web
+      # `npm run build` is `tsc -b && vite build`. NOT `tsc --noEmit`, which exits
+      # 0 on code this rejects — that is how a type error reached a deployment
+      # once already.
+      - run: npm run build
+        working-directory: app/web
+
+  image:
+    name: image builds and boots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: ragkit:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # BOOT IT, do not just build it. Three deploy-breaking defects in this
+      # project built cleanly and failed at container start: fastapi missing from
+      # the default extra, a missing `pathlib` import in the static mount, and
+      # hatchling failing on an absent README. A build that is never run is a
+      # syntax check.
+      #
+      # No GEMINI_API_KEY here on purpose: /api/health must answer without one, so
+      # a health check cannot depend on a paid service being reachable.
+      - name: boot at nano limits and answer /api/health
+        run: |
+          docker run -d --name ci --cpus 0.25 --memory 512m -p 8000:8000 ragkit:ci
+          for i in $(seq 1 45); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/api/health || true)
+            [ "$code" = "200" ] && echo "healthy after ${i}0s" && break
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:8000/api/health > /dev/null
+          echo "--- the read-only guard must hold in the image ---"
+          for path in /api/ingest /api/documents; do
+            got=$(curl -s -o /dev/null -w '%{http_code}' -X POST "http://127.0.0.1:8000$path")
+            echo "  POST $path -> $got"
+            [ "$got" = "403" ] || { echo "GUARD OPEN in the image"; exit 1; }
+          done
+          got=$(curl -s -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:8000/api/documents/x)
+          echo "  DELETE /api/documents/x -> $got"
+          [ "$got" = "403" ] || { echo "GUARD OPEN in the image"; exit 1; }
+          echo "--- memory at nano limits ---"
+          docker stats ci --no-stream --format '  {{.MemUsage}} ({{.MemPerc}})'
+      - name: container logs on failure
+        if: failure()
+        run: docker logs ci
+
+  retrieval-regression:
+    name: retrieval regression gate
+    runs-on: ubuntu-latest
+    # Needs a key: the eval embeds each question. The generation tier is
+    # deliberately NOT gated — see the generation_tier_ci_gating deferral. One run
+    # is n=1, and an unchanged index has already moved abstentions 17->18 between
+    # runs, so a generation gate would fail builds for no reason and get muted.
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --extra web
+
+      - name: retrieval eval vs stored baseline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PYTHONIOENCODING: utf-8
+          # Bounded so a runaway loop cannot spend real money from CI. The whole
+          # eval embeds ~92 short questions; this is far above that and far below
+          # anything alarming.
+          RAGKIT_MAX_OPERATION_TOKENS: '200000'
+          RAGKIT_DAILY_TOKEN_CAP: '400000'
+          RAGKIT_DEPLOYMENT_KIND: internal
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "no GEMINI_API_KEY secret set -- skipping the retrieval gate."
+            echo "This is a REPORTED skip, not a silent pass: the gate is off until"
+            echo "the secret exists, and this line is the record of that."
+            exit 0
+          fi
+          uv run python -m ragkit.eval.run --suite data/eval/golden.jsonl
