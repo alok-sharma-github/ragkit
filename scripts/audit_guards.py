@@ -286,12 +286,116 @@ def check_guard_messages_route_neutral() -> tuple[bool, list[str]]:
     return ok, lines
 
 
+# ---------------------------------------------------------------------------
+# Check 4 -- runtime state under data/index/ is not tracked by git
+# ---------------------------------------------------------------------------
+
+# Paths under data/index/ that are BUILD OUTPUT and belong in the repo, each with
+# the reason it ships. Everything else found there must be gitignored.
+#
+# The direction of failure is what makes this safe: a path that is neither declared
+# here nor ignored FAILS. So a new runtime store added next year is caught the day
+# it appears, rather than shipping someone's data because nobody remembered to
+# extend a list in .gitignore.
+# Matches `config.DATA_INDEX / "name"` with either quote style. Defined at module
+# scope rather than inline because a regex containing both quote characters is
+# exactly the string that gets mangled when a patch script rewrites this file --
+# which it did, producing a SyntaxError.
+_DATA_INDEX_LITERAL = r"""DATA_INDEX\s*/\s*["']([^"']+)["']"""
+
+BUILD_OUTPUT: dict[str, str] = {
+    "numpy_index": "the prebuilt index -- the reason data/index/ is tracked at all",
+    "ingest_manifest.json": "what was ingested, and under which parser version",
+    "manifest.json": "the corpus record; delta detection reads it",
+    "resolved_models.json": "which model IDs this key resolved to, recorded not guessed",
+}
+
+
+def check_runtime_state_untracked() -> tuple[bool, list[str]]:
+    """Every path under data/index/ is either declared build output or ignored.
+
+    WHY THIS EXISTS. data/index/ was deliberately un-ignored so the prebuilt index
+    ships and a fresh clone can answer a question immediately. That was right, and
+    it captured more than it named: `conversations/` and `jobs/` live under the
+    same directory and are RUNTIME USER STATE. Eight ad-hoc debugging conversations
+    and nine job records were staged for a public repo.
+
+    Fixing it by listing those two paths in .gitignore would have restated the
+    distinction as a literal, and a literal drifts the moment a third runtime
+    directory appears -- which is the hand-maintained-list problem this file exists
+    to avoid, one layer down.
+
+    DERIVED FROM TWO SOURCES, UNIONED, because either alone under-covers:
+
+      code literals   `config.DATA_INDEX / "x"` -- catches a store that is named
+                      but not yet created
+      the filesystem  catches paths composed dynamically. `numpy_index` comes from
+                      `DATA_INDEX / name` with a parameter default, so no literal
+                      grep can see it -- and a check that silently missed the most
+                      important directory under audit would be the "correct on some
+                      of the traffic" failure again.
+    """
+    import subprocess
+
+    idx_dir = ROOT / "data" / "index"
+    lines: list[str] = []
+
+    named: set[str] = set()
+    for path in (ROOT / "ragkit").rglob("*.py"):
+        src = path.read_text(encoding="utf-8")
+        for m in re.finditer(_DATA_INDEX_LITERAL, src):
+            named.add(m.group(1))
+    on_disk = {e.name for e in idx_dir.iterdir()} if idx_dir.exists() else set()
+    candidates = sorted((named | on_disk) - {".gitkeep"})
+
+    lines.append(f"  paths named in code: {len(named)} | on disk: {len(on_disk)}")
+
+    ok = True
+    for name in candidates:
+        target = idx_dir / name
+        ignored = subprocess.run(
+            ["git", "check-ignore", "-q", str(target)],
+            cwd=ROOT, capture_output=True,
+        ).returncode == 0
+        tracked = bool(subprocess.run(
+            ["git", "ls-files", str(target)],
+            cwd=ROOT, capture_output=True, text=True,
+        ).stdout.strip())
+        declared = name in BUILD_OUTPUT
+
+        if declared and not tracked and target.exists():
+            ok = False
+            lines.append(f"    [MISSING ] {name} -- declared build output, not tracked")
+        elif declared:
+            lines.append(f"    [ships   ] {name}")
+        elif ignored and not tracked:
+            lines.append(f"    [ignored ] {name}")
+        elif tracked:
+            ok = False
+            lines.append(
+                f"    [TRACKED!] {name} -- runtime state staged for the repo. "
+                "Declare it in BUILD_OUTPUT with a reason, or gitignore it."
+            )
+        else:
+            lines.append(f"    [untracked] {name} (not ignored, but nothing staged)")
+
+    stale = sorted(set(BUILD_OUTPUT) - on_disk)
+    if stale:
+        ok = False
+        lines.append("")
+        lines.append("  FAIL: BUILD_OUTPUT names paths that do not exist:")
+        for n in stale:
+            lines.append(f"    [STALE] {n}")
+    return ok, lines
+
+
 def main() -> int:
     print("guard coverage -- for a guard, coverage is the invariant\n")
     results = [
         ("paid routes are all guarded", check_paid_routes_guarded()),
         ("demo allowlist has no dead patterns", check_demo_allowlist()),
         ("guard messages are route-neutral", check_guard_messages_route_neutral()),
+        ("runtime state is not tracked by git", check_runtime_state_untracked()),
     ]
     failed = 0
     for title, (ok, lines) in results:

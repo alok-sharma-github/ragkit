@@ -477,6 +477,66 @@ knew what the answer should be.
 The defensive form is cheap: a derived count must apply the same population filter
 as the headline it will sit beside, and should be checked against it.
 
+## A-11 · An untestable path is where a trivial bug hides indefinitely
+
+`Manifest.summary()` returns a `str`. The removal preview called
+`.get("pipeline_fingerprint")` on it. That raises on **every** call — a bug a
+single execution catches, and one that no amount of subtlety was required to
+create.
+
+It survived because `DELETE /api/documents/{id}` was its only caller, and **you
+cannot exercise that endpoint without deleting a document.** Not
+built-and-unreachable (A-1), not correct-on-some-of-the-traffic (A-3), but a third
+thing: **reachable, and never reached, because reaching it costs something.**
+
+That is a distinct hazard, and it selects for *trivial* bugs rather than subtle
+ones. A subtle bug on a hot path gets found eventually because the path runs. A
+trivial bug on a destructive path can sit indefinitely, because every reasonable
+person avoids running it — and reviewing it is no help, since reviewing is exactly
+what missed it.
+
+### The consequence for design
+
+**Separating "what would happen" from "do it" makes destructive paths
+exercisable.** `GET /api/documents/{id}/impact` was added because the removal
+confirm dialog needed to show consequences *before* the user committed — `DELETE`
+returns its preview and queues the deletion in the same call, so its "preview"
+describes what it has already started.
+
+That was the first argument. The second is stronger and was not anticipated: the
+dry-run is a **testable surface for a destructive operation**, and the bug it
+would have caught was already sitting there. Every destructive endpoint deserves
+one, and not only for the dialog.
+
+A second property arrived from the HTTP verb rather than from a special case:
+because the dry-run is a `GET`, it passes the read-only demo guard untouched. The
+consequences of a delete stay visible on a deployment where the delete itself is
+refused. **Showing what a destructive action would do is not a destructive
+action** — and expressing that as a verb rather than an exception to the guard
+means nothing had to be widened to allow it.
+
+### The same reasoning, applied to a list
+
+Un-ignoring `data/index/` so the prebuilt index ships also captured
+`conversations/` and `jobs/` — eight ad-hoc debugging conversations and nine job
+records, staged for a public repo. On a customer deployment those files are *their*
+data. **Widening an exemption captured more than it named**, which is the same
+shape as widening a guard and invalidating a string written while it was narrow
+(A-5).
+
+Listing the two offending paths in `.gitignore` would have restated the
+distinction as a literal, and a literal drifts the moment a third runtime store
+appears. So it is derived instead (`audit_guards.py` check 4): every path under
+`data/index/` must be either declared build output *with a reason*, or ignored —
+and one that is neither **fails**, so a new runtime store is caught the day it
+appears.
+
+The derivation unions **code literals with the filesystem**, because either alone
+under-covers. `numpy_index` is composed as `DATA_INDEX / name` from a parameter
+default, so no literal grep can see it — and a check that silently missed the most
+important directory under audit would be A-3 all over again, inside the tool
+written to prevent it.
+
 ---
 
 # Part 3 — Deliberately not decided
