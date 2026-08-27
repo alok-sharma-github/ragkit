@@ -299,6 +299,17 @@ def main() -> int:
     )
     L.append("")
     L.append(
+        "**What that rules out.** A zero here is a strong negative result, not "
+        "an absence of data: 24 chances for the model to receive complete "
+        "context and misuse it, and it took none of them. So prompt "
+        "engineering, lost-in-the-middle reordering, context compression and "
+        "fine-tuning the reader (RAFT and similar) are not deprioritised -- "
+        "they are **ruled out on evidence**, because every one of them improves "
+        "a step that is not failing. Spending on any of them would be spending "
+        "where the measurement says nothing is wrong."
+    )
+    L.append("")
+    L.append(
         "That points at one change rather than several. `source_hit` is 100% at "
         "every budget, so the right *document* is always found and the loss is "
         "ranking *within* it -- which is exactly what a situating prefix addresses. "

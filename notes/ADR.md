@@ -437,6 +437,46 @@ recalled rather than read -- parent median 192 (190), p90 799 (793), and "7 of
 wrong but internally inconsistent, and it survived writing, reading back, and a
 proofread. Only running the measurement caught it.
 
+## A-10 · Comparable is not the same as disjoint
+
+Two artifacts can be provably about the same system and still not be addable.
+**Same-system** and **disjoint-events** are independent properties, and the
+stamping work bought the first while leaving the second entirely unguarded.
+
+The failure analysis pools three sources. All three carry the same fingerprint and
+the same token budget, so pooling was *comparable*. Eight questions were both a
+retrieval miss and an abstention — one failure, appearing in two inputs — so
+pooling was **not disjoint**, and a single event was counted twice in a document
+whose entire output is a per-category count. Every proportion would have been
+wrong by roughly a third.
+
+**It surfaced only because the total refused to reconcile:** 37 classified against
+32 the inputs implied. That is the same instrument that caught `partial < strict`
+— two numbers that must agree, disagreeing — and it is the only reason this was
+caught at all. **Had I expected 37, the histogram would have shipped.** No
+inspection of the code would have found it; the sets look independent right up
+until you list them.
+
+So pooling now asserts both properties: the stamp for same-system, and `N in ==
+N classified out` for disjointness, with an explicit precedence rule for events
+that legitimately appear in two inputs.
+
+### The sibling bug, in the same function
+
+`per_item` holds all 101 golden items, including 5 `out_of_scope` questions whose
+**correct** behaviour is retrieving nothing. Counting those as retrieval failures
+turned 14 misses into 19.
+
+That is the third instance of one shape: **a derived number computed over a
+population that does not match the name on it.** The 18%-headerless figure was the
+first and had to be withdrawn. The `text_source` slice that would have run over
+zero repaired chunks was the second. Each time the tell was **arithmetic, not
+inspection** — a count that did not add up, noticed because something else already
+knew what the answer should be.
+
+The defensive form is cheap: a derived count must apply the same population filter
+as the headline it will sit beside, and should be checked against it.
+
 ---
 
 # Part 3 — Deliberately not decided
@@ -451,6 +491,7 @@ proofread. Only running the measurement caught it.
 | xlsx + OCR detection | a prospect's corpus is materially scans or spreadsheets |
 | Stripe billing | more than ~10 customers; invoice manually until then |
 | OpenTelemetry | more than one process needs to correlate a trace |
+| Generation-tier CI gating | multiple runs per commit become affordable, **or** a threshold is calibrated against measured variance — **no predicate**, same reasoning as D-17 |
 | Durable spend ledger | Phase 2 — **no predicate, by decision D-17** |
 
 **A known defect in this table.** The `entailment_verification` predicate reads

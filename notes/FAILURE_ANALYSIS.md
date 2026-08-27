@@ -54,6 +54,8 @@ All three inputs carry the same fingerprint and budget; the script refuses to po
 
 **And it concentrates.** `table_or_image` accounts for 15 of 24 failures (62%) -- consistent with its abstention rate being the highest of any stratum. Tables and figures are the weak subsystem, not retrieval in general.
 
+**What that rules out.** A zero here is a strong negative result, not an absence of data: 24 chances for the model to receive complete context and misuse it, and it took none of them. So prompt engineering, lost-in-the-middle reordering, context compression and fine-tuning the reader (RAFT and similar) are not deprioritised -- they are **ruled out on evidence**, because every one of them improves a step that is not failing. Spending on any of them would be spending where the measurement says nothing is wrong.
+
 That points at one change rather than several. `source_hit` is 100% at every budget, so the right *document* is always found and the loss is ranking *within* it -- which is exactly what a situating prefix addresses. Contextual retrieval's deferral has already expired on its own predicate, and this histogram is the second, independent argument for it.
 
 **What this cannot tell you.** FP1 is structurally absent: the golden set was generated *from* the corpus, so a question whose answer is missing entirely cannot appear. FP6 and FP7 need human judgement of answer quality that no automated check here performs. Their zeros mean **not measured**, not **does not happen**.

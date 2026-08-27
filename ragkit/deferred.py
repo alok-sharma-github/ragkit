@@ -166,6 +166,52 @@ def review() -> dict[str, Any]:
             ),
         ),
         Deferral(
+            name="generation_tier_ci_gating",
+            guide_module="M9",
+            decision=(
+                "CI gates on the RETRIEVAL tier only (>3% NDCG@5 regression). "
+                "Generation-tier metrics are reported, never gated."
+            ),
+            because=(
+                "the two tiers differ in a way that decides this. Retrieval is "
+                "deterministic -- cached embeddings, hand-written BM25, RRF -- so "
+                "the same commit against the same index gives the same NDCG, and a "
+                "3% drop is a real change. Generation is SAMPLED, so a single run "
+                "is n=1 and a one-run comparison cannot separate a regression from "
+                "noise. Gating on it would fail builds for no reason, and a gate "
+                "that fires without cause gets muted, which costs the retrieval "
+                "gate its credibility too"
+            ),
+            revisit_when=(
+                "generation-tier gating is actually wanted, and EITHER several runs "
+                "per commit are affordable (each full pass is ~$0.86 and ~18 min) OR "
+                "a threshold has been calibrated against measured run-to-run "
+                "variance -- which requires repeated runs on an unchanged index, "
+                "something never done here"
+            ),
+            cost_if_wrong=(
+                "a faithfulness regression ships unnoticed between eval runs. "
+                "Mitigated, not solved: every generation failure so far has been "
+                "FP2/FP3 -- retrieval, which IS gated -- and zero were FP4, so the "
+                "ungated tier is currently the one where nothing has ever gone wrong"
+            ),
+            orphans=(),
+            # No predicate, and for the same reason as durable_spend_ledger: the
+            # condition is "someone measured the variance", and nothing in
+            # data/eval can observe whether that happened. A proxy -- say, two
+            # judged artifacts existing -- would fire on two runs made for
+            # unrelated reasons, which is a correlation standing in for a
+            # condition. The pattern this file exists to refuse.
+            expired=False,
+            evidence=(
+                "observed ONCE, and a single difference is not a variance estimate: "
+                "re-running the generation tier on an unchanged index at an "
+                "unchanged budget moved abstentions 17 -> 18 of 92 and flipped one "
+                "judge verdict from failed to succeeded. Direction and magnitude "
+                "unknown from n=2 runs"
+            ),
+        ),
+        Deferral(
             name="durable_spend_ledger",
             guide_module="M14",
             decision=(
