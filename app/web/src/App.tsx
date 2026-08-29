@@ -450,6 +450,11 @@ export function App() {
   const [convs, setConvs] = useState<Conversation[]>([]);
   const [activeConv, setActiveConv] = useState<string | null>(null);
   const [turns, setTurns] = useState<AskResponse[]>([]);
+  // The question that has been SENT but not yet answered. It appears in the
+  // transcript straight away, so pressing enter visibly does something -- an
+  // answer takes several seconds and a blank screen for that long reads as a
+  // dropped keystroke.
+  const [pending, setPending] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [mode, setMode] = useState<"dense" | "sparse" | "rrf">("dense");
@@ -471,6 +476,14 @@ export function App() {
   const ask = async () => {
     const question = q.trim();
     if (!question || busy) return;
+    // CLEARED FIRST, not after the round trip. `setQ("")` used to run after the
+    // await, so the question sat in the box for the whole several-second wait
+    // -- which looks like the send did not register, and invites a second
+    // press. Clearing immediately and showing the question in the transcript
+    // are two halves of the same fix: one alone would leave the visitor with a
+    // blank box and no evidence anything happened.
+    setQ("");
+    setPending(question);
     setBusy(true);
     setErr(null);
     try {
@@ -481,14 +494,19 @@ export function App() {
       }
       const res = await api.askIn(cid, { question, budget, sources: 6, mode });
       setTurns((t) => [...t, res]);
-      setQ("");
       api.conversations().then((r) => setConvs(r.conversations));
     } catch (e: any) {
       setErr(e.message);
+      // PUT THE TEXT BACK. A failed send that also loses what was typed makes
+      // the visitor retype it, and the ones most likely to fail are the long
+      // considered questions rather than the short ones.
+      setQ((cur) => (cur ? cur : question));
     } finally {
+      setPending(null);
       setBusy(false);
     }
   };
+
 
   const openConv = async (id: string) => {
     setActiveConv(id);
@@ -646,7 +664,7 @@ export function App() {
         ) : (
           <>
             <div className="min-h-0 flex-1 overflow-y-auto">
-              {turns.length === 0 ? (
+              {turns.length === 0 && !pending ? (
                 /* SHOW THE BEHAVIOUR, THEN NAME THE NOTATION.
                    This screen used to open with a colour legend -- "blue is
                    quoted text, amber is a chart the assistant read for you" --
@@ -713,6 +731,7 @@ export function App() {
                     conversationId={activeConv ?? undefined}
                     toast={toast}
                     onToast={setToast}
+                    pending={pending}
                   />
                 </div>
               )}

@@ -29,7 +29,7 @@ import {
 } from "../api";
 import { Panel, Spinner } from "./primitives";
 import Markdown, { Inline } from "./Markdown";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 /* -------------------------------------------------------------- citation chip */
 
@@ -456,18 +456,49 @@ export function AnswerView({
   conversationId,
   toast,
   onToast,
+  pending,
 }: {
   turns: AskResponse[];
   conversationId?: string;
   toast: string | null;
   onToast: (s: string | null) => void;
+  // A question that has been sent and has no answer yet.
+  pending?: string | null;
 }) {
   const [open, setOpen] = useState<{ chunkId: string; quote: string | null } | null>(null);
   const last = turns[turns.length - 1];
 
+  // THE SCROLLING COLUMN IS THIS ONE, and the first attempt put the listener on
+  // the parent -- which never scrolls, because the transcript scrolls inside
+  // here. A scroll handler attached to an element that cannot scroll is silent
+  // rather than wrong, which is why it would have shipped.
+  const col = useRef<HTMLDivElement>(null);
+  const tail = useRef<HTMLDivElement>(null);
+  const following = useRef(true);
+
+  useEffect(() => {
+    const el = col.current;
+    if (!el) return;
+    const onScroll = () => {
+      following.current = el.scrollHeight - el.scrollTop - el.clientHeight < 140;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // ONLY IF THEY WERE FOLLOWING ALONG. This product invites you to scroll up
+  // into a source and check a quotation; yanking the view away mid-read is
+  // worse than not scrolling at all. And it scrolls to the START of the new
+  // turn rather than the end of the page -- an answer is read from its
+  // beginning, and landing at its end means scrolling back up to read it.
+  useEffect(() => {
+    if (!following.current) return;
+    tail.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [turns.length, pending]);
+
   return (
     <div className="grid h-full grid-cols-1 overflow-hidden lg:grid-cols-[1fr_26rem]">
-      <div className="overflow-y-auto">
+      <div ref={col} className="overflow-y-auto">
         {turns.map((t, i) => (
           <TurnBlock
             key={i}
@@ -478,11 +509,30 @@ export function AnswerView({
             onToast={onToast}
           />
         ))}
+        {/* The sent question, before its answer exists. Deliberately NOT
+            shaped like a turn: it has no citations, no evidence and no
+            reconciliation, and giving it that shape would imply those are
+            pending rather than absent. */}
+        {pending && (
+          <div className="px-6 pb-8">
+            <div className="border-t border-paper-300 pt-5">
+              <p className="font-serif text-[16px] leading-snug text-ink-900">
+                {pending}
+              </p>
+              <p className="mt-2 flex items-center gap-2 text-[12px] text-ink-400">
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-quote-600" />
+                searching your documents…
+              </p>
+            </div>
+          </div>
+        )}
         {toast && (
           <div className="mx-6 mb-4 rounded border border-paper-400 bg-paper-100 px-3 py-2 text-[12px] text-ink-600">
             {toast}
           </div>
         )}
+        {/* The scroll target, at the very end of the column. */}
+        <div ref={tail} />
       </div>
 
       {open ? (
