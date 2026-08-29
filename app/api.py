@@ -777,13 +777,15 @@ def _invalidate_index() -> None:
 
 
 @app.post("/api/documents")
-async def upload(files: list[UploadFile] = File(...)) -> dict[str, Any]:
+async def upload(request: Request,
+                 files: list[UploadFile] = File(...)) -> JSONResponse:
     """Accept files into the corpus. Does NOT index them -- call /api/ingest.
 
     Two steps rather than one, deliberately: upload is fast and per-file, ingest
     is slow and corpus-wide (it rebuilds the index). Fusing them would make a
     5-file upload run five full rebuilds.
     """
+    session = sessions.STORE.get_or_create(session_owner(request))
     config.DATA_RAW.mkdir(parents=True, exist_ok=True)
     saved, rejected = [], []
     for f in files:
@@ -828,8 +830,63 @@ async def upload(files: list[UploadFile] = File(...)) -> dict[str, Any]:
             staged.unlink(missing_ok=True)
         saved.append({"name": name, "bytes": len(data),
                       "source_id": Source.normalize_id(dest)})
-    return {"saved": saved, "rejected": rejected,
+    # THE UPLOAD BELONGS TO A SESSION, NOT THE CORPUS.
+    #
+    # This is the line that closes the gap the upload guard did not: the guard
+    # bounds the PARSER, ownership bounds WHO CAN SEE THE RESULT. Until an
+    # uploaded file was ingested under a session id, a perfectly safe PDF from a
+    # stranger still landed in the shared public corpus -- validated, and visible
+    # to the next visitor.
+    if saved:
+        for row in saved:
+            sessions.STORE.note_document(session.session_id, row["source_id"])
+
+    body = {"saved": saved, "rejected": rejected,
+            "session": session.to_json(),
             "next": "POST /api/ingest to make these searchable"}
+
+    resp = JSONResponse(content=body)
+    # Issued on upload rather than on first visit: a visitor who only asks
+    # questions of the public corpus needs no session at all, and handing an
+    # identifier to someone who does not need one is a cost with no benefit.
+    _set_session_cookie(resp, session.session_id)
+    return resp
+
+
+@app.post("/api/sessions/sweep")
+def sweep_sessions() -> dict[str, Any]:
+    """Purge expired upload sessions and everything they added.
+
+    An endpoint rather than a background thread, deliberately: a thread that
+    deletes documents is a thing running with no request to attribute it to and
+    no place for its failures to surface. This returns what it removed and what
+    it could not, so a failed purge is visible rather than retried silently
+    forever.
+
+    The deletion itself is `pipeline.remove_source` -- the same path a manual
+    delete takes. Two ways to delete is how "gone from one store, still in
+    another" happens.
+    """
+    return sessions.purge_expired()
+
+
+@app.get("/api/sessions/me")
+def my_session(request: Request) -> dict[str, Any]:
+    """What this browser's session holds, if it has one.
+
+    Reports the PUBLIC state for a visitor with no session rather than 404ing:
+    "you have uploaded nothing" is the true answer, and it is what the UI needs
+    to decide whether to offer a purge control.
+    """
+    owner = session_owner(request)
+    s = sessions.STORE.get(owner) if owner else None
+    return {
+        "has_session": s is not None,
+        "session": s.to_json() if s else None,
+        "ttl_seconds": config.UPLOAD_TTL_SECONDS,
+        "corpus": "public documents only" if s is None
+                  else "public documents plus your uploads",
+    }
 
 
 @app.post("/api/ingest")
@@ -853,31 +910,12 @@ def start_ingest(caption_images: bool = Query(default=True)) -> dict[str, Any]:
                      for k, v in res.plan.items()},
         }
 
-    job = jobs.STORE.submit("ingest", work, caption_images=caption_images)
-    return {"job": job.to_json(),
-            "queued_behind": len(jobs.STORE.queued()) - 1,
-            "note": "progress is per document, not per page: the parser emits "
-                    "nothing until a document finishes"}
-
-
-def _current_fingerprint() -> str:
-    """The pipeline fingerprint of the live index.
-
-    A helper because the first version of this read `Manifest.summary()`, which
-    returns a STRING -- so `.get("pipeline_fingerprint")` would have raised on
-    every call. It survived review because the only caller is DELETE, and DELETE
-    cannot be exercised without deleting something: an untestable path is where a
-    trivial bug hides indefinitely. That is also the argument for the dry-run
-    endpoint below.
-    """
-    p = config.DATA_EVAL / "index_report.json"
-    if not p.exists():
-        return ""
-    try:
-        return str(json.loads(p.read_text("utf-8")).get("pipeline_fingerprint") or "")
-    except Exception:  # noqa: BLE001
-        return ""
-
+    resp = JSONResponse(content=body)
+    # Issued on upload rather than on first visit: a visitor who only asks
+    # questions of the public corpus needs no session, and handing out an
+    # identifier to someone who does not need one is a cost with no benefit.
+    _set_session_cookie(resp, session.session_id)
+    return resp
 
 @app.get("/api/documents/{source_id:path}/impact")
 def removal_impact(source_id: str) -> dict[str, Any]:
