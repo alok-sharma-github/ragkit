@@ -635,6 +635,33 @@ def ensure_dirs() -> None:
 # one that explains it is protecting a shared free-tier key looks operated.
 DEMO_MODE = os.getenv("RAGKIT_DEMO_MODE") == "1"
 
+# D-19: STRANGERS MAY UPLOAD, and that is a widening of ONE exemption rather
+# than a switch that turns the demo guard off.
+#
+# Turning DEMO_MODE off would have worked and would have been wrong: it opens
+# re-ingest, delete and the session sweep at the same time, none of which a
+# visitor needs and all of which are destructive. D-19 accepted the risk of
+# strangers parsing PDFs; it accepted nothing about strangers deleting the
+# corpus. An exemption should name what it excuses.
+#
+# STILL OFF, and the reason changed. It was held pending a manual walk of the
+# path; the walk happened, and it found the path does not complete:
+#
+#   1. A visitor uploads. It succeeds, and the response says "POST /api/ingest to
+#      make these searchable". /api/ingest returns 403 on a demo, by design. So
+#      the upload lands, is owned by the session, and can never be asked about.
+#   2. The uploaded file is written to data/raw -- the SHARED CORPUS DIRECTORY.
+#      `corpus_files()` rglobs that directory, so the next operator-run
+#      `ragkit ingest` would index a stranger's document with owner=PUBLIC_OWNER.
+#      Ownership is enforced in the index; the filesystem route around it was not.
+#   3. The obvious fix -- ingest just the uploaded file -- WIPES THE CORPUS.
+#      `Manifest.plan` computes deletions as `set(records) - present_ids`, so a
+#      single-file ingest marks every other document absent and purges it.
+#
+# Each component is correct in isolation, which is why this held for so long. The
+# SEQUENCE is what was never run, and running it took fifteen minutes.
+DEMO_ALLOW_UPLOADS = os.getenv("RAGKIT_DEMO_ALLOW_UPLOADS") == "1"
+
 # Per-client budget for the one endpoint that must stay open. Generation is the
 # demo, so /api/ask cannot be disabled -- but a single visitor holding the whole
 # free-tier quota means the next visitor sees nothing but 429s. A window keeps

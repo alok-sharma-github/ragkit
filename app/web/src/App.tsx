@@ -417,7 +417,10 @@ export function App() {
           <div className="mt-3">
             <Uploader
               onDone={refresh}
-              readOnly={!!status?.demo?.read_only}
+              /* uploads_enabled, NOT read_only. The demo refuses deletion and
+                 accepts uploads; driving both controls off one flag is what
+                 made "turn on uploads" look like a one-line change. */
+              readOnly={status?.demo?.uploads_enabled === false}
               readOnlyWhy={status?.demo?.why ?? ""}
             />
           </div>

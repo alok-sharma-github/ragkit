@@ -86,12 +86,31 @@ _DEMO_ALLOWED_WRITES = (
     re.compile(r"^/api/conversations$"),
     re.compile(r"^/api/conversations/[^/]+/ask$"),
     re.compile(r"^/api/feedback$"),
+    # UPLOAD IS PRODUCT USE, NOT CORPUS MUTATION -- the same distinction that
+    # caused a live outage when this middleware gated /api/ask by method and
+    # returned 401 to every visitor asking a question.
+    #
+    # Without this line, flipping DEMO_MODE off would not have opened uploads to
+    # a visitor: it would have moved them from "read-only demo" (403, honest) to
+    # "write password required" (401, a door they cannot open). Every piece
+    # behind the flag was tested; the SEQUENCE was not, and the sequence is what
+    # a visitor experiences.
+    #
+    # Anchored exactly. `^/api/documents$` matches the POST and cannot match
+    # `/api/documents/{source_id}`, so DELETE stays refused -- which is the whole
+    # reason this is a widened exemption rather than DEMO_MODE=0.
+    *((re.compile(r"^/api/documents$"),) if config.DEMO_ALLOW_UPLOADS else ()),
 )
 # Only the paths that call Gemini are metered. Creating a conversation writes a
 # few bytes; generating an answer spends a shared, unpublished free-tier budget.
 _METERED = (
     re.compile(r"^/api/ask$"),
     re.compile(r"^/api/conversations/[^/]+/ask$"),
+    # An upload spends embeddings and image captions, so it is metered like an
+    # answer. Left unmetered it would be the one paid route a visitor could call
+    # without limit -- the guard-coverage failure, arriving through the door
+    # that was just opened.
+    re.compile(r"^/api/documents$"),
 )
 _hits: dict[str, deque] = defaultdict(deque)
 
@@ -464,7 +483,19 @@ def status() -> dict[str, Any]:
         "budget": budget.snapshot().to_json(),
         "demo": {
             "read_only": config.DEMO_MODE,
-            "why": ("this deployment shares one free-tier Gemini key, so upload, "
+            # SEPARATE FROM read_only, because one boolean cannot answer two
+            # questions. The UI gated BOTH the upload control and the delete
+            # control on `read_only`, so opening uploads by flipping that flag
+            # would have re-enabled deletion in the same motion. Uploads are on;
+            # deleting the shared corpus is still refused.
+            "uploads_enabled": config.DEMO_ALLOW_UPLOADS,
+            "upload_limits": (
+                f"PDF only, up to {config.MAX_UPLOAD_PAGES} pages and "
+                f"{config.MAX_UPLOAD_BYTES // (1024 * 1024)} MB. Your upload is "
+                f"visible only to you and is deleted after "
+                f"{config.UPLOAD_TTL_SECONDS // 3600} hours."
+            ) if config.DEMO_ALLOW_UPLOADS else "",
+            "why": ("this deployment shares one free-tier Gemini key, so "
                     "re-ingest and delete are disabled" if config.DEMO_MODE else ""),
             "rate_limit": (f"{config.DEMO_RATE_LIMIT_REQUESTS} questions per "
                            f"{config.DEMO_RATE_LIMIT_WINDOW_SECONDS // 60} minutes"

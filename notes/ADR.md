@@ -506,6 +506,42 @@ That is an accepted risk with real mitigations, not a solved problem. Saying so 
 stronger than implying otherwise, and it is the sentence to re-read before
 widening what the demo accepts.
 
+**NOT YET ENABLED, and the reason is a walk rather than a doubt.** Every
+component was built and individually checked, so the remaining step looked like
+flipping a flag. Walking the visitor's path end to end took fifteen minutes and
+found that the path does not complete:
+
+1. **The upload succeeds and then dead-ends.** The response says *"POST
+   /api/ingest to make these searchable"*, and `/api/ingest` returns 403 on a
+   demo — correctly, it is a corpus-wide rebuild. So the file lands, is owned by
+   the session, and can never be asked about.
+2. **The file is written to `data/raw`, the shared corpus directory.**
+   `corpus_files()` rglobs it, so the next operator-run `ragkit ingest` would
+   index a stranger's document with `owner=PUBLIC_OWNER`. Ownership is enforced
+   *in the index*; the route around it through the filesystem was not closed.
+3. **The obvious fix wipes the corpus.** `Manifest.plan` computes deletions as
+   `set(records) - present_ids`, so ingesting only the uploaded file marks every
+   other document absent and purges it.
+
+None of these is a bug in a component. Each component is correct, and this
+project has now produced the same shape often enough to name it: **the pieces
+were tested and the sequence was not, and the sequence is what a visitor
+experiences.** It is the same lesson as the isolation test that passed on a path
+the product does not take, arriving at the level of a user journey rather than a
+function call.
+
+What ships in the meantime is the half that is unambiguously right: uploads are
+opened by **widening one exemption** (`^/api/documents$`) rather than by turning
+`DEMO_MODE` off, so re-ingest, delete and the session sweep stay refused; and the
+UI's single `read_only` flag — which drove the upload control *and* the delete
+control — is split, because opening uploads through it would have re-enabled
+deletion in the same motion.
+
+The remaining work is a session-scoped, **additive** ingest: chunk under the
+session's owner, append to the live index, and never participate in delete
+detection. The in-memory version of exactly that already exists — it is what the
+isolation invariant does to inject its probes.
+
 **Reverses when:** the demo carries anything worth stealing beyond a corpus of
 public papers, or a customer's documents share a deployment with strangers'
 uploads. Either makes the process boundary too thin, and the next step is a

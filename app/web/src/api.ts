@@ -153,7 +153,15 @@ export interface StatusResponse {
   // Present when the backend is deployed read-only. Optional so a local backend
   // that predates the field still typechecks rather than needing a lockstep
   // deploy of both halves.
-  demo?: { read_only: boolean; why: string; rate_limit: string };
+  demo?: {
+    read_only: boolean;
+    // Distinct from read_only on purpose: the demo refuses deletion and
+    // accepts uploads, so one flag cannot drive both controls.
+    uploads_enabled?: boolean;
+    upload_limits?: string;
+    why: string;
+    rate_limit: string;
+  };
 }
 
 export interface Job {
