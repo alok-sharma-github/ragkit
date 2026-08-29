@@ -445,6 +445,64 @@ def _refuse_vacuous_passes(checks: list[Check]) -> list[Check]:
     return out
 
 
+def _ask_paths_check(fp: list[str]) -> list[Check]:
+    """Do BOTH ask endpoints retrieve as the visitor? Answered by reading them.
+
+    THE 500 THIS EXISTS BECAUSE OF. `ask()` gained a `request` parameter so it
+    could read the session cookie and return the visitor's own uploads. FastAPI
+    injects that for `/api/ask`. `/api/conversations/{id}/ask` calls `ask()` as a
+    plain function -- so the signature changed, one caller was updated, and every
+    conversational question returned 500 on the live site.
+
+    The crash was the LUCKY half. Had the parameter been optional, there would
+    have been no error at all: a conversation would simply never see the
+    documents the visitor had just uploaded, and the symptom would have been "it
+    can't find my file" -- indistinguishable from ordinary retrieval failure.
+
+    This is the same family as an ownership filter on `search_budget` while the
+    product calls `retrieve()`: a property enforced on one of two paths. So the
+    check is not "does ask work" but "do all the ask paths carry the owner".
+    """
+    import inspect as _i
+
+    try:
+        import app.api as _api
+    except Exception:  # noqa: BLE001 -- no web layer installed
+        return [Check("Every ask path carries the visitor",
+                      "all /ask endpoints pass the request through",
+                      "web layer not importable", "NOT_MEASURED", fingerprint=fp)]
+
+    paths = {"/api/ask": "ask", "/api/conversations/{cid}/ask": "conversation_ask"}
+    missing = []
+    for route, fn_name in paths.items():
+        fn = getattr(_api, fn_name, None)
+        if fn is None:
+            missing.append(f"{route} (no handler)")
+            continue
+        if "request" not in _i.signature(fn).parameters:
+            missing.append(f"{route} takes no Request")
+            continue
+        src = _i.getsource(fn)
+        # It must not merely accept a request -- it must USE it, either by
+        # resolving the owner itself or by handing it to the function that does.
+        if "session_owner(request)" not in src and ", request)" not in src:
+            missing.append(f"{route} accepts a Request and never passes it on")
+
+    return [Check(
+        name="Every ask path carries the visitor",
+        rule="both /ask endpoints resolve the session, or hand the request to one that does",
+        observed=("; ".join(missing) if missing
+                  else f"{len(paths)} ask paths, all carrying the session"),
+        state="FAILS" if missing else "HOLDS",
+        n=len(paths), fingerprint=fp,
+        detail="an ask with no request has no cookie, so it cannot see the "
+               "visitor's own uploads -- and if the parameter were optional that "
+               "would be silent rather than a 500",
+        why="conversation_ask called ask() as a plain function after ask() gained "
+            "a Request parameter; every conversational question 500'd on live",
+    )]
+
+
 def _upload_additivity_check(fp: list[str]) -> list[Check]:
     """Can adding one session's file remove somebody else's? Answered by trying it.
 
@@ -888,6 +946,7 @@ def reconcile() -> dict[str, Any]:
     checks.extend(_primary_artifact_check(fp))
     checks.extend(_upload_reachability_check(fp))
     checks.extend(_upload_additivity_check(fp))
+    checks.extend(_ask_paths_check(fp))
     checks = _refuse_vacuous_passes(checks)
 
     n_fail = sum(1 for c in checks if c.state == "FAILS")

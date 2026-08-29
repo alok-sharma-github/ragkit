@@ -171,6 +171,10 @@ function Uploader({
   const [note, setNote] = useState<string | null>(null);
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
+  // Defaults to thorough: it is the better answer, and the visitor who does not
+  // read the toggle should get the better answer. The one who is in a hurry can
+  // say so.
+  const [thorough, setThorough] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Polls until the job settles. The interval is deliberately unhurried: the
@@ -205,7 +209,7 @@ function Uploader({
     setNote(null);
     setBusy(true);
     try {
-      const up: any = await api.upload(files);
+      const up: any = await api.upload(files, thorough);
       if (up.rejected?.length) {
         setMsg(up.rejected.map((r: any) => `${r.name}: ${r.reason}`).join(" · "));
       }
@@ -242,11 +246,32 @@ function Uploader({
   }
 
   const running = busy || (job !== null && (job.state === "queued" || job.state === "running"));
-  // The stage the job reports, shown verbatim. "understanding the document" is
-  // a truer thing to show for ninety seconds than a percentage would be -- cost
-  // per page varies enough that a progress bar would be wrong most of the time.
   const stage = job?.progress?.stage ?? "";
   const detail = job?.progress?.detail ?? "";
+
+  // A REAL FRACTION, not a decorative one. Within a single document the
+  // passages are roughly equal work, so `current / total` is honest here --
+  // unlike a per-DOCUMENT percentage, where measured cost ranges from 0.4s to
+  // 107s and a bar would be wrong most of the time. The bar only appears once
+  // the total is known.
+  const cur = job?.progress?.current ?? 0;
+  const tot = job?.progress?.total ?? 0;
+  const frac = tot > 1 && cur > 0 ? Math.min(1, cur / tot) : 0;
+
+  // ESTIMATED FROM THIS UPLOAD, not from a constant. The rate depends on the
+  // host, the document and the cache -- a hardcoded "1 minute per 5 pages" is
+  // wrong on a cached re-upload by two orders of magnitude. Measured from the
+  // passages actually completed so far, and shown only once there is enough to
+  // measure.
+  const [t0] = useState(() => Date.now());
+  const eta = (() => {
+    if (!frac || cur < 3) return "";
+    const per = (Date.now() - t0) / cur;
+    const left = Math.round((per * (tot - cur)) / 1000);
+    if (left < 20) return "nearly there";
+    if (left < 90) return `about ${Math.ceil(left / 10) * 10} seconds left`;
+    return `about ${Math.ceil(left / 60)} minute${left >= 90 ? "s" : ""} left`;
+  })();
 
   return (
     <div>
@@ -275,10 +300,23 @@ function Uploader({
         <div className="mt-1 text-[11px] leading-relaxed text-ink-400">
           {running
             ? (stage
-                ? `${stage}${detail ? ` — ${detail}` : ""}`
+                ? `${stage}${tot > 1 && cur > 0 ? ` — ${cur} of ${tot} passages` : detail ? ` — ${detail}` : ""}`
                 : "uploading…")
             : "Drop a PDF here, or click to browse"}
         </div>
+        {running && frac > 0 && (
+          <div className="mt-2">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-paper-300">
+              <div
+                className="h-1.5 rounded-full bg-quote-600 transition-[width] duration-500"
+                style={{ width: `${Math.round(frac * 100)}%` }}
+              />
+            </div>
+            {eta && (
+              <div className="mt-1 text-[10.5px] tabular-nums text-ink-400">{eta}</div>
+            )}
+          </div>
+        )}
         {running && (
           <div className="mt-2 rounded-sm bg-quote-600/[0.06] px-2 py-1.5 text-[10.5px] leading-relaxed text-quote-600">
             {/* THE DESIGNED ANSWER TO THE WAIT, and it was never built:
@@ -304,6 +342,37 @@ function Uploader({
           e.target.value = "";
         }}
       />
+      {/* THE TRADE, STATED WITH NUMBERS, BEFORE THEY COMMIT.
+          Both options are real and neither is a trap: thorough writes a short
+          summary of every passage before indexing it, which is what took a
+          14-page document four minutes. Fast skips that. The numbers are
+          measured, not estimated -- 5.2s against 23.1s on the same six-passage
+          document, and +3 of 92 on the retrieval benchmark. */}
+      {!running && (
+        <div className="mt-2">
+          <div className="flex gap-1">
+            {([true, false] as const).map((t) => (
+              <button
+                key={String(t)}
+                onClick={() => setThorough(t)}
+                className={`flex-1 rounded border px-2 py-1 text-[10.5px] transition ${
+                  thorough === t
+                    ? "border-ink-900 bg-ink-900 text-paper-50"
+                    : "border-paper-400 text-ink-500 hover:border-ink-400"
+                }`}
+              >
+                {t ? "Thorough" : "Fast"}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-[10.5px] leading-relaxed text-ink-400">
+            {thorough
+              ? "Reads each passage and writes a short note on what it covers — finds more, and takes about a minute per five pages."
+              : "Indexes straight away — a few seconds. Finds slightly less, most noticeably in tables and figures."}
+          </p>
+        </div>
+      )}
+
       {/* THE LIMITS, BEFORE THEY REFUSE ANYTHING. A cap a visitor discovers by
           hitting it is indistinguishable from a bug. */}
       {limits && (

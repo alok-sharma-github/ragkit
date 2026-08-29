@@ -481,12 +481,66 @@ def _index_write_lock(index_name: str, *, timeout: float = 120.0):
         lock.unlink(missing_ok=True)
 
 
+def _appendable(idx: NumpyIndex, strategy: str) -> tuple[bool, str]:
+    """May a chunk built now be appended to this index? Returns (ok, reason).
+
+    THE QUESTION IS COMPARABILITY, NOT SAMENESS. A different embedding model or
+    dimensionality puts a chunk in a different vector space and cosine against it
+    is meaningless -- that must be refused. A different CONTEXTUALISER only
+    changes the text that was embedded; the space is identical, the scores are
+    comparable, and the difference is a retrieval-quality trade a visitor is
+    entitled to make about their own document.
+
+    DECOMPOSED WITHOUT FIELDS NOBODY STORED. The obvious implementation compares
+    parser/chunker/embed_model one by one -- and the index records none of them:
+    `embed_model` exists on the chunk and is an empty string, never populated.
+    So instead this asks what the fingerprint WOULD be under each contextualiser
+    setting and accepts a match with either. If one matches, everything except
+    the contextualiser agrees, which is exactly the claim needed.
+
+    Dimensionality is checked directly off the vectors, because that is the one
+    property that can be observed rather than inferred.
+    """
+    # THE CORPUS must share one fingerprint. UPLOADS need not, and scoping this
+    # was the other half of a narrowing I applied to `uniform_contextualization`
+    # and not here -- so the first fast upload made the index two-fingerprinted
+    # and the next thorough upload was refused. The rule is about the measured
+    # population; a visitor's file is not in it.
+    fps = {c.pipeline_fingerprint for c in idx.children if c.origin == "corpus"}
+    if len(fps) != 1:
+        return False, (f"the CORPUS holds {len(fps)} fingerprints: {sorted(fps)} "
+                       "-- re-ingest it before appending anything")
+    have = fps.pop()
+
+    dim = int(idx.vectors.shape[1]) if idx.vectors.size else 0
+    if dim and dim != config.EMBED_DIM:
+        return False, (f"the index is {dim}-dimensional and this build produces "
+                       f"{config.EMBED_DIM} -- a different vector space")
+
+    allowed = {
+        pipeline_version(strategy, contextual=c).fingerprint(): c
+        for c in (True, False)
+    }
+    if have not in allowed:
+        return False, (f"the index was built by pipeline {have}, and neither "
+                       "contextualiser setting reproduces it -- the parser, "
+                       "chunker or embedding model has changed")
+    return True, ""
+
+
 def ingest_upload(
     paths: Sequence[Path],
     *,
     owner: str,
     index_name: str = "numpy_index",
     caption_images: bool = True,
+    # WHETHER TO PAY FOR THE SLOW ENRICHMENT ON THIS UPLOAD.
+    #
+    # Measured on a 6-passage document: 5.2s without, 23.1s with -- 4.4x. And
+    # measured on the golden set, the enrichment is worth +3 of 92 overall and
+    # +3 of 38 on tables and figures. That is a real trade and it belongs to
+    # whoever is waiting, not to whoever wrote the default.
+    contextual: bool | None = None,
     # Called as (stage, done, total, detail). Uploading is the one place a
     # visitor waits on this system, and the wait is minutes on a 0.25 vCPU host
     # -- so the stages are reported rather than left to a spinner.
@@ -514,6 +568,7 @@ def ingest_upload(
     """
     if not paths:
         return {"added": 0, "sources": []}
+    contextual = config.CONTEXTUAL_PREFIXES if contextual is None else contextual
     config.ensure_dirs()
     # Read once outside the lock only to VALIDATE the fingerprint -- cheap, and
     # re-read inside the lock before appending, because anything read out here
@@ -522,20 +577,24 @@ def ingest_upload(
     # The fingerprint of the index being APPENDED TO, not a fresh one. A chunk
     # embedded under different settings than its neighbours is the mixed-index
     # defect, and here it would arrive one upload at a time.
-    fp = sorted({c.pipeline_fingerprint for c in idx.children})
-    if len(fp) != 1:
-        raise RuntimeError(
-            f"refusing to append to an index with {len(fp)} fingerprints: {fp}. "
-            "Appending to a mixed index makes the mixture permanent."
-        )
-    pipe = pipeline_version("header_aware_parent",
-                            contextual=config.CONTEXTUAL_PREFIXES)
-    if pipe.fingerprint() != fp[0]:
-        raise RuntimeError(
-            f"refusing to append chunks stamped {pipe.fingerprint()} to an index "
-            f"of {fp[0]}. Re-ingest the corpus, or the upload is measured under a "
-            "pipeline the rest of the index was not built with."
-        )
+    pipe = pipeline_version("header_aware_parent", contextual=contextual)
+
+    # WHICH DIFFERENCES ACTUALLY MATTER, rather than "the whole stamp must match".
+    #
+    # The first version refused any fingerprint mismatch, which was right for a
+    # corpus rebuild and too strong here: it made "index this upload without the
+    # slow enrichment" impossible, because the contextualiser is part of the
+    # stamp.
+    #
+    # The distinction is whether the vectors are COMPARABLE. A different
+    # embedding model or dimensionality puts the chunk in a different space, and
+    # cosine against it is meaningless -- that must still be refused. A different
+    # contextualiser only changes the TEXT that was embedded; the space is the
+    # same, the numbers are comparable, and the difference is a retrieval-quality
+    # trade the visitor is entitled to make about their own document.
+    ok, why = _appendable(idx, "header_aware_parent")
+    if not ok:
+        raise RuntimeError(f"refusing to append to this index: {why}")
 
     new_chunks: list[Chunk] = []
     sources: list[str] = []
@@ -546,7 +605,7 @@ def ingest_upload(
                 on_progress("reading", i, len(paths), p.name)
             src, blocks, diag = L.load(p, caption_images=caption_images)
             situate = None
-            if config.CONTEXTUAL_PREFIXES:
+            if contextual:
                 if on_progress:
                     # THE SLOW STAGE, NAMED. One model call per passage, which is
                     # most of the wall clock: a 14-page PDF is ~200 seconds
@@ -560,15 +619,26 @@ def ingest_upload(
                 # looks exactly like a hang. A counter that advances every few
                 # seconds is the difference between "working" and "stuck", and
                 # it costs one integer.
+                # N OF M, not just N. The number of passages is known once the
+                # document is chunked, so the fraction is REAL -- unlike a
+                # per-document percentage, which would assume uniform cost
+                # across documents and be wrong most of the time. Within one
+                # document the passages are roughly equal work, so this is the
+                # one place a progress bar is honest.
                 done = [0]
+                n_passages = sum(
+                    1 for c in S.build_chunks(src, blocks, pipeline=pipe,
+                                              owner=owner, origin="upload")
+                    if c.role is ChunkRole.CHILD
+                )
 
                 def situate(parent_text: str, body: str, _syn: str = syn) -> str:
                     out = contextualize.situate(doc_synopsis=_syn,
                                                 parent_text=parent_text, body=body)
                     done[0] += 1
                     if on_progress:
-                        on_progress("understanding the document", i, len(paths),
-                                    f"{p.name} — passage {done[0]}")
+                        on_progress("understanding the document",
+                                    done[0], n_passages, p.name)
                     return out
             chunks = S.build_chunks(src, blocks, pipeline=pipe,
                                     owner=owner, origin="upload",

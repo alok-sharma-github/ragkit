@@ -199,14 +199,29 @@ class NumpyIndex:
             # computed -- and the gap only appeared when contextualisation
             # stopped being deferred. So it is computed directly now, over the
             # field that actually records it.
+            # SCOPED TO THE MEASURED POPULATION, and that is a narrowing of
+            # the claim rather than a loosening of the rule.
+            #
+            # This invariant exists to stop a DILUTED A/B: half the corpus
+            # contextualised, an experiment run over the mixture, and a real
+            # effect reported as not-worth-the-cost. A visitor's upload is never
+            # in the golden set, never in a sweep, and cannot move any published
+            # figure -- so it cannot dilute anything. Including it would make the
+            # eval refuse to score the moment a stranger uploaded a file, which
+            # is a guarantee about the wrong population.
+            #
+            # The corpus must still be uniform with itself. That is the claim
+            # that was always meant.
             "uniform_contextualization": len(
                 {
                     c.has_contextual_prefix
                     for c in kids
-                    if c.text_provenance is not TextProvenance.MODEL_GENERATED
+                    if c.origin == "corpus"
+                    and c.text_provenance is not TextProvenance.MODEL_GENERATED
                 }
             ) <= 1,
             "n_contextualized": sum(1 for c in kids if c.has_contextual_prefix),
+            "n_upload_chunks": sum(1 for c in kids if c.origin != "corpus"),
         }
         if n_dropped:
             report["warning"] = (

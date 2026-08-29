@@ -345,14 +345,21 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
-  upload: async (files: File[]) => {
+  upload: async (files: File[], thorough = true) => {
     const fd = new FormData();
     files.forEach((f) => fd.append("files", f));
-    const res = await fetch("/api/documents", { method: "POST", body: fd });
+    const res = await fetch(`/api/documents?thorough=${thorough ? 1 : 0}`, {
+      method: "POST",
+      body: fd,
+    });
     if (!res.ok) throw new Error(`upload failed: ${res.status}`);
     return (await res.json()) as {
       saved: { name: string; bytes: number; source_id: string }[];
       rejected: { name: string; reason: string }[];
+      // Present whenever anything was accepted; the indexing runs in the
+      // background because it cannot finish inside the request.
+      job?: Job | null;
+      mode?: "thorough" | "fast";
       next: string;
     };
   },

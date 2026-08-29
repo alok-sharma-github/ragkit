@@ -857,7 +857,13 @@ def _invalidate_index() -> None:
 
 @app.post("/api/documents")
 async def upload(request: Request,
-                 files: list[UploadFile] = File(...)) -> JSONResponse:
+                 files: list[UploadFile] = File(...),
+                 # THE VISITOR'S CHOICE, not the operator's. Measured on a
+                 # 6-passage document: 5.2s without the LLM prefix, 23.1s with.
+                 # Measured on the golden set: the prefix is worth +3 of 92
+                 # overall and +3 of 38 on tables and figures. Whoever is waiting
+                 # gets to make that trade.
+                 thorough: bool = Query(default=True)) -> JSONResponse:
     """Accept a visitor's files, index them under their session, and answer.
 
     The docstring used to end "Does NOT index them -- call /api/ingest", which
@@ -981,6 +987,7 @@ async def upload(request: Request,
                 jobs.STORE.update(j, stage=stage, current=cur, total=total,
                                   detail=detail)
             res = pipeline.ingest_upload(paths, owner=session.session_id,
+                                         contextual=thorough,
                                          on_progress=progress)
             # Rebuilt only after the append succeeded, so a failed job cannot
             # leave the process serving a half-written index.
@@ -997,8 +1004,11 @@ async def upload(request: Request,
             # Reported, not silent. A purge that fails needs somewhere to be
             # seen, and this is the request it happened during.
             "swept": swept,
-            "next": ("reading your document -- about a minute for every five "
-                     "pages" if job else "nothing was accepted")}
+            "mode": "thorough" if thorough else "fast",
+            "next": (("reading your document closely -- about a minute for every "
+                      "five pages" if thorough else
+                      "reading your document -- this should take a few seconds")
+                     if job else "nothing was accepted")}
 
     resp = JSONResponse(content=body)
     # Issued on upload rather than on first visit: a visitor who only asks
@@ -1206,12 +1216,23 @@ def delete_conversation(cid: str) -> dict[str, Any]:
 
 
 @app.post("/api/conversations/{cid}/ask")
-def conversation_ask(cid: str, req: ConvAsk) -> dict[str, Any]:
+def conversation_ask(cid: str, req: ConvAsk, request: Request) -> dict[str, Any]:
     """Ask within a conversation: history is supplied and the turn is persisted.
 
     The history comes from the STORE, not the client. A client-supplied history
     can be edited, and an answer condensed against a history nobody recorded is
     not reproducible -- the turn would be unexplainable afterwards.
+
+    TAKES THE REQUEST, and forgetting to was a live 500 on every conversational
+    question. `ask()` gained a `request` parameter so it could read the session
+    cookie and retrieve the visitor's own uploads; FastAPI injects that for
+    `/api/ask`, but this endpoint calls `ask()` as a PLAIN FUNCTION and there is
+    nothing to inject it. So the signature changed and one of the two callers
+    did not.
+
+    Two bugs in one line, and the second is the quieter: even had it not raised,
+    an ask with no request has no cookie, so a conversation could never see the
+    documents the visitor just uploaded. The crash was the lucky half.
     """
     c = conversations.STORE.get(cid)
     if c is None:
@@ -1220,7 +1241,7 @@ def conversation_ask(cid: str, req: ConvAsk) -> dict[str, Any]:
     payload = ask(AskRequest(
         question=req.question, budget=req.budget, sources=req.sources,
         mode=req.mode, history=c.history(),
-    ))
+    ), request)
 
     u = payload["understanding"]
     turn = conversations.Turn(
