@@ -180,7 +180,11 @@ jobs:
         env:
           IMAGE_TAG: ${{ steps.push.outputs.tag }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          WRITE_TOKEN: ${{ secrets.RAGKIT_WRITE_TOKEN }}
+          # NOT SENT TO A DEMO. A demo denies mutation categorically, so a
+          # password there is meaningless -- and passing one made every product
+          # POST require it, which took the public demo offline. Belt and braces
+          # with the middleware fix: the token is absent where it has no meaning.
+          WRITE_TOKEN: ${{ steps.target.outputs.kind == 'demo' && '' || secrets.RAGKIT_WRITE_TOKEN }}
           DEPLOY_LABEL: ${{ github.event.inputs.deployment_label }}
           MAX_OP_TOKENS: ${{ vars.RAGKIT_MAX_OPERATION_TOKENS || '400000' }}
           DAILY_CAP: ${{ vars.RAGKIT_DAILY_TOKEN_CAP || '500000' }}

@@ -151,7 +151,42 @@ async def demo_guard(request: Request, call_next):
     # have been invisible: the demo would still refuse writes, the local dev box
     # would still accept them, and only a customer deployment -- the one case
     # nobody tests before there is a customer -- would be open.
-    if is_write and not _UNLOCK_PATH.match(path) and not _write_token_ok(request):
+    # WHAT THE PASSWORD PROTECTS: corpus MUTATION, not product USE.
+    #
+    # This read `if is_write and ...`, and every product action is a POST --
+    # so setting a write token on the public demo returned 401 for /api/ask and
+    # the demo could not answer a question at all. Shipped, and caught by the
+    # post-deploy check rather than by me.
+    #
+    # The local test is why it got through: I asserted the paths that must be
+    # DENIED (ingest, upload, delete) and never asserted that the ALLOWED ones
+    # still work once a token exists. Testing the deny path is half a guard.
+    #
+    # The allowlist already names product use exactly -- ask, feedback,
+    # conversations. Everything else that writes is mutation. So both mechanisms
+    # now key off the same set instead of two overlapping notions of "write".
+    is_mutation = is_write and not any(p.match(path) for p in _DEMO_ALLOWED_WRITES)
+
+    # THE CATEGORICAL REFUSAL WINS. On a demo, mutation is denied outright -- no
+    # password exists that would permit it -- so answering 401 "write password
+    # required" would tell a visitor to go and find a key to a door that is
+    # bricked up. Checked before the token so the more fundamental reason is the
+    # one reported.
+    if is_mutation and config.DEMO_MODE:
+        return JSONResponse(
+            status_code=403,
+            content={
+                "detail": "read-only demo",
+                "why": "this deployment shares one Gemini key, so uploads, "
+                       "re-ingest and deletion are disabled -- a single ingest "
+                       "would exhaust the day's budget for everyone else",
+                "what_you_can_do": "ask questions of the indexed documents, or "
+                                   "clone the repo and run it against your own "
+                                   "key to use the full pipeline",
+            },
+        )
+
+    if is_mutation and not _UNLOCK_PATH.match(path) and not _write_token_ok(request):
         return JSONResponse(
             status_code=401,
             content={
@@ -168,7 +203,7 @@ async def demo_guard(request: Request, call_next):
         return await call_next(request)
 
     if is_write:
-        if not any(p.match(path) for p in _DEMO_ALLOWED_WRITES):
+        if is_mutation:
             # 403 with the REASON, not a bare status. A demo that silently lacks
             # upload reads as unfinished; one that says why it is read-only reads
             # as operated. Same principle as every degradation notice here.
