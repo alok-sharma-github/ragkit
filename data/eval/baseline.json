@@ -1,5 +1,5 @@
 {
-  "seconds": 4.5,
+  "seconds": 5.9,
   "regression_tests": {
     "What is the Precision@5 for the BM25_ONLY method in the Meridian Retri": {
       "passes_at_budget": 250,
@@ -505,6 +505,7 @@
       "page_text_clip": 3
     },
     "n_header_missing": 3,
+    "index_report_describes_this_index": true,
     "resolved_models": {
       "workhorse": "gemini-3.7-flash",
       "cheap": "gemini-3.5-flash-lite",

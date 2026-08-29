@@ -1038,6 +1038,25 @@ weeks.
 Recorded here rather than quietly fixed, because a document that only lists
 solved problems is a brochure.
 
+**A second defect, fixed but with an unprovable blast radius.** Until A-15,
+`_index_provenance` read `pipeline_fingerprint` from `index_report.json` — a file
+describing the last *ingest*, not the index being *scored*. So **every eval run
+against a non-default index, before today, carried the wrong fingerprint**: a
+measurement of index B stamped with index A's identity, by the mechanism whose
+entire job is refusing to compare across systems.
+
+The fix is in. What cannot be established is the blast radius. Nothing published
+appears to depend on one of those runs — the 2×2 in D-6 reads each arm's
+fingerprint off its own chunks, and every headline figure came from the default
+index, where the sidecar happened to be correct. But "appears to" is the accurate
+verb. There is no log of which indexes were ever scored, so **it cannot be proven
+that no earlier comparison was affected**, and a claim of "no impact" would be a
+guess wearing the clothes of an audit.
+
+Recorded at the strength it can be supported: one defect, one fix, one unprovable
+scope. The same reason the 18% headerless figure was withdrawn rather than
+qualified — the confidence, not the number, was the part that was wrong.
+
 ---
 
 ## Appendix — the numbers
@@ -1046,16 +1065,16 @@ All produced by running something. Reproduce with `ragkit eval`,
 `ragkit judge score`, `ragkit reconcile`, `ragkit audit`, `ragkit spend`.
 
 **Which run.** Every generation-tier figure below comes from one stamped artifact:
-fingerprint `6fd55e19a82a7c28`, parser
-`pymupdf4llm@1.28+...`, budget
-`1500`. Artifacts that record neither cannot be pooled with
+fingerprint `4d54ab24999d336e`, parser `pymupdf4llm@1.28+...`, budget `1500`,
+child cost basis `delivered`. (The **was** column is fingerprint
+`6fd55e19a82a7c28` under basis `indexed`.) Artifacts that record neither cannot be pooled with
 each other, which is why the stamp exists -- and why the failure analysis refuses
 an unstamped input rather than inheriting a fingerprint nobody verified.
 
 **These numbers move between runs, and the variance is not quantified.** Re-running
-the generation tier on an unchanged index and an unchanged budget moved abstentions
-17 -> 18 and `table_or_image` 27% -> 29%, and made one judge verdict that had
-failed succeed. Generation is sampled, so a single run is a sample of one. Nothing
+the generation tier on an unchanged index and an unchanged budget once moved
+abstentions 17 -> 18 and `table_or_image` 27% -> 29%, and made one judge verdict
+that had failed succeed. Generation is sampled, so a single run is a sample of one. Nothing
 here reports a confidence interval over repeated runs, and a difference of one or
 two items between runs should not be read as a change in the system.
 

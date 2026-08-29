@@ -374,6 +374,20 @@ def _primary_artifact_check(fp: list[str]) -> list[Check]:
                    "on purpose",
         ),
         Check(
+            name="Headline artifact is complete",
+            rule="the headline artifact carries every section the UI renders",
+            observed=(f"budget_sweep has {len(ev.get('budget_sweep') or {})} points, "
+                      f"per_item {len(ev.get('per_item') or [])} rows"),
+            state=("HOLDS" if (ev.get("budget_sweep") and ev.get("per_item"))
+                   else "FAILS"),
+            n=1, fingerprint=fp,
+            detail="a --no-sweep run writes a VALID artifact with an empty sweep, so "
+                   "the recall-vs-budget chart renders blank while every other check "
+                   "on this page passes -- found by reading the live page, not the file",
+            why="the first version of this invariant checked the artifact's identity "
+                "and not its completeness, and passed an artifact whose chart was empty",
+        ),
+        Check(
             name="Headline artifact used the current cost basis",
             rule=f"child_cost_basis == {config.CHILD_COST_BASIS!r}",
             observed=f"{basis!r}",
