@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import uuid
 from pathlib import Path
 from typing import Any, Literal
 
@@ -44,7 +45,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from ragkit import (budget, citations_index, config, conversations,
-                    feedback as fb, gemini, jobs, pipeline)
+                    feedback as fb, gemini, jobs, pipeline, upload_guard)
 from ragkit.eval import reconcile as R
 from ragkit.generate import answer as A
 from ragkit.index.fusion import explain as explain_fusion
@@ -761,17 +762,38 @@ async def upload(files: list[UploadFile] = File(...)) -> dict[str, Any]:
                              f"no loader for '{ext}' -- supported: {sorted(ALLOWED)}"})
             continue
         data = await f.read()
-        if len(data) > MAX_UPLOAD_BYTES:
-            rejected.append({"name": name, "reason":
-                             f"{len(data) / 1e6:.0f} MB exceeds the {MAX_UPLOAD_BYTES // 1024 // 1024} MB limit"})
-            continue
-        if ext == ".pdf" and not data.startswith(b"%PDF"):
-            # Content check, not just extension. A renamed HTML error page with a
-            # .pdf suffix parses to garbage and indexes silently.
-            rejected.append({"name": name, "reason": "not a PDF (missing %PDF header)"})
-            continue
-        dest = config.DATA_RAW / name
-        dest.write_bytes(data)
+
+        # QUARANTINE FIRST, THEN INSPECT, THEN ADMIT.
+        #
+        # The file has to exist on disk to be inspected -- the probe is a separate
+        # process and takes a path -- but it must not land in DATA_RAW before it
+        # is judged, because anything in DATA_RAW is a candidate for the next
+        # ingest. Writing straight to the corpus and deleting on rejection means
+        # there is a window in which a refused file is indexable, and windows like
+        # that are how a rejected document ends up searchable.
+        quarantine = config.DATA_RAW.parent / "quarantine"
+        quarantine.mkdir(parents=True, exist_ok=True)
+        staged = quarantine / f"{uuid.uuid4().hex[:12]}{ext}"
+        staged.write_bytes(data)
+
+        try:
+            verdict = upload_guard.check_upload(staged)
+            if not verdict.ok:
+                # The visitor-facing sentence, not the code. See upload_guard for
+                # why: this reader cannot raise a page cap, so the message has to
+                # name the limit AND what would work instead.
+                rejected.append({
+                    "name": name,
+                    "reason": verdict.visitor_message,
+                    "code": verdict.code,
+                    "pages": verdict.pages,
+                })
+                continue
+            dest = config.DATA_RAW / name
+            dest.write_bytes(data)
+        finally:
+            # The quarantine copy goes whether the file was admitted or refused.
+            staged.unlink(missing_ok=True)
         saved.append({"name": name, "bytes": len(data),
                       "source_id": Source.normalize_id(dest)})
     return {"saved": saved, "rejected": rejected,

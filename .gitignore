@@ -71,3 +71,6 @@ data/index/citation_index.json
 
 # Scratch API response dumps from manual testing
 /t[0-9]*.json
+
+# Untrusted uploads are inspected here before admission; never committed.
+data/quarantine/

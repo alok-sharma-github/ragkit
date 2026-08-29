@@ -711,3 +711,39 @@ SPEND_LEDGER_PATH = CACHE_DIR / "spend_ledger.json"
 # deploy workflow always passes the secret for a customer service, and the demo
 # does not need it because DEMO_MODE already denies writes.
 WRITE_TOKEN = os.getenv("RAGKIT_WRITE_TOKEN", "")
+
+
+# ---------------------------------------------------------------------------
+# UPLOAD LIMITS (public demo)
+#
+# ACCEPTED RISK, NAMED. Letting strangers upload PDFs to a public URL means
+# untrusted bytes reaching a C parsing library through a Python wrapper, on our
+# AWS account. PyMuPDF is good software and PDF parsers have a long history of
+# memory-safety bugs; that is a property of the format, not of this library.
+# Ephemeral purge narrows the window. It does not close it.
+#
+# The trade is deliberate: the product's differentiator -- refusing to quote what
+# it cannot verify -- is INVISIBLE on our own corpus, because a visitor has no way
+# to know the tables are broken. On their own document they know exactly what is
+# in it, and the same behaviour reads as a catch rather than a limitation. That is
+# worth the exposure, with these mitigations.
+#
+# PAGES ARE THE COURTESY; TIME AND MEMORY ARE THE GUARANTEE. ~8s/page measured on
+# this corpus, so 20 pages is roughly the longest wait a visitor tolerates. But a
+# five-page file can be a decompression bomb or one page with 200k vector paths --
+# passing any page cap and hanging the parser. The wall clock and the address-space
+# limit do not care what shape the file is.
+MAX_UPLOAD_PAGES = int(os.getenv("RAGKIT_MAX_UPLOAD_PAGES", "20"))
+MAX_UPLOAD_BYTES = int(os.getenv("RAGKIT_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
+# Complexity a page count cannot see.
+MAX_UPLOAD_OBJECTS = int(os.getenv("RAGKIT_MAX_UPLOAD_OBJECTS", "50000"))
+
+# Hard bounds on the parse subprocess. RLIMIT_AS is POSIX-only, so on Windows the
+# memory cap silently does not apply -- the probe REPORTS which limits it actually
+# installed rather than letting the caller assume. A limit believed to be in force
+# and absent is worse than none, because it licenses relaxing the checks that work.
+PARSE_TIMEOUT_SECONDS = int(os.getenv("RAGKIT_PARSE_TIMEOUT", "45"))
+PARSE_MEM_MB = int(os.getenv("RAGKIT_PARSE_MEM_MB", "512"))
+
+# How long an uploaded document stays retrievable before it is purged.
+UPLOAD_TTL_SECONDS = int(os.getenv("RAGKIT_UPLOAD_TTL", str(60 * 60)))
