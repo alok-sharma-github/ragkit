@@ -858,7 +858,12 @@ def _invalidate_index() -> None:
 @app.post("/api/documents")
 async def upload(request: Request,
                  files: list[UploadFile] = File(...)) -> JSONResponse:
-    """Accept files into the corpus. Does NOT index them -- call /api/ingest.
+    """Accept a visitor's files, index them under their session, and answer.
+
+    The docstring used to end "Does NOT index them -- call /api/ingest", which
+    stopped being true when the dead-end was closed: /api/ingest is a corpus-wide
+    rebuild a demo refuses, so telling a visitor to call it was telling them to
+    hit a 403. Upload indexes inline now.
 
     Two steps rather than one, deliberately: upload is fast and per-file, ingest
     is slow and corpus-wide (it rebuilds the index). Fusing them would make a
@@ -953,29 +958,47 @@ async def upload(request: Request,
     # /api/ingest is 403 on a demo -- correctly, it is a corpus-wide rebuild. So
     # the upload succeeded and dead-ended: owned, stored, unaskable. Every piece
     # worked; the sequence did not.
-    ingested: dict[str, Any] = {}
+    # INDEXED IN THE BACKGROUND, because it cannot finish inside the request.
+    #
+    # This ran inline, and inline was right for the two-page file that proved the
+    # path works. On the real deployment it is not: a 14-page PDF at 0.25 vCPU
+    # takes minutes, Lightsail's proxy closes the connection at ~60 seconds, and
+    # the visitor sees `504 Gateway Time-out` on an upload that is in fact still
+    # working. Measured against the live URL: a 2-page file took 43s, an 11-page
+    # file 504'd at 63.7s.
+    #
+    # So the request does only what is fast -- validate, quarantine, save -- and
+    # hands back a job id. The slow part is one model call per passage, and the
+    # job reports which stage it is in, because a visitor watching an unlabelled
+    # spinner for three minutes concludes it is broken and is not being
+    # unreasonable.
+    job = None
     if saved:
-        try:
-            ingested = pipeline.ingest_upload(
-                [config.DATA_UPLOADS / session.session_id / r["name"] for r in saved],
-                owner=session.session_id,
-            )
+        paths = [config.DATA_UPLOADS / session.session_id / r["name"] for r in saved]
+
+        def work(j: jobs.Job) -> dict[str, Any]:
+            def progress(stage: str, cur: int, total: int, detail: str) -> None:
+                jobs.STORE.update(j, stage=stage, current=cur, total=total,
+                                  detail=detail)
+            res = pipeline.ingest_upload(paths, owner=session.session_id,
+                                         on_progress=progress)
+            # Rebuilt only after the append succeeded, so a failed job cannot
+            # leave the process serving a half-written index.
             _invalidate_index()
-        except Exception as exc:  # noqa: BLE001
-            # A failed ingest must not look like a successful upload. The file
-            # stays (the session owns it and the sweep will purge it); what the
-            # visitor is told is that it is not searchable, and why.
-            ingested = {"added": 0, "error": type(exc).__name__, "detail": str(exc)[:300]}
+            return res
+
+        job = jobs.STORE.submit("upload", work,
+                                session=session.session_id,
+                                files=[r["name"] for r in saved])
 
     body = {"saved": saved, "rejected": rejected,
             "session": session.to_json(),
-            "indexed": ingested,
+            "job": job.to_json() if job else None,
             # Reported, not silent. A purge that fails needs somewhere to be
             # seen, and this is the request it happened during.
             "swept": swept,
-            "next": ("ask a question -- your document is searchable in this session only"
-                     if ingested.get("added") else
-                     "your document was stored but could not be indexed")}
+            "next": ("reading your document -- about a minute for every five "
+                     "pages" if job else "nothing was accepted")}
 
     resp = JSONResponse(content=body)
     # Issued on upload rather than on first visit: a visitor who only asks

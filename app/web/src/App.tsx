@@ -14,6 +14,7 @@ import {
   type AskResponse,
   type Conversation,
   type Doc,
+  type Job,
   type StatusResponse,
 } from "./api";
 import { AnswerView } from "./components/Answer";
@@ -158,15 +159,46 @@ function Uploader({
   // that refuses them cannot drift apart.
   limits: string;
 }) {
-  // NO JOB POLLER any more. Upload indexes in the same request, so there is no
-  // background job to watch -- and the poller's only caller was the /api/ingest
-  // kick-off a demo refuses. Removed rather than left dormant: an unused poller
-  // is one more thing that looks like it is doing something.
+  // THE POLLER IS BACK, and the reason is measured rather than anticipated.
+  //
+  // It was removed when upload started indexing inline -- correct for a
+  // two-page test file, wrong for a real one. A 14-page PDF takes minutes at
+  // 0.25 vCPU and the proxy gives up at 60 seconds, so the visitor got a 504 on
+  // an upload that was still working. The request now returns a job id and this
+  // watches it.
+  const [job, setJob] = useState<Job | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Polls until the job settles. The interval is deliberately unhurried: the
+  // work takes minutes, and a tight poll would spend the visitor's rate-limit
+  // allowance on status checks.
+  const poll = useCallback((id: string) => {
+    const tick = async () => {
+      try {
+        const j = await api.job(id);
+        setJob(j);
+        if (j.state === "queued" || j.state === "running") {
+          setTimeout(tick, 2000);
+          return;
+        }
+        setBusy(false);
+        if (j.state === "failed") {
+          setMsg(j.error?.split(String.fromCharCode(10))[0] ?? "could not read that document");
+        } else {
+          setNote("ready — ask a question about it");
+          onDone();
+        }
+      } catch {
+        setBusy(false);
+        setMsg("lost contact with the server while reading your document");
+      }
+    };
+    setTimeout(tick, 1500);
+  }, [onDone]);
 
   const send = async (files: File[]) => {
     setMsg(null);
@@ -177,23 +209,16 @@ function Uploader({
       if (up.rejected?.length) {
         setMsg(up.rejected.map((r: any) => `${r.name}: ${r.reason}`).join(" · "));
       }
-      if (up.saved?.length) {
-        // UPLOAD NOW INDEXES IN THE SAME CALL, so there is nothing to kick off
-        // afterwards. This used to POST /api/ingest -- a corpus-wide rebuild
-        // that a demo refuses with 403, which meant a successful upload was
-        // immediately followed by a failure the visitor could do nothing about.
-        if (up.indexed?.added) {
-          setNote(`indexed — ask a question about ${up.saved[0].name}`);
-          onDone();
-        } else if (up.indexed?.error) {
-          setMsg("stored, but could not be indexed — try a text-based PDF");
-        }
+      if (up.saved?.length && up.job) {
+        setJob(up.job);
+        poll(up.job.id);
       }
     } catch {
       setMsg("upload failed — check the file and try again");
-    } finally {
       setBusy(false);
     }
+    // `busy` is NOT cleared here: the upload request returning is the START of
+    // the work, not the end of it. The poller clears it when the job settles.
   };
 
   // A DROP ZONE, not a button. Upload is the action that turns a demo corpus
@@ -216,7 +241,12 @@ function Uploader({
     );
   }
 
-  const running = busy;
+  const running = busy || (job !== null && (job.state === "queued" || job.state === "running"));
+  // The stage the job reports, shown verbatim. "understanding the document" is
+  // a truer thing to show for ninety seconds than a percentage would be -- cost
+  // per page varies enough that a progress bar would be wrong most of the time.
+  const stage = job?.progress?.stage ?? "";
+  const detail = job?.progress?.detail ?? "";
 
   return (
     <div>
@@ -244,9 +274,23 @@ function Uploader({
         </div>
         <div className="mt-1 text-[11px] leading-relaxed text-ink-400">
           {running
-            ? "this takes a few seconds per page"
+            ? (stage
+                ? `${stage}${detail ? ` — ${detail}` : ""}`
+                : "uploading…")
             : "Drop a PDF here, or click to browse"}
         </div>
+        {running && (
+          <div className="mt-2 rounded-sm bg-quote-600/[0.06] px-2 py-1.5 text-[10.5px] leading-relaxed text-quote-600">
+            {/* THE DESIGNED ANSWER TO THE WAIT, and it was never built:
+                "you can ask questions while they prepare". A two-minute wait
+                with nothing to do reads as broken; the same wait with something
+                worth doing reads as work happening. And it is true -- the
+                preloaded corpus is searchable throughout, because the index is
+                only locked for the final append. */}
+            You can ask questions of the loaded papers while this finishes —
+            about a minute for every five pages.
+          </div>
+        )}
       </div>
       <input
         ref={inputRef}
@@ -624,6 +668,10 @@ export function App() {
                       ? "Ask a question about your documents…"
                       : "Add a document first"
                   }
+                  /* Never disabled while a document is indexing. The corpus is
+                     searchable throughout, and taking the composer away during
+                     the one wait in the product would remove the only thing
+                     there is to do. */
                   className="min-h-[2.75rem] flex-1 resize-none rounded-md border border-paper-400 bg-paper-50 px-3 py-2 font-serif text-[14px] text-ink-900 outline-none placeholder:text-ink-400 focus:border-ink-400"
                 />
                 <button

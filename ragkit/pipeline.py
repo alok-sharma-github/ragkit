@@ -487,6 +487,10 @@ def ingest_upload(
     owner: str,
     index_name: str = "numpy_index",
     caption_images: bool = True,
+    # Called as (stage, done, total, detail). Uploading is the one place a
+    # visitor waits on this system, and the wait is minutes on a 0.25 vCPU host
+    # -- so the stages are reported rather than left to a spinner.
+    on_progress: Callable[[str, int, int, str], None] | None = None,
 ) -> dict[str, Any]:
     """Add ONE session's files to the live index. Additive, never destructive.
 
@@ -537,16 +541,35 @@ def ingest_upload(
     sources: list[str] = []
     manifest = Manifest()
     with limits.collect() as log:
-        for p in paths:
+        for i, p in enumerate(paths):
+            if on_progress:
+                on_progress("reading", i, len(paths), p.name)
             src, blocks, diag = L.load(p, caption_images=caption_images)
             situate = None
             if config.CONTEXTUAL_PREFIXES:
+                if on_progress:
+                    # THE SLOW STAGE, NAMED. One model call per passage, which is
+                    # most of the wall clock: a 14-page PDF is ~200 seconds
+                    # locally and longer on a quarter-vCPU host.
+                    on_progress("understanding the document", i, len(paths), p.name)
                 doc_text = "\n\n".join(b.text for b in blocks if b.text.strip())
                 syn = contextualize.synopsis(src.title or src.source_id, doc_text)
 
+                # COUNTED, so the stage visibly moves. Naming the stage was not
+                # enough: it sat unchanged for 170 of the 200 seconds, which
+                # looks exactly like a hang. A counter that advances every few
+                # seconds is the difference between "working" and "stuck", and
+                # it costs one integer.
+                done = [0]
+
                 def situate(parent_text: str, body: str, _syn: str = syn) -> str:
-                    return contextualize.situate(doc_synopsis=_syn,
-                                                 parent_text=parent_text, body=body)
+                    out = contextualize.situate(doc_synopsis=_syn,
+                                                parent_text=parent_text, body=body)
+                    done[0] += 1
+                    if on_progress:
+                        on_progress("understanding the document", i, len(paths),
+                                    f"{p.name} — passage {done[0]}")
+                    return out
             chunks = S.build_chunks(src, blocks, pipeline=pipe,
                                     owner=owner, origin="upload",
                                     contextualizer=situate)
@@ -566,6 +589,9 @@ def ingest_upload(
             sources.append(src.source_id)
 
         kids = [c for c in new_chunks if c.role is ChunkRole.CHILD]
+        if on_progress:
+            on_progress("indexing", len(paths), len(paths),
+                        f"{len(kids)} passages")
         vecs, _st = gemini.embed_texts([c.embed_text for c in kids], kind="document")
 
     # THE ONLY SERIALISED SECTION, and it is deliberately the smallest one.
