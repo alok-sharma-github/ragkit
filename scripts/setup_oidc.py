@@ -41,6 +41,39 @@ PROVIDER_HOST = "token.actions.githubusercontent.com"
 ALLOWED_REFS = ("refs/heads/main", "refs/heads/product")
 
 
+def _repo_ids() -> tuple[str, str]:
+    """Numeric owner and repository ids, from the API rather than hardcoded.
+
+    They appear in the OIDC subject and they are stable, but writing them as
+    literals would make this script quietly wrong for any other repo -- the same
+    hand-maintained-list problem the guard audit exists to avoid.
+    """
+    import json
+    import subprocess
+
+    r = subprocess.run(
+        ["gh", "api", f"repos/{REPO}", "--jq", "{repo: .id, owner: .owner.id}"],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        return "", ""
+    d = json.loads(r.stdout)
+    return str(d["owner"]), str(d["repo"])
+
+
+def _subjects() -> list[str]:
+    """Every subject form allowed to assume the role, as exact strings."""
+    owner_id, repo_id = _repo_ids()
+    owner, name = REPO.split("/", 1)
+    subs = [f"repo:{REPO}:ref:{ref}" for ref in ALLOWED_REFS]
+    if owner_id and repo_id:
+        subs += [
+            f"repo:{owner}@{owner_id}/{name}@{repo_id}:ref:{ref}"
+            for ref in ALLOWED_REFS
+        ]
+    return subs
+
+
 def aws(*args: str, check: bool = True) -> tuple[int, str]:
     r = subprocess.run(
         ["aws", *args], capture_output=True, text=True, cwd=ROOT,
@@ -93,9 +126,24 @@ def main() -> int:
                     f"{PROVIDER_HOST}:aud": "sts.amazonaws.com",
                     # StringEquals, not StringLike, and a list of exact subs.
                     # No wildcard means no fork-PR path in.
-                    f"{PROVIDER_HOST}:sub": [
-                        f"repo:{REPO}:ref:{ref}" for ref in ALLOWED_REFS
-                    ],
+                    #
+                    # BOTH SUBJECT FORMATS, because GitHub is not sending the one
+                    # the docs describe. The token this repo actually receives is:
+                    #
+                    #   repo:owner@81555853/ragkit@1346983103:ref:refs/heads/main
+                    #
+                    # -- an IMMUTABLE-ID subject, with the numeric owner and repo
+                    # ids appended. That is strictly better security (a renamed or
+                    # recreated repo cannot inherit the old trust) and it is not
+                    # what the documented `repo:owner/repo:ref:...` form matches,
+                    # so the role rejected every token with "Not authorized to
+                    # perform sts:AssumeRoleWithWebIdentity".
+                    #
+                    # Read from the actual token rather than guessed a third time.
+                    # Both forms are listed so a rollback on GitHub's side does not
+                    # break deploys; extra exact values cost nothing, and there is
+                    # still no wildcard and so still no fork-PR path in.
+                    f"{PROVIDER_HOST}:sub": _subjects(),
                 },
             },
         }],

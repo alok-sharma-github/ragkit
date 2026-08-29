@@ -77,25 +77,11 @@ jobs:
           echo "kind=${KIND:-demo}" >> "$GITHUB_OUTPUT"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "deploying $BRANCH -> service '$SERVICE' as kind '${KIND:-demo}'"
-      # TEMPORARY DIAGNOSTIC. The role rejected the token with "Not authorized to
-      # perform sts:AssumeRoleWithWebIdentity" on BOTH workflow_run and
-      # workflow_dispatch, so the pinned `sub` does not match what GitHub sends.
-      # Two guesses have already been wrong; this reads the claim instead.
-      #
-      # Prints CLAIMS ONLY, never the token. sub and aud are exactly what the trust
-      # policy matches on, and exactly what the AWS error is about.
-      - name: read the OIDC subject claim
-        run: |
-          curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN"                "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com"           | python3 -c '
-          import base64, json, sys
-          tok = json.load(sys.stdin)["value"]
-          part = tok.split(".")[1]
-          part += "=" * (-len(part) % 4)
-          c = json.loads(base64.urlsafe_b64decode(part))
-          for k in ("sub", "aud", "repository", "ref", "event_name", "workflow_ref"):
-              print("%-14s %s" % (k, c.get(k)))
-          '
-
+      # The subject claim this repo receives is the IMMUTABLE-ID form
+      # (`repo:owner@<id>/<name>@<id>:ref:...`), not the documented
+      # `repo:owner/name:ref:...`. The trust policy lists both; see
+      # scripts/setup_oidc.py. Read from a real token rather than guessed --
+      # the diagnostic step that read it is removed now that it has.
       - name: assume the deploy role via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
