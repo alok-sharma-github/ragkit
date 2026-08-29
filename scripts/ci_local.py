@@ -147,8 +147,25 @@ def main(argv: list[str] | None = None) -> int:
         else:
             failed.append(g.name)
             print(f"  [FAIL] {g.name}  ({dt:.1f}s)  exit {r.returncode}")
-            tail = (r.stdout + r.stderr).strip().splitlines()[-8:]
-            for line in tail:
+            # THE WHOLE OUTPUT OF A FAILING GATE, not the last eight lines.
+            #
+            # This printed a tail, and the tail is where a summary lives, not
+            # where the diagnosis does. `reconcile` prints every check and then
+            # its total, so the eight-line window showed the total and hid the
+            # one FAILING line above it. That cost two CI round-trips and a
+            # Docker build to answer "which check?" -- a question the log had
+            # already answered and thrown away.
+            #
+            # A gate that says "something failed" without saying what is a
+            # notification, not a diagnosis. Nothing is saved by truncating the
+            # rare case; the passing case still prints nothing.
+            body = (r.stdout + r.stderr).strip().splitlines()
+            keep = [ln for ln in body
+                    if any(m in ln for m in ("FAIL", "fail", "Error", "Traceback"))]
+            # Show the signal lines first, then the full text, so a long output
+            # still leads with the reason.
+            shown = (keep + ["   -- full output --"] + body) if keep else body
+            for line in shown:
                 print(f"         {line[:110]}")
 
     print()

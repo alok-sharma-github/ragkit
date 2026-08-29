@@ -45,11 +45,28 @@ def resolve_asset(path: str) -> Path | None:
     """
     root = config.DATA_RAW.resolve()
     cand = Path(path)
-    # Join to the root FIRST. An absolute path keeps only its filename, a
-    # relative one is interpreted where the caller meant it -- inside the corpus.
-    target = (root / cand.name) if cand.is_absolute() else (root / cand)
+
+    # ABSOLUTE PATHS ARE REFUSED, not reinterpreted. The previous version kept
+    # their basename -- `/etc/passwd` became `data/raw/passwd` -- which is
+    # contained and therefore safe, and which is also PLATFORM-DEPENDENT in a
+    # security rule, which is a defect on its own.
+    #
+    # `Path("/etc/passwd").is_absolute()` is True on Linux and False on Windows,
+    # where it is merely rooted. So the same input took different branches on
+    # different operating systems: on Windows it escaped the root and was
+    # refused; on Linux it was silently rewritten to a corpus filename. The
+    # invariant passed on my machine and FAILED IN CI, which is the only reason
+    # anybody looked.
+    #
+    # The UI never sends an absolute path. Refusing them outright makes the
+    # behaviour identical everywhere and removes a silent reinterpretation of
+    # untrusted input -- and `is_absolute()` is not enough to spot one, because
+    # a leading separator is not "absolute" on Windows.
+    if cand.is_absolute() or path.startswith(("/", "\\")) or cand.drive:
+        return None
+
     try:
-        resolved = target.resolve()
+        resolved = (root / cand).resolve()
         resolved.relative_to(root)
     except ValueError:
         return None
