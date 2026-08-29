@@ -308,6 +308,25 @@ BUILD_OUTPUT: dict[str, str] = {
     "ingest_manifest.json": "what was ingested, and under which parser version",
     "manifest.json": "the corpus record; delta detection reads it",
     "resolved_models.json": "which model IDs this key resolved to, recorded not guessed",
+    # THE COMPARISON ARM, and it ships for the same reason the index does.
+    #
+    # D-6 and A-13 both rest on a 2x2 over two indexes, and one of those claims is
+    # that a technique looked like a loss until the accounting was corrected. A
+    # reader who cannot re-run that has been given an assertion. Same standing as
+    # keeping parser_survey.INVALID.json: the record of how a number was found to
+    # be wrong is worth more than the corrected number alone.
+    #
+    # Listed by exact name rather than by a `numpy_index_*` pattern. A pattern
+    # would exempt every future experiment directory in advance, which is the
+    # widened-exemption mistake this project has already paid for twice -- an
+    # exemption should name what it excuses, not a shape that future things might
+    # happen to match.
+    "numpy_index_breadcrumb": (
+        "the breadcrumb-only arm of the D-6 / A-13 comparison; without it the "
+        "before/after is a claim rather than something a reader can re-run"
+    ),
+    "manifest.numpy_index_breadcrumb.json": "that arm's corpus record",
+    "ingest_manifest.numpy_index_breadcrumb.json": "that arm's ingest record",
 }
 
 

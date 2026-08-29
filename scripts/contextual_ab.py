@@ -133,25 +133,19 @@ def main() -> int:
               "are the same system and there is nothing to compare.")
         return 2
 
-    # EVERY RUN BELOW OVERWRITES data/eval/eval_results.json, because run() writes
-    # its artifact -- so this script would leave the primary eval artifact
-    # describing whichever cell happened to go last (a 250-token run against the
-    # wrong index), and the failure histogram would then refuse to pool. Same
-    # shape as the manifest defect this comparison already exposed: a
-    # side-by-side must not damage the thing it is compared against. Snapshot
-    # and restore, in a finally, so a crash mid-table cannot leave it damaged
-    # either.
-    artifacts = [ROOT / "data" / "eval" / "eval_results.json"]
-    saved = {a: a.read_bytes() for a in artifacts if a.exists()}
+    # NOTHING BELOW TOUCHES data/eval/eval_results.json.
+    #
+    # It used to. Every cell ran the eval, the eval wrote its artifact, and this
+    # script left the primary record describing whichever cell went last. The
+    # first fix here was snapshot-and-restore in a `finally` -- correct, and the
+    # wrong layer: it defended one caller against a hazard every caller had. So
+    # `run()` now writes only where it is told, and this loop is back to being
+    # what it looks like.
     cells: dict[str, dict[str, dict[str, object]]] = {}
-    try:
-        for arm, index_name in arms.items():
-            cells[arm] = {}
-            for basis in BASES:
-                cells[arm][basis] = {str(b): _eval(index_name, basis, b) for b in BUDGETS}
-    finally:
-        for a, blob in saved.items():
-            a.write_bytes(blob)
+    for arm, index_name in arms.items():
+        cells[arm] = {}
+        for basis in BASES:
+            cells[arm][basis] = {str(b): _eval(index_name, basis, b) for b in BUDGETS}
 
     out = {
         "meta": meta,

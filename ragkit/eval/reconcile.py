@@ -304,6 +304,87 @@ def _contextual_prefix_check(fp: list[str]) -> list[Check]:
     ]
 
 
+# Imported rather than restated: a second copy of 1500 would drift, and this
+# check exists to catch exactly that class of disagreement.
+from .run import HEADLINE_BUDGET as _HEADLINE_BUDGET  # noqa: E402
+
+
+def _primary_artifact_check(fp: list[str]) -> list[Check]:
+    """Does the headline artifact describe the index that actually ships?
+
+    THE HAZARD THIS EXISTS FOR, twice observed. An experiment writes to a shared
+    file and the record of the shipped system quietly becomes a record of the
+    experiment. First the ingest manifest, when building a second index for an
+    A/B repointed the shipped index's provenance at a different pipeline. Then
+    eval_results.json, when the A/B's 24 runs left it describing a 250-token run
+    against the wrong index. Both times nothing failed: the demo served, the UI
+    rendered, and a document said something true about a system that was not the
+    one running.
+
+    Both are now structurally prevented -- index-scoped manifests, and an eval
+    that writes only where it is told. This is the check that would have caught
+    either WITHOUT knowing about it, which is the point: the prevention is
+    specific to two causes and this is specific to the property.
+
+    It compares the artifact against the INDEX ON DISK rather than against
+    another artifact, because a sidecar describing the wrong index is exactly
+    the failure being tested for.
+    """
+    from ..index.numpy_index import NumpyIndex
+
+    ev = _load(config.DATA_EVAL / "eval_results.json")
+    if not ev:
+        return [Check("Headline artifact describes the shipped index",
+                      "eval_results.json provenance == data/index/numpy_index",
+                      "no eval_results.json", "NOT_MEASURED", fingerprint=fp)]
+    try:
+        kids = NumpyIndex.load("numpy_index").children
+    except Exception as exc:  # noqa: BLE001
+        return [Check("Headline artifact describes the shipped index",
+                      "eval_results.json provenance == data/index/numpy_index",
+                      f"index unreadable: {type(exc).__name__}", "NOT_MEASURED",
+                      fingerprint=fp)]
+
+    on_disk = sorted({c.pipeline_fingerprint for c in kids})
+    claimed = (ev.get("index_provenance") or {}).get("pipeline_fingerprint")
+    matches = len(on_disk) == 1 and on_disk[0] == claimed
+    basis = (ev.get("index_provenance") or {}).get("child_cost_basis")
+    budget = ev.get("token_budget")
+
+    return [
+        Check(
+            name="Headline artifact describes the shipped index",
+            rule="eval_results.json provenance == the chunks in data/index/numpy_index",
+            observed=(f"both {claimed}" if matches
+                      else f"artifact says {claimed}, index carries {on_disk}"),
+            state="HOLDS" if matches else "FAILS",
+            n=len(kids), fingerprint=fp,
+            detail=f"budget {budget}, child cost basis {basis!r}",
+            why="an experiment writing to a shared file has twice turned the record "
+                "of the shipped system into a record of the experiment, silently",
+        ),
+        Check(
+            name="Headline artifact was measured at the headline budget",
+            rule=f"token_budget == {_HEADLINE_BUDGET}",
+            observed=f"{budget}",
+            state=("HOLDS" if budget == _HEADLINE_BUDGET
+                   else "FAILS"),
+            n=1, fingerprint=fp,
+            detail="a stray run at another budget leaves a headline nobody quoted "
+                   "on purpose",
+        ),
+        Check(
+            name="Headline artifact used the current cost basis",
+            rule=f"child_cost_basis == {config.CHILD_COST_BASIS!r}",
+            observed=f"{basis!r}",
+            state="HOLDS" if basis == config.CHILD_COST_BASIS else "FAILS",
+            n=1, fingerprint=fp,
+            detail="two bases answer different questions under the same field "
+                   "names -- see A-13",
+        ),
+    ]
+
+
 def reconcile() -> dict[str, Any]:
     """Read the artifacts on disk and evaluate every invariant.
 
@@ -460,6 +541,7 @@ def reconcile() -> dict[str, Any]:
     # in-memory copy of the index and actually queried. Nothing is written to disk.
     checks.extend(_isolation_check(fp))
     checks.extend(_contextual_prefix_check(fp))
+    checks.extend(_primary_artifact_check(fp))
 
     n_fail = sum(1 for c in checks if c.state == "FAILS")
     n_hold = sum(1 for c in checks if c.state == "HOLDS")

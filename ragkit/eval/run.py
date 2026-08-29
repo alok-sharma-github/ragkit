@@ -72,12 +72,35 @@ RESULTS = config.DATA_EVAL / "eval_results.json"
 
 
 def _index_provenance(idx: NumpyIndex) -> dict[str, Any]:
+    """What produced the index BEING SCORED -- read off it, not off a sidecar.
+
+    THE HOLE THIS CLOSES, and it sat inside the mechanism built to prevent it.
+    `index_report.json` describes the LAST INGEST. Scoring any other index --
+    an A/B arm, an experiment, a rebuild under a different flag -- produced a
+    payload stamped with the shipped index's fingerprint, because that is what
+    the sidecar happened to say. So a run against index B could be compared
+    against a baseline from index A and the fingerprint rule, whose entire job is
+    to refuse that comparison, would report a match.
+
+    Found by a negative control: the new "headline artifact describes the shipped
+    index" invariant was deliberately fed a run against the wrong index, and it
+    held. The budget check caught the incident; the fingerprint check did not,
+    because both numbers came from the same wrong place.
+
+    The chunks carry the fingerprint they were built under. That is the primary
+    record, it travels with the thing being measured, and it cannot be about a
+    different index.
+    """
+    fps = sorted({c.pipeline_fingerprint for c in idx.children})
     rep_path = config.DATA_EVAL / "index_report.json"
     rep = json.loads(rep_path.read_text("utf-8")) if rep_path.exists() else {}
+    # Sidecar values are kept only where the chunks do not carry the fact, and
+    # only when the sidecar is provably about THIS index.
+    describes_this = len(fps) == 1 and rep.get("pipeline_fingerprint") == fps[0]
     return {
-        "parser_version": rep.get("parser_version"),
-        "chunker_version": rep.get("chunker_version"),
-        "pipeline_fingerprint": rep.get("pipeline_fingerprint"),
+        "parser_version": rep.get("parser_version") if describes_this else None,
+        "chunker_version": rep.get("chunker_version") if describes_this else None,
+        "pipeline_fingerprint": fps[0] if len(fps) == 1 else f"MIXED {fps}",
         "strategy": idx.meta.get("strategy"),
         "dim": idx.meta.get("dim"),
         "n_children": idx.meta.get("n_children_indexed"),
@@ -90,8 +113,11 @@ def _index_provenance(idx: NumpyIndex) -> dict[str, Any]:
         "uniform_provenance": idx.meta.get("uniform_provenance"),
         "uniform_contextualization": idx.meta.get("uniform_contextualization"),
         "n_contextualized": idx.meta.get("n_contextualized"),
-        "child_text_source": rep.get("child_text_source"),
-        "n_header_missing": rep.get("n_header_missing"),
+        "child_text_source": rep.get("child_text_source") if describes_this else None,
+        "n_header_missing": rep.get("n_header_missing") if describes_this else None,
+        # Stated, so a null above reads as "the sidecar was about another index"
+        # rather than as "this was not measured".
+        "index_report_describes_this_index": describes_this,
         "resolved_models": gemini.resolve_models(),
     }
 
@@ -103,6 +129,21 @@ def run(
     limit: int | None = None,
     sweep: bool = True,
     verbose: bool = True,
+    # WHERE TO WRITE, and None means NOWHERE.
+    #
+    # This function used to write data/eval/eval_results.json unconditionally, so
+    # measuring anything overwrote the record of the shipped system as a side
+    # effect. The A/B comparison ran 24 evals and left the primary artifact
+    # describing the last cell -- a 250-token run against the wrong index -- and
+    # the failure histogram then refused to pool, which is how it was found.
+    #
+    # That is the SECOND time an experiment has quietly rewritten production's
+    # record in this project; the manifest was the first. The pattern deserves a
+    # rule rather than a third instance: AN EXPERIMENT WRITES TO ITS OWN
+    # NAMESPACE AND NEVER TO THE PRIMARY ARTIFACT. Making it a parameter with a
+    # default of None makes the write the deliberate act and the measurement the
+    # cheap one -- the opposite of how it was.
+    artifact: Path | None = None,
 ) -> dict[str, Any]:
     items = G.load()
     if not items:
@@ -238,7 +279,8 @@ def run(
             "per_item": [r.to_json() for r in results],
             "degradations": log.to_dicts(),
         }
-    RESULTS.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    if artifact is not None:
+        artifact.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return payload
 
 
@@ -326,7 +368,11 @@ def main(argv: list[str] | None = None) -> int:
         except Exception:  # noqa: BLE001
             pass
 
-    payload = run(index_name=args.index, token_budget=args.budget, limit=args.limit,
+    # The CLI is the caller that speaks for the shipped system, so it is the one
+    # that names the primary artifact. Every other caller gets a payload and
+    # writes nothing.
+    payload = run(artifact=RESULTS,
+                  index_name=args.index, token_budget=args.budget, limit=args.limit,
                   sweep=not args.no_sweep)
     if args.json:
         print(json.dumps(payload["metrics"], indent=2))

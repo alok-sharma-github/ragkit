@@ -227,7 +227,20 @@ executed rather than asserted. Currently 0 failing, 9 passing, 3 not measured.
 
 **Deferral** — a decision *not* to build something, stored with the condition that
 reverses it, so it expires itself rather than being remembered. One has already
-fired on its own terms.
+fired on its own terms and been acted on.
+→ *Qualifier: the condition has to be something a machine can check against the
+project's own measurements, or the deferral is prose again. Where no such
+condition exists, the entry says so rather than being wired to something that
+merely correlates — three of the seven are in that state deliberately.*
+
+**Namespace rule** — an experiment writes to its own files and never to the ones
+describing the running system.
+→ *Qualifier: this is a rule because it was broken twice, both times silently.
+Building a second search index rewrote the first one's record of how it was made;
+running a comparison overwrote the main results file with its last measurement.
+Nothing failed either time — the system kept working while its own paperwork
+described something else. Both are now prevented by construction, and a separate
+check asserts the property directly, in case there is a third door.*
 
 **Owner** — who may retrieve a passage. The shared demo corpus is public; an
 uploaded document belongs to the session that uploaded it and to nobody else.

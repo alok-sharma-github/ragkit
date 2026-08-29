@@ -892,6 +892,117 @@ else.** A cost function that quietly includes index-time text is measuring stora
 while reporting delivery.
 
 
+
+## A-14 · Context helps a passage that cannot describe itself, and hurts one whose value is being unlike its neighbours
+
+The most transferable thing to come out of D-6, and it is a rule about *when* a
+technique works rather than whether it does.
+
+A situating prefix adds a sentence saying what a passage is about. For a table of
+numbers whose headers were lost in extraction, that is transformative: the
+passage previously carried nothing searchable and now states what it is a table
+*of*. Measured, `table_or_image` recall went **32/38 → 35/38**, and generation
+declines on the same stratum went **29% → 21%**. It is the weakest subsystem in
+the project and it gained the most.
+
+For a bibliography it is poison, and the mechanism is worth stating exactly.
+
+A bibliography's entire retrieval value is that it contains a rare string nobody
+else has. After contextualisation, **every** reference section in **every**
+document carries a prefix saying approximately *"in the references section of
+this paper, these citations document related work on…"*. That is accurate,
+useful, document-level context — and it is **shared vocabulary across the
+corpus**. A query whose only discriminating signal is one rare token now competes
+against fifteen passages that all match the generic description well.
+
+Measured, on the one item that lost its document:
+
+| | children retrieved | from the right document |
+|---|---|---|
+| breadcrumb | 6 | 2 |
+| contextual | 19 | **0** |
+
+Nineteen passages were retrieved and none of them were the right one. The prefix
+did not make the target worse; it made the *competition* better at looking like a
+plausible answer to a citation lookup.
+
+The analogy that makes it stick: labelling every box in the attic "OLD PAPERS".
+Helpful for most of them, and disastrous for the one box you could previously
+find because it was the only one with your passport in it.
+
+**So the rule, and it is predictable from the content type in advance:**
+
+> A situating prefix helps a passage that cannot describe itself, and hurts a
+> passage whose retrieval value is precisely that it is unlike its neighbours.
+
+**Why this matters more than the one lost item.** 1 of 92 is a rounding error
+against a +3 headline. The mechanism is not, because it names a content type
+where the technique backfires — and **contracts, invoices, part catalogues and
+policy schedules are made of that content type.** A clause number, an invoice ID,
+a part code: the rare token *is* the query. Any corpus of those is a corpus where
+enabling this feature uncritically would cost retrievals, and the failure would
+be silent — a slightly worse ranking, forever, on exactly the lookups the
+customer cares most about.
+
+That is the note to re-read before turning contextual prefixes on for the first
+non-academic corpus. It is recorded as a deferral with a predicate rather than as
+a fix, for reasons in Part 3.
+
+## A-15 · An experiment writes to its own namespace, never to the primary artifact
+
+Twice now, running an experiment has quietly rewritten the record of the shipped
+system:
+
+1. **The manifest.** Building a second index for an A/B repointed
+   `data/index/manifest.json` at a different pipeline. The demo kept serving with
+   a manifest claiming a fingerprint its own chunks did not carry.
+2. **The eval results.** The 2×2 comparison ran 24 evals, each of which wrote
+   `data/eval/eval_results.json`, leaving the primary artifact describing the
+   last cell — a 250-token run against the wrong index.
+
+Neither failed loudly. Both were caught by something refusing to combine
+mismatched inputs — the failure histogram declining to pool across fingerprints,
+which is a check built for a different reason entirely.
+
+Two instances is a pattern, and the pattern has a shape: **a measurement is
+supposed to be a read, and these were writes.** The fix is not to be careful.
+
+**What was done, in the order it should have been done.** The first attempt was
+snapshot-and-restore in the comparison script — correct, and at the wrong layer:
+it defended one caller against a hazard that every caller had. So instead:
+
+- `eval.run()` takes `artifact: Path | None = None` and writes **nowhere** by
+  default. The CLI — the caller that speaks for the shipped system — is the one
+  that names the primary path. The snapshot-and-restore was then deleted, which
+  is the test of whether a fix is structural: the workaround becomes removable.
+- Manifests and index reports are index-scoped, so a non-default index cannot
+  write the default one's files.
+
+**And one check that does not depend on knowing the cause.** The prevention above
+is specific to two mechanisms; a third would find a third door. So the reconciler
+now asserts the *property*: **the headline artifact describes the index that
+actually ships** — fingerprint read off the chunks on disk, plus the budget and
+the cost basis it was measured under.
+
+**That check immediately found a hole inside the mechanism it was checking.** Fed
+a deliberate reproduction of incident (2), it *held*. `_index_provenance` read
+`pipeline_fingerprint` from `index_report.json` — a sidecar describing the last
+ingest, not the index being scored — so an eval of index B produced a payload
+stamped with index A's fingerprint. **The rule that exists to refuse comparisons
+across systems would have reported a match between two different systems.** Same
+defect as A-12 and one level further in: the stamp was being copied from
+whichever file was nearest rather than read off the thing it describes.
+
+Fixed by reading the fingerprint from the chunks, which travel with what is being
+measured. Sidecar fields are now returned only when the sidecar provably
+describes the same index, and `index_report_describes_this_index` says so
+explicitly so a null reads as "that file was about something else" rather than
+"not measured".
+
+The general form: **a measurement must not have side effects on the record of the
+thing it measures, and its provenance must be read from the subject rather than
+from whatever file is closest.**
+
 ---
 
 # Part 3 — Deliberately not decided

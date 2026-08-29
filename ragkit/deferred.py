@@ -74,6 +74,23 @@ def review() -> dict[str, Any]:
         b = by_stratum.get(name)
         return int(b["child_strict"]["n"]) if b else 0
 
+    # HOW MANY QUESTIONS LOST THEIR DOCUMENT ENTIRELY, in the stratum where a
+    # rare unique token is the whole query. This is the observable consequence of
+    # the dilution described in A-14: a contextual prefix gives every
+    # bibliography in the corpus the same generic description, and a lookup whose
+    # only signal is one rare string then loses to fifteen passages that match
+    # that description well.
+    #
+    # It is close to the property but not identical to it -- an item can lose its
+    # document for unrelated reasons, a bad chunk boundary among them. So this
+    # predicate is a PROMPT TO LOOK, not a proof, and the threshold says why: one
+    # is a rounding error against 92, two is a pattern.
+    rows = [r for r in (ev or {}).get("per_item", []) if not r.get("skipped")]
+    identifier_lost = sum(
+        1 for r in rows
+        if r.get("stratum") == "exact_identifier" and r.get("source_hit") is False
+    )
+
     hard_strata_measured = (
         not cov.get("missing")
         and stratum_n("multi_hop") >= M.MIN_N_FOR_RATE
@@ -176,6 +193,50 @@ def review() -> dict[str, Any]:
                 "2x2 in data/eval/contextual_ab.json: child_strict at 250 tokens "
                 "reads 25 / 30 / 15 / 38 across breadcrumb-indexed, "
                 "breadcrumb-delivered, contextual-indexed, contextual-delivered"
+            ),
+        ),
+        Deferral(
+            name="suppress_prefix_on_rare_token_passages",
+            guide_module="M5",
+            decision=(
+                "No rule that skips the contextual prefix for reference lists or "
+                "other passages whose value is a rare unique token."
+            ),
+            because=(
+                "the fix is a PREDICATE, and this project has now been wrong about "
+                "a predicate repeatedly. A rule matching 'looks like a "
+                "bibliography' would correlate with the target and fail at the "
+                "edges -- a related-work section, a table of citations, an "
+                "appendix of sources -- and because it SUPPRESSES a feature, its "
+                "errors are silent: a wrongly-skipped passage just retrieves "
+                "slightly worse forever, with nothing to notice. Worse, it would "
+                "be tuned against n=1: one document, one question, one corpus of "
+                "academic papers, with no way to tell whether it generalises. The "
+                "honest version of the rule is 'skip passages whose value is a "
+                "rare unique token', and that is not detectable from the passage "
+                "-- it depends on what people search for"
+            ),
+            revisit_when=(
+                "a SECOND exact_identifier question loses its document entirely, "
+                "or a corpus arrives whose queries are mostly rare tokens -- "
+                "contracts, invoices, part catalogues, policy schedules. Either "
+                "turns n=1 into evidence. The second would make it urgent within "
+                "a day, and is the case to check before enabling prefixes on any "
+                "non-academic corpus"
+            ),
+            cost_if_wrong=(
+                "citation-style lookups retrieve slightly worse, silently. "
+                "Currently one item of 92 against a +3 headline; the risk is that "
+                "the ratio is a property of THIS corpus rather than of the "
+                "technique"
+            ),
+            orphans=(),
+            expired=identifier_lost >= 2,
+            evidence=(
+                f"exact_identifier questions that lost their document entirely: "
+                f"{identifier_lost}. See A-14 -- the measured case retrieved 19 "
+                "children and none from the right document, against 6 and 2 "
+                "before contextualisation"
             ),
         ),
         Deferral(
