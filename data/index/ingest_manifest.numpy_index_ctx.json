@@ -1,0 +1,10 @@
+{
+  "degradations": [],
+  "pipeline_fingerprint": "4d54ab24999d336e",
+  "parser_version": "pymupdf4llm@1.28+lines-detector@1+quadcorr-unset+cleanhdr@2+pagetextrepair@3+bboxflags@1",
+  "chunker_version": "header_aware_parent@3",
+  "n_children": 814,
+  "n_parents": 442,
+  "provenance_ok": true,
+  "run_clean": true
+}

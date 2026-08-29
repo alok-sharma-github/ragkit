@@ -140,29 +140,53 @@ def review() -> dict[str, Any]:
             evidence=f"human_verified={(ev or {}).get('golden_set', {}).get('human_verified', 0)}",
         ),
         Deferral(
-            name="contextual_retrieval_llm_prefix",
+            name="contextual_prefixes_enabled",
             guide_module="M5",
-            decision="Heading breadcrumbs only; no LLM-written chunk prefixes.",
+            decision=(
+                "LLM-written contextual prefixes are BUILT and MEASURED; the "
+                "serving flag is off."
+            ),
             because=(
-                "the free version has not been beaten yet. Breadcrumbs cost zero API "
-                "calls and are already in embed_text; the paid version must beat that "
-                "baseline rather than an empty one"
+                "this is no longer 'not built' -- the old deferral expired on its "
+                "own predicate, the feature was implemented, and the whole corpus "
+                "was contextualised and scored against the index it would replace. "
+                "At a fixed k it does exactly what it claims (+4 at k=3, +5 at k=5). "
+                "At a fixed TOKEN BUDGET it loses, because search_budget charges a "
+                "child its embed_text and the prefix is ~66 tokens on a ~300-token "
+                "body -- so a fifth fewer children fit. Turning it on today would "
+                "make the product worse on the metric the product reports, for a "
+                "reason that is about the metric rather than the feature (A-13)"
             ),
             revisit_when=(
-                "a chunking experiment shows header-aware + breadcrumb recall is the "
-                "binding constraint, i.e. child_strict plateaus below ~0.90 at a "
-                "realistic budget with source_hit already at 1.0"
+                "the child cost function charges delivery rather than index text. "
+                "Under that accounting the same two indexes read +9 at 250, +8 at "
+                "500 and +3 at 1500 -- a clear win at the budgets a deployment "
+                "actually runs at. The flag should flip in the same change that "
+                "corrects the accounting, and not before"
             ),
-            cost_if_wrong="one LLM call per chunk at ingest, and a mixed-provenance risk",
-            orphans=("contextualize_skipped",),
-            expired=bool(
-                head.get("child_strict", {}).get("rate") is not None
-                and head["child_strict"]["rate"] < 0.90
-                and head.get("source_hit", {}).get("rate") == 1.0
+            cost_if_wrong=(
+                "a measured retrieval gain is left on the table at tight budgets. "
+                "Bounded and cheap to reverse: every prefix is cached, so rebuilding "
+                "the contextualised index costs 23 seconds and zero API calls"
             ),
+            # `contextualize_skipped` is no longer an orphan -- it has a writer in
+            # pipeline.ingest now. It sat in this tuple being excused as "waiting,
+            # not forgotten" for as long as the feature was deferred, which is
+            # exactly as long as that excuse was true.
+            orphans=(),
+            # NO PREDICATE, and for the reason the two entries below give: nothing
+            # in data/eval can observe "somebody changed the cost function". A
+            # proxy -- say, child_strict moving -- would fire on any unrelated
+            # improvement, which is a correlation standing in for a condition.
+            # This file exists to refuse that.
+            expired=False,
             evidence=(
-                f"child_strict={head.get('child_strict', {}).get('label')}, "
-                f"source_hit={head.get('source_hit', {}).get('label')}"
+                "measured over 93 golden items with needles: fixed-k +4 @k=3, "
+                "+5 @k=5; fixed-budget (embed_text cost) -11 @250, 0 @1500; "
+                "fixed-budget (display_text cost) +9 @250, +3 @1500. "
+                "1,032,463 input tokens, 0 refusals, mean prefix 66 tokens. "
+                "See data/eval/contextual_ab.json and index numpy_index_ctx "
+                "(fingerprint 4d54ab24999d336e)"
             ),
         ),
         Deferral(

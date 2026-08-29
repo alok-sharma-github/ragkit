@@ -412,7 +412,13 @@ def status() -> dict[str, Any]:
             "continuation_suspects": rec.n_continuation_suspects,
             # The design's states. Our ingest is synchronous, so nothing is ever
             # PREPARING or QUEUED -- reporting those would be inventing a
-            # capability. INCOMPLETE is real: it means captions were skipped.
+            # capability. INCOMPLETE is real, and it now has two causes: a
+            # skipped image caption (that part of the document is unretrievable
+            # at all) or a skipped contextual prefix (that part is indexed with
+            # weaker retrieval text than its neighbours). The second is milder
+            # and still worth saying, because a document where only SOME
+            # children got the paid treatment is not comparable with one where
+            # all of them did.
             "state": "SEARCHABLE_INCOMPLETE" if rec.n_uncontextualized else "READY",
         })
     return {
@@ -427,6 +433,14 @@ def status() -> dict[str, Any]:
             "provenance_populations": rep.get("provenance_populations"),
             "parser_version": rep.get("parser_version"),
             "chunker_version": rep.get("chunker_version"),
+            # WHICH ENRICHMENT BUILT THIS INDEX: "breadcrumb-only" or
+            # "llm-prefix@1". Surfaced because two indexes with the same parser
+            # and chunker are still different systems if one of them paid for a
+            # situating sentence per chunk, and the inspector's whole job is to
+            # let a reader check a number against the thing that produced it.
+            "contextualizer": rep.get("contextualizer"),
+            "n_contextualized": rep.get("n_contextualized"),
+            "contextualization": rep.get("contextualization"),
             "pipeline_fingerprint": rep.get("pipeline_fingerprint"),
         },
         "models": gemini.resolve_models(),

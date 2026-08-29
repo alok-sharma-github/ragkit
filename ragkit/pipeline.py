@@ -176,7 +176,20 @@ def ingest(
         # to be the default way of answering "what will this cost".
         return _contextual_estimate(strategy, files, caption_images)
     pipe = pipeline_version(strategy, contextual=contextual)
-    manifest = Manifest()
+    # THE MANIFEST BELONGS TO THE INDEX IT DESCRIBES.
+    #
+    # It was shared, and building a second index for an A/B silently rewrote the
+    # first one's provenance: after `ingest --index numpy_index_ctx` the manifest
+    # said fingerprint 4d54ab24 while data/index/numpy_index still held chunks
+    # stamped 6fd55e19. Nothing failed. The demo kept serving, the documents
+    # sidebar kept rendering, and the record of which pipeline produced the
+    # shipped index was simply wrong -- the exact defect A-12 is about, caused by
+    # the tool built to investigate a different one.
+    #
+    # A side-by-side comparison must not be able to damage the thing it is
+    # compared against.
+    manifest = Manifest(None if index_name == "numpy_index"
+                        else config.DATA_INDEX / f"manifest.{index_name}.json")
     result = IngestResult()
 
     paths = list(files) if files is not None else L.corpus_files()
@@ -363,7 +376,11 @@ def ingest(
                 "degradations": log.to_dicts(),
             }
         )
-        (config.DATA_EVAL / "index_report.json").write_text(
+        # Same rule as the manifest: a non-default index writes its own report
+        # rather than overwriting the one that describes the shipped index.
+        report_name = ("index_report.json" if index_name == "numpy_index"
+                       else f"index_report.{index_name}.json")
+        (config.DATA_EVAL / report_name).write_text(
             json.dumps(report, indent=2), encoding="utf-8"
         )
         result.index_report = report
@@ -374,6 +391,11 @@ def ingest(
         # called it -- only to_dicts(), which reaches the caller and dies with
         # the process. Found by the name-the-caller audit.
         log.write_manifest(
+            # Index-scoped for the same reason the manifest and the index report
+            # are: three files described the shipped index, and building a second
+            # index quietly re-pointed all three at it.
+            None if index_name == "numpy_index"
+            else config.DATA_INDEX / f"ingest_manifest.{index_name}.json",
             pipeline_fingerprint=pipe.fingerprint(),
             parser_version=L.PARSER_VERSION,
             chunker_version=S.CHUNKER_VERSIONS[strategy],

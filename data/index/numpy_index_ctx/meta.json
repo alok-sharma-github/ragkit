@@ -1,0 +1,20 @@
+{
+  "strategy": "header_aware_parent",
+  "n_children_in": 814,
+  "n_children_indexed": 814,
+  "n_children_dropped_zero_vector": 0,
+  "n_parents": 442,
+  "n_orphan_children": 0,
+  "dim": 768,
+  "n_prefixed": 803,
+  "n_model_generated": 11,
+  "n_header_missing": 3,
+  "n_continuation_suspect": 1,
+  "uniform_provenance": true,
+  "provenance_populations": {
+    "prefixed": 803,
+    "model_generated": 11
+  },
+  "uniform_contextualization": true,
+  "n_contextualized": 814
+}

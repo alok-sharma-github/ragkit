@@ -105,16 +105,68 @@ reorders documents that are already correct. Dense at 3,000 tokens is already 96
 help are exactly the ones currently unmeasured. **The decision is deferred on
 evidence that does not exist yet, and says so.**
 
-### D-6 · Heading breadcrumbs, not LLM-written chunk prefixes — **now expired**
+### D-6 · Contextual prefixes are built and measured; the flag stays OFF
 
-Contextual Retrieval (the Anthropic result: 35% / 49% / 67% reduction in failed
+Contextual Retrieval (the Anthropic result: 35% / 49% / 67% fewer failed
 retrievals) was deferred in favour of a free heading-breadcrumb baseline, on the
 principle that the paid version must beat the free one rather than an empty one.
+**Its own predicate fired** — `child_strict = 86%`, below the ~90% threshold,
+with `source_hit` already at 1.0 — so it was built, run over the whole corpus,
+and measured against the index it was meant to replace.
 
-**Its own predicate has since fired**: `child_strict = 86%` (below the ~90%
-threshold) with `source_hit` already at 1.0. It expired without anyone
-remembering to check, which is the entire argument for storing deferrals as
-predicates. Cost to act: ~$0.69.
+**What it cost.** 814 prefixes and 15 document synopses: 1,032,463 input and
+55,660 output tokens, zero refusals, mean prefix 66 tokens against a ~300-token
+body. The textbook version — whole document in the prompt per chunk — would have
+been **15,791,052** input tokens on this corpus, 11.3× more; a per-document
+synopsis plus the chunk's own parent section buys the same situating information
+without depending on a prompt-cache discount nobody here has observed. Six of
+fifteen sources are below Gemini's 4,096-token minimum cacheable prefix and
+would have paid full price per chunk regardless.
+
+**What it bought, measured three ways** over 93 golden items with needles
+(a larger population than the eval's 92 — the eval also quarantines its own
+fixture and drops out-of-scope items):
+
+| | k=3 | k=5 | k=10 | k=20 |
+|---|---|---|---|---|
+| breadcrumb | 67 | 73 | 84 | 89 |
+| contextual | **71** | **78** | 83 | 89 |
+
+At a fixed **k** — no budget, so packing cannot confound it — the prefix does
+exactly what it claims: **+4 at k=3 and +5 at k=5**, converging by k=10. It moves
+the right chunk up the ranking, which is precisely the failure mode the histogram
+identified (all 23 failures FP2/FP3, `source_hit` 100%).
+
+At a fixed **token budget**, the shipped metric says the opposite:
+
+| budget | breadcrumb | contextual | Δ |
+|---|---|---|---|
+| 250 | 27 | 16 | **−11** |
+| 500 | 56 | 56 | 0 |
+| 1500 | 80 | 80 | 0 |
+| 3000 | 89 | 85 | −4 |
+
+**So the flag stays off, and the reason is not "the technique does not work".**
+It works, and `search_budget` charges the child for it — see **A-13**, which is
+the more useful finding of the two. Under a delivery-based cost the same two
+indexes read **+9 at 250, +8 at 500, +3 at 1500**.
+
+Everything is on disk and reproducible: `scripts/contextual_ab.py`,
+`data/eval/contextual_ab.json`, index `numpy_index_ctx`, fingerprint
+`4d54ab24999d336e` against the shipped `6fd55e19a82a7c28`. Prefixes are cached,
+so re-running the build costs nothing — 23 seconds, zero API calls.
+
+**Which is also why `index_report.ctx.json` reports zero tokens**, and the number
+above came from the first build rather than from that file. The cache makes the
+artifact answer "what did THIS run cost" (nothing) rather than "what did the
+index cost" (1.03M tokens). Two different questions with the same field name, and
+worth naming here rather than leaving a reader to find a contradiction between a
+document and a file.
+
+**Reverses when:** A-13 is resolved. If the cost function is corrected, this
+becomes a clear win at exactly the budgets a real deployment runs at, and the
+flag should flip in the same change that corrects it — not before, because
+turning it on today makes the product worse on the metric the product reports.
 
 ## Ingestion
 
@@ -646,6 +698,60 @@ because it changes what every stored comparison means.
 
 The general form, worth carrying: **a stamp is a claim about exactly the inputs it
 hashes.** Everything else it appears to vouch for, it does not.
+
+
+## A-13 · A budget is a claim about delivery; do not charge one unit for text the other never pays for
+
+The finding that came out of contextual retrieval, and it is worth more than the
+feature was.
+
+`search_budget` fills a token budget with retrieval units and stops. It charges
+
+- a **parent** the tokens of its `display_text` — what the model will read
+- a **child** the tokens of its `embed_text` — what the *index* holds
+
+`embed_text` is the body plus a heading breadcrumb plus, now, a situating
+sentence. None of that reaches the model: what a child retrieval delivers is its
+body, or its parent. So the child unit pays for its own index-time enrichment
+and the parent unit pays for nothing equivalent — **in the one comparison budget
+normalisation exists to make fair.**
+
+This is older than contextual retrieval. Breadcrumbs have been charged the whole
+time; they were simply short enough (~9% of a paper chunk) that nobody looked. A
+66-token situating sentence on a ~300-token body is ~22%, and at that size the
+asymmetry stops being a rounding error and starts deciding conclusions:
+
+| budget | Δ charged `embed_text` | Δ charged `display_text` |
+|---|---|---|
+| 250 | −11 | **+9** |
+| 500 | 0 | **+8** |
+| 1000 | +1 | +1 |
+| 1500 | 0 | **+3** |
+| 3000 | −4 | −1 |
+
+Same index. Same golden set. Same technique. **The conclusion inverts on the
+choice of denominator, and both columns are correct arithmetic.** One of them is
+over the right denominator.
+
+The mechanism of the loss is visible in the fill: at a 1,500-token budget the
+breadcrumb index delivers a mean of 1,390 tokens of children and the
+contextualised one delivers 1,363 — but a fifth of the second number is prose no
+reader will ever see, and each unit is now large enough that one fewer fits. At
+250 tokens it is stark: 44 questions receive **nothing at all**, against 29 for
+the baseline, because a single contextualised child no longer fits inside the
+budget.
+
+**Why this is not fixed in the same commit.** Changing the cost function moves
+every `child_strict` figure this project has published — the README, this
+document, the interview material — for an index nobody re-ingested. That is a
+re-baseline, and a re-baseline is a decision about what past numbers meant, not a
+patch. It is recorded here, with the measurement that motivates it, so the choice
+is made deliberately rather than absorbed.
+
+The general form, and it is the same shape as A-12: **a normalised metric is a
+claim about one specific resource. Charge every unit the resource the claim is
+about, and nothing else.** A cost function that quietly includes index-time text
+is measuring storage while reporting delivery.
 
 ---
 

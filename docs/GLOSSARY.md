@@ -59,6 +59,23 @@ budget.** From one sweep over the same 92 questions — misses at 250 tokens: 67
 at 1,500: 14; at 12,000: zero. A miss count without its budget describes a knob
 setting rather than a system. (That sweep's 1,500 figure is 78/92; the headline
 below is 79/92 from a later run — see **pipeline fingerprint**.)*
+→ *Second qualifier, and it is a known defect rather than a caveat: a **parent**
+is charged the text it delivers, while a **child** is charged the text it was
+indexed under — which includes its heading trail and any contextual prefix. The
+smaller unit therefore pays for text nobody reads, in the one comparison the
+measure exists to make fair. It changed no conclusion while the extra text was
+short; with a contextual prefix attached it inverts one.*
+
+**Contextual prefix** — one or two sentences written by a model and prepended to a
+passage *before it is indexed*, saying what the passage is about — resolving "the
+method" to a name, "it" to a system. It is added to the searchable text only; it
+never reaches the answer, and it can never be quoted.
+→ *Qualifier: measured here, it improves **ranking** and worsens **packing**, and
+which of those you see depends entirely on how you measure. At a fixed number of
+passages it wins clearly (+4 of 93 at three passages, +5 at five). At a fixed
+token budget — the way this project reports — it loses, because the ~66-token
+prefix is charged against the budget and roughly a fifth fewer passages fit. Same
+index, opposite conclusion. Hence the feature is built and switched off.*
 
 **Strict fill** — the rule that retrieval never exceeds the token budget, even when
 that means returning nothing at all.
