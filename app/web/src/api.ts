@@ -176,6 +176,8 @@ export interface Job {
   kind: string;
   state: "queued" | "running" | "done" | "failed" | "cancelled";
   progress: { stage: string; current: number; total: number; detail: string };
+  /** What the job was asked to do -- for uploads, the file names. */
+  params?: Record<string, any>;
   result: any;
   error: string | null;
 }

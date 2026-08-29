@@ -173,7 +173,15 @@ function Uploader({
   // watches it.
   const [job, setJob] = useState<Job | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
-  const [note, setNote] = useState<string | null>(null);
+  // The finished upload, named, and it stays until dismissed.
+  //
+  // Completion used to be an 11px grey line under the limits text -- present,
+  // and easy to miss entirely, which is what happened: a first-time user went
+  // to another tab, came back after it had finished, and the only evidence was
+  // that line and a corpus count that had gone from 15 to 16.
+  //
+  // A finish that a person can walk past is not an announcement.
+  const [done, setDone] = useState<string | null>(null);
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
   // Defaults to thorough: it is the better answer, and the visitor who does not
@@ -198,6 +206,11 @@ function Uploader({
           poll(r.mine.id);
         } else if (r.mine.state === "failed") {
           setMsg(r.mine.error?.split(String.fromCharCode(10))[0] ?? "that document could not be read");
+        } else if (r.mine.state === "done") {
+          // FINISHED WHILE THEY WERE ELSEWHERE. This is the case that was
+          // reported: the work completed, and nothing said so on return.
+          const files: string[] = (r.mine.params?.files as string[]) ?? [];
+          setDone(files[0] ?? "your document");
         }
       })
       .catch(() => undefined);
@@ -224,7 +237,10 @@ function Uploader({
         if (j.state === "failed") {
           setMsg(j.error?.split(String.fromCharCode(10))[0] ?? "could not read that document");
         } else {
-          setNote("ready — ask a question about it");
+          // NAMES THE FILE. "ready" alone does not tell a returning visitor
+          // WHAT is ready, and they may have uploaded before wandering off.
+          const files: string[] = (j.params?.files as string[]) ?? [];
+          setDone(files[0] ?? "your document");
           onDone();
         }
       } catch {
@@ -237,7 +253,7 @@ function Uploader({
 
   const send = async (files: File[]) => {
     setMsg(null);
-    setNote(null);
+    setDone(null);
     setBusy(true);
     try {
       const up: any = await api.upload(files, thorough);
@@ -413,7 +429,31 @@ function Uploader({
       {limits && (
         <p className="mt-1.5 text-[10.5px] leading-relaxed text-ink-400">{limits}</p>
       )}
-      {note && <p className="mt-1.5 text-[11px] text-quote-600">{note}</p>}
+      {done && (
+        <div className="mt-2 rounded-md border border-quote-600/35 bg-quote-600/[0.07] px-3 py-2.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-[11.5px] font-semibold text-quote-600">
+                Ready to ask about
+              </div>
+              <div className="mt-0.5 truncate text-[12px] text-ink-900" title={done}>
+                {done}
+              </div>
+            </div>
+            <button
+              onClick={() => setDone(null)}
+              className="shrink-0 text-[11px] text-ink-400 hover:text-ink-900"
+              title="dismiss"
+            >
+              ×
+            </button>
+          </div>
+          <p className="mt-1.5 text-[10.5px] leading-relaxed text-ink-500">
+            Type a question below — answers will come from this as well as the
+            loaded papers.
+          </p>
+        </div>
+      )}
       {msg && <p className="mt-1.5 text-[11px] leading-relaxed text-chart-600">{msg}</p>}
     </div>
   );
@@ -604,11 +644,23 @@ export function App() {
           </p>
         </div>
 
+        {/* THE TWO TABS ARE NOT PEERS, and styling them identically said they
+            were. Answers IS the product; Inspector is the evidence behind it,
+            written for someone who wants to audit the numbers. A first-time
+            visitor was being offered a dense statistics page as if it were half
+            of what they came for -- so it now says who it is for, in four
+            words, rather than leaving them to find out by opening it. */}
         <nav className="mt-4 flex gap-1">
-          {(["answers", "inspector"] as Screen[]).map((s) => (
+          {(
+            [
+              ["answers", "ask your documents"],
+              ["inspector", "how it was measured"],
+            ] as [Screen, string][]
+          ).map(([s, hint]) => (
             <button
               key={s}
               onClick={() => setScreen(s)}
+              title={hint}
               className={`rounded px-2 py-1 text-[11px] uppercase tracking-wide transition ${
                 screen === s
                   ? "bg-ink-900 text-paper-50"
@@ -619,6 +671,11 @@ export function App() {
             </button>
           ))}
         </nav>
+        <p className="mt-1.5 text-[10.5px] leading-relaxed text-ink-400">
+          {screen === "answers"
+            ? "Ask a question and every claim links to where it came from."
+            : "The evidence behind the answers — how retrieval was measured, and what it gets wrong. Written for engineers."}
+        </p>
 
         {/* UPLOAD FIRST, and the ordering is the point.
             The list of documents a visitor did NOT add was on top, sorted
