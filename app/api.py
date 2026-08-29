@@ -51,7 +51,8 @@ from ragkit.generate import answer as A
 from ragkit.index.fusion import explain as explain_fusion
 from ragkit.index.hybrid import HybridIndex
 from ragkit.retrieve.query import condense
-from ragkit.ingest.document import Chunk, ChunkRole, Manifest, Source, TextProvenance
+from ragkit.ingest.document import (PUBLIC_OWNER, Chunk, ChunkRole, Manifest,
+                                    Source, TextProvenance)
 
 app = FastAPI(title="RAGkit", version="0.1.0")
 app.add_middleware(
@@ -807,6 +808,7 @@ def start_ingest(caption_images: bool = Query(default=True)) -> dict[str, Any]:
         def progress(stage: str, cur: int, total: int, detail: str) -> None:
             jobs.STORE.update(job, stage=stage, current=cur, total=total, detail=detail)
         res = pipeline.ingest(caption_images=caption_images, verbose=False,
+                              owner=PUBLIC_OWNER, origin="corpus",
                               on_progress=progress)
         _invalidate_index()
         return {

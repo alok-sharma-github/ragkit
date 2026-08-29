@@ -184,13 +184,13 @@
       "tables_repaired": 0,
       "tables_headerless": 0,
       "children_page_text": 0,
-      "from_cache": false
+      "from_cache": true
     }
   ],
   "embed_stats": {
-    "hits": 802,
-    "misses": 12,
-    "api_calls": 1,
+    "hits": 814,
+    "misses": 0,
+    "api_calls": 0,
     "failed": 0
   },
   "degradations": []

@@ -9,7 +9,7 @@
         "title": "hnsw_p2",
         "n_pages": 0,
         "bytes_size": 552338,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "ec5ff48913b2ea7a9c8a7ac824a7015a2f399cb12e802ab5e870520c75e194e2"
       },
@@ -41,7 +41,7 @@
         "title": "lost-in-the-middle_p1",
         "n_pages": 0,
         "bytes_size": 407203,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "9b136923ccaa65c55ea1103425b0296a0e8a8f4c45396df6c0d209c48d912031"
       },
@@ -73,7 +73,7 @@
         "title": "lost-in-the-middle_p5",
         "n_pages": 0,
         "bytes_size": 445004,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "73e750129a52c7b5d5d34be4feaaba051e6c7c78413d09a5491a937f36ed10a9"
       },
@@ -103,7 +103,7 @@
         "title": "raptor_p2",
         "n_pages": 0,
         "bytes_size": 396368,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "18a3ded75cf53db72d8591619b71137d53f96a3a35966ed822a175b085a37eb8"
       },
@@ -135,7 +135,7 @@
         "title": "benchmark-report",
         "n_pages": 2,
         "bytes_size": 13995,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "9c955473a092da7db484b8cc008943de5c244aa7f571b0be086af6775dafb06b"
       },
@@ -181,7 +181,7 @@
         "title": "graphrag-local-to-global",
         "n_pages": 26,
         "bytes_size": 6893854,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "72704788048448ae44cb49e91b494b8d7dc3eb610d22a90ace2bcaf7e5717fee"
       },
@@ -523,7 +523,7 @@
         "title": "hnsw",
         "n_pages": 13,
         "bytes_size": 2636958,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "f588ca9682fd7e0499162c2ea7d2f53633a58a335196b8c5697135dc3a50cc70"
       },
@@ -770,7 +770,7 @@
         "title": "hyde",
         "n_pages": 11,
         "bytes_size": 424964,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "7f7bab374cc9f6d97c9128ff073189e6c60907e17eae96af2ea47cbdb32c4f32"
       },
@@ -968,7 +968,7 @@
         "title": "lost-in-the-middle",
         "n_pages": 18,
         "bytes_size": 747542,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "63521d6480244de5e3a9588c1f2656ed235ea957bba8a48cba79585f2fd1ef64"
       },
@@ -1244,7 +1244,7 @@
         "title": "manual",
         "n_pages": 0,
         "bytes_size": 36522,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "526abd4b90b910d3ab248d78bc6cb1c2f8a342b8a6911d29a24177d0682c71f7"
       },
@@ -1290,7 +1290,7 @@
         "title": "ragas",
         "n_pages": 8,
         "bytes_size": 231984,
-        "ingested_at": "2026-08-26T05:30:15+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "1c3ecc2c82e811a10fad91d397f70b2ca002307f81e45aa01b0b80d47941fe51"
       },
@@ -1417,7 +1417,7 @@
         "title": "raptor",
         "n_pages": 23,
         "bytes_size": 2547113,
-        "ingested_at": "2026-08-26T05:30:16+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "d19deef9bd92df7007162eedf0742a90588da0ad59c2f5b3e3cb555095480617"
       },
@@ -1783,7 +1783,7 @@
         "title": "self-rag",
         "n_pages": 30,
         "bytes_size": 1405127,
-        "ingested_at": "2026-08-26T05:30:16+00:00",
+        "ingested_at": "2026-08-29T07:07:58+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "b29d8c8edc6277392465033cd6c60b39ae791fe44044a81fab40c26d1882040c"
       },
@@ -2230,7 +2230,7 @@
         "title": "seven-failure-points",
         "n_pages": 6,
         "bytes_size": 570647,
-        "ingested_at": "2026-08-26T05:30:16+00:00",
+        "ingested_at": "2026-08-29T07:07:59+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "34d5db0fe7f394cb1274c153666cb6370bf066be5ef72fa06fa9b1e41596552b"
       },
@@ -2367,7 +2367,7 @@
         "title": "Taleer - Test Flight Feedback from Andi 24.08.26",
         "n_pages": 5,
         "bytes_size": 461693,
-        "ingested_at": "2026-08-26T05:30:16+00:00",
+        "ingested_at": "2026-08-29T07:07:59+00:00",
         "pipeline_fingerprint": "6fd55e19a82a7c28",
         "parsed_hash": "9008e9f74db824e8d644de554ecc610a0d849c2814d4c4ae7412116ec21da070"
       },

@@ -112,6 +112,15 @@ def ingest(
     files: Sequence[Path] | None = None,
     verbose: bool = True,
     on_progress: Callable[[str, int, int, str], None] | None = None,
+    # WHO WILL BE ABLE TO RETRIEVE WHAT THIS PRODUCES.
+    #
+    # Required, no default, all the way down to the Chunk constructor. A default
+    # of PUBLIC_OWNER would make "forgot to pass it" and "meant it to be public"
+    # the same keystroke, and only one of those is a leak. The CLI states
+    # PUBLIC_OWNER explicitly; the upload path states the session id. Both are
+    # deliberate acts, visible at the call site.
+    owner: str,
+    origin: str = "corpus",
 ) -> IngestResult:
     """Corpus -> index, with the manifest recording what each source produced.
 
@@ -166,7 +175,8 @@ def ingest(
                 # table with plausible numbers.
                 on_progress("parsing", len(result.per_file), len(paths), p.name)
             src, blocks, diag = L.load(p, caption_images=caption_images)
-            chunks = S.build_chunks(src, blocks, strategy=strategy, pipeline=pipe)
+            chunks = S.build_chunks(src, blocks, strategy=strategy, pipeline=pipe,
+                                    owner=owner, origin=origin)
             all_chunks.extend(chunks)
 
             kids = [c for c in chunks if c.role is ChunkRole.CHILD]

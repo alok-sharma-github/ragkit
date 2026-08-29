@@ -23,7 +23,7 @@ from pathlib import Path
 
 from . import config, gemini, limits, pipeline
 from .index.numpy_index import NumpyIndex
-from .ingest.document import Manifest
+from .ingest.document import PUBLIC_OWNER, Manifest
 
 
 def _fix_console() -> None:
@@ -58,7 +58,11 @@ def cmd_models(args: argparse.Namespace) -> int:
 
 def cmd_ingest(args: argparse.Namespace) -> int:
     files = [Path(f) for f in args.file] if args.file else None
+    # The CLI builds the SHARED corpus. Stated explicitly because a default
+    # would make forgetting indistinguishable from intending.
     r = pipeline.ingest(
+        owner=PUBLIC_OWNER,
+        origin="corpus",
         strategy=args.strategy,
         caption_images=not args.no_images,
         files=files,

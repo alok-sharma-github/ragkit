@@ -327,6 +327,16 @@ def _make_child(
     position: int,
     n_siblings: int,
     pipeline: PipelineVersion,
+    # NO DEFAULT, DELIBERATELY. Ownership is not something set after the fact --
+    # it is a fact about the chunk that must be stated to create one. A default
+    # of PUBLIC_OWNER would make "forgot to pass it" and "meant it to be public"
+    # the same keystroke, and only one of those is a leak.
+    #
+    # assert_owned() in NumpyIndex.__init__ is the backstop. This is the version
+    # the editor catches, which is cheaper than the version the constructor
+    # catches, which is cheaper than the version a visitor catches.
+    owner: str,
+    origin: str,
 ) -> Chunk:
     """Build one child from ONE already-sliced body.
 
@@ -347,6 +357,8 @@ def _make_child(
         prov = TextProvenance.MODEL_GENERATED
 
     return Chunk(
+        owner=owner,
+        origin=origin,
         chunk_id=Chunk.make_id(src.source_id, ordinal, embed_text, ChunkRole.CHILD),
         source_id=src.source_id,
         ordinal=ordinal,
@@ -382,7 +394,8 @@ def _make_child(
 
 
 def _make_parent(
-    *, src: Source, section: _Section, ordinal: int, pipeline: PipelineVersion
+    *, src: Source, section: _Section, ordinal: int, pipeline: PipelineVersion,
+    owner: str, origin: str,
 ) -> Chunk:
     """The returned unit. Never embedded, and its body never carries a breadcrumb.
 
@@ -395,6 +408,8 @@ def _make_parent(
     body = section.text
     prov = _section_provenance(section)
     return Chunk(
+        owner=owner,
+        origin=origin,
         chunk_id=Chunk.make_id(src.source_id, ordinal, body, ChunkRole.PARENT),
         source_id=src.source_id,
         ordinal=ordinal,
@@ -491,6 +506,12 @@ def build_chunks(
     parent_tokens: int | None = None,
     overlap_ratio: float | None = None,
     pipeline: PipelineVersion | None = None,
+    # REQUIRED, and it propagates to every chunk this produces. There is exactly
+    # one chunking entry point and two Chunk constructors, all in this file, so
+    # this parameter is the whole surface: nothing can become searchable without
+    # passing through here and stating who owns it.
+    owner: str,
+    origin: str = "corpus",
 ) -> list[Chunk]:
     """Blocks -> chunks, under one named strategy.
 
@@ -524,7 +545,8 @@ def build_chunks(
 
         parent: Chunk | None = None
         if use_parents:
-            parent = _make_parent(src=src, section=sec, ordinal=ordinal, pipeline=pipeline)
+            parent = _make_parent(src=src, section=sec, ordinal=ordinal,
+                              pipeline=pipeline, owner=owner, origin=origin)
             chunks.append(parent)
             ordinal += 1
 
@@ -535,6 +557,8 @@ def build_chunks(
         for pos, piece in enumerate(bodies):
             chunks.append(
                 _make_child(
+                owner=owner,
+                origin=origin,
                     src=src, body=piece, prefix=prefix, section=sec, ordinal=ordinal,
                     parent_id=parent.chunk_id if parent else None,
                     position=pos, n_siblings=len(bodies), pipeline=pipeline,
