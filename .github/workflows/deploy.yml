@@ -157,6 +157,20 @@ jobs:
                   "RAGKIT_DAILY_TOKEN_CAP": os.environ["DAILY_CAP"],
                   "RAGKIT_CORS_ORIGINS": url.rstrip("/"),
                   "RAGKIT_WRITE_TOKEN": os.environ.get("WRITE_TOKEN", ""),
+                  # D-19: strangers may upload to the PUBLIC DEMO only.
+                  #
+                  # Set from the repo variable so it can be turned off without a
+                  # code change, and scoped to kind == "demo" because a customer
+                  # deployment already accepts uploads through the write
+                  # password -- handing it this flag as well would open uploads
+                  # there to anyone, which is the opposite of the intent.
+                  #
+                  # The IMAGE defaults it OFF, so a deployment that forgets this
+                  # variable refuses uploads rather than accepting them: the
+                  # same safe-direction rule as RAGKIT_DEMO_MODE above.
+                  "RAGKIT_DEMO_ALLOW_UPLOADS": (
+                      os.environ.get("ALLOW_UPLOADS", "0") if kind == "demo" else "0"
+                  ),
               },
           }}
           # unhealthyThreshold x intervalSeconds must exceed the cold boot, which
@@ -188,6 +202,9 @@ jobs:
           DEPLOY_LABEL: ${{ github.event.inputs.deployment_label }}
           MAX_OP_TOKENS: ${{ vars.RAGKIT_MAX_OPERATION_TOKENS || '400000' }}
           DAILY_CAP: ${{ vars.RAGKIT_DAILY_TOKEN_CAP || '500000' }}
+          # Defaults to 0. Set the repo variable RAGKIT_DEMO_ALLOW_UPLOADS to 1
+          # to accept visitor uploads on the public demo (D-19).
+          ALLOW_UPLOADS: ${{ vars.RAGKIT_DEMO_ALLOW_UPLOADS || '0' }}
 
       - name: wait for the deployment, then verify it
         run: |
