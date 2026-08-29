@@ -25,20 +25,32 @@ to generation rather than blamed on "the RAG."
 
 | metric | value |
 |---|---|
-| `child_strict` recall @1500-token budget | **79/92 = 86%** |
-| `source_hit` (right document surfaced) @every budget | **92/92 = 100%** |
+| `child_strict` recall @1500-token budget | **82/92 = 89%** |
+| `source_hit` (right document surfaced) @1500 | **91/92 = 99%** (100% @≥3000) |
 | NDCG@5 — dense vs RRF | 0.848 [0.761, 0.907] vs 0.880 [0.798, 0.932] |
 | RRF on `exact_identifier` queries @500 tokens | 68% → **89%** |
 
-`source_hit = 100%` with `child_strict = 86%` is the useful finding: the correct
-document is *always* retrieved, so every remaining failure is ranking **within** a
-document. That localises the next piece of work precisely, and it is why no
-reranker was added — see [Decisions](#decisions-and-the-conditions-that-reverse-them).
+`source_hit = 99%` with `child_strict = 89%` is the useful finding: the correct
+document is retrieved for every question but one, so nearly every remaining
+failure is ranking **within** a document. That localises the next piece of work
+precisely, and it is why no reranker was added — see
+[Decisions](#decisions-and-the-conditions-that-reverse-them).
+
+Both numbers moved recently, and not for the same reason. `child_strict` rose
+because an LLM-written prefix now says what each passage is about; `source_hit`
+fell by one because that same prefix makes every bibliography in the collection
+look alike, drowning the one rare word a citation lookup depended on. The full
+before/after, and the accounting bug found underneath it, are in the ADR (D-6,
+A-13).
 
 Recall is reported **budget-normalised** rather than as recall@k. Comparing a
 child unit against a parent unit at "k=10" compares 3,000 tokens of context
 against 12,000; at a fixed token budget the comparison is fair. The fill rule is
-strict — it never exceeds the budget even when that returns nothing.
+strict — it never exceeds the budget even when that returns nothing. Each unit is
+charged the text it **delivers to the model**, which sounds obvious and was not
+true here until recently: children were charged their index text, so the smaller
+unit paid for enrichment the larger one never paid for. Fixing that flipped one
+conclusion outright — see A-13.
 
 Confidence intervals are Wilson, and any rate with n < 10 is printed as counts
 (`1 of 2`) rather than a percentage.
@@ -47,9 +59,9 @@ Confidence intervals are Wilson, and any rate with n < 10 is printed as counts
 
 | metric | value |
 |---|---|
-| faithfulness, **over answers only** | 74/74 = 100% |
-| questions the system declined to answer | 17 of 91 |
-| abstention rate, `table_or_image` stratum | **10/37 = 27%** |
+| faithfulness, **over answers only** | 78/78 = 100% |
+| questions the system declined to answer | 14 of 92 |
+| abstention rate, `table_or_image` stratum | **8/38 = 21%** |
 | judge agreement with hand labels (Cohen's kappa) | **0.897** (raw 0.933, chance 0.353, n=30) |
 
 Read those first two rows together. **100% faithfulness is not a quality claim.**

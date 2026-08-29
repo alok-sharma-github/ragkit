@@ -245,9 +245,36 @@ CONTEXT_SYNOPSIS_MAX_CHARS = 24_000     # ~6k tokens of the document head
 CONTEXT_PARENT_MAX_CHARS = 4_000        # ~1k tokens; p90 parent is ~800
 CONTEXT_PREFIX_MAX_WORDS = 60
 
-# OFF BY DEFAULT, and it stays off until the eval says it earned its place.
-# A flag that defaults on is a decision made by whoever forgot to set it.
-CONTEXTUAL_PREFIXES = os.getenv("RAGKIT_CONTEXTUAL_PREFIXES") == "1"
+# WHAT A CHILD IS CHARGED AGAINST A TOKEN BUDGET. See ADR A-13.
+#
+#   "delivered" -- display_text: the body, which is what reaches the model
+#   "indexed"   -- embed_text: body + heading trail + contextual prefix
+#
+# `delivered` is the correct basis and the default. A budget is a promise about
+# what the model will read; a heading trail and a situating sentence are index
+# text that reaches nobody, and charging them against delivery makes the measure
+# describe something no user experiences.
+#
+# The asymmetry this fixes: a PARENT was always charged its display_text, so
+# under `indexed` the small unit paid for enrichment the large unit never paid
+# for -- in the one comparison budget normalisation exists to make fair. It
+# changed no conclusion while the extra text was a ~9% breadcrumb. With a
+# 66-token contextual prefix on a ~300-token body it inverted one: contextual
+# retrieval read -11 at a 250-token budget under `indexed` and +9 under
+# `delivered`, on the same index and the same questions.
+#
+# `indexed` is KEPT REACHABLE rather than deleted, because every figure this
+# project published before the correction was measured under it. A comparison
+# nobody can re-run is an assertion.
+CHILD_COST_BASIS = os.getenv("RAGKIT_CHILD_COST_BASIS", "delivered")
+
+# TURNED ON IN THE SAME CHANGE that corrects the accounting, and not before.
+# Under `indexed` this made the product worse on the metric the product reports;
+# under `delivered` it is +9 / +8 / +3 at 250 / 500 / 1500 tokens. Flipping it
+# first would have shipped a measured regression; correcting the accounting
+# first would have moved every published figure with nothing to show for it.
+CONTEXTUAL_PREFIXES = os.getenv("RAGKIT_CONTEXTUAL_PREFIXES", "1") == "1"
+
 
 # Implicit context caching is automatic on Gemini 2.5+ — nothing to enable.
 # But the minimum cacheable prefix on 3.x flash is 4096 tokens, so a document

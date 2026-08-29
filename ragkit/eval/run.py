@@ -81,6 +81,12 @@ def _index_provenance(idx: NumpyIndex) -> dict[str, Any]:
         "strategy": idx.meta.get("strategy"),
         "dim": idx.meta.get("dim"),
         "n_children": idx.meta.get("n_children_indexed"),
+        # HOW THE BUDGET WAS SPENT, recorded next to what was in the index.
+        # A run under "indexed" and a run under "delivered" answer different
+        # questions with the same field name, and the difference is large enough
+        # to invert a conclusion (A-13). Same argument as the fingerprint: two
+        # numbers are comparable only if this matches.
+        "child_cost_basis": config.CHILD_COST_BASIS,
         "uniform_provenance": idx.meta.get("uniform_provenance"),
         "uniform_contextualization": idx.meta.get("uniform_contextualization"),
         "n_contextualized": idx.meta.get("n_contextualized"),
@@ -265,7 +271,8 @@ def gate(payload: dict[str, Any], *, tolerance: float | None = None) -> tuple[bo
     base = json.loads(BASELINE.read_text("utf-8"))
 
     # Refusal 5: say so rather than quietly comparing across systems.
-    for k in ("parser_version", "chunker_version", "pipeline_fingerprint"):
+    for k in ("parser_version", "chunker_version", "pipeline_fingerprint",
+              "child_cost_basis"):
         a, b = base["index_provenance"].get(k), payload["index_provenance"].get(k)
         if a != b:
             msgs.append(f"PROVENANCE CHANGED {k}: baseline={a} now={b}")

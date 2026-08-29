@@ -14,5 +14,7 @@
   "provenance_populations": {
     "prefixed": 803,
     "model_generated": 11
-  }
+  },
+  "uniform_contextualization": true,
+  "n_contextualized": 814
 }

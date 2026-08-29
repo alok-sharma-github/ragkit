@@ -55,32 +55,40 @@ rather than a fixed *number* of passages. Comparing "ten children" against "ten
 parents" compares 3,000 words against 12,000, so the larger unit wins by being
 given more room. At a fixed budget the comparison is fair.
 → *Qualifier: **every recall figure in this project is meaningless without its
-budget.** From one sweep over the same 92 questions — misses at 250 tokens: 67;
-at 1,500: 14; at 12,000: zero. A miss count without its budget describes a knob
-setting rather than a system. (That sweep's 1,500 figure is 78/92; the headline
-below is 79/92 from a later run — see **pipeline fingerprint**.)*
-→ *Second qualifier, and it is a known defect rather than a caveat: a **parent**
-is charged the text it delivers, while a **child** is charged the text it was
-indexed under — which includes its heading trail and any contextual prefix. The
-smaller unit therefore pays for text nobody reads, in the one comparison the
-measure exists to make fair. It changed no conclusion while the extra text was
-short; with a contextual prefix attached it inverts one.*
+budget.** From one sweep over the same 92 questions — misses at 250 tokens: 54;
+at 1,500: 10; at 12,000: zero. A miss count without its budget describes a knob
+setting rather than a system.*
+→ *Second qualifier: for most of this project's life the two units were charged
+differently — see **cost basis**. Corrected now, but it means a recall figure
+needs a third thing attached to be comparable: its budget, its pipeline, and which
+text it charged. The re-measurement is in the decision record; the short version is
+that the old accounting was penalising the smaller unit, so the published
+comparison was conservative rather than inflated.*
 
 **Contextual prefix** — one or two sentences written by a model and prepended to a
 passage *before it is indexed*, saying what the passage is about — resolving "the
 method" to a name, "it" to a system. It is added to the searchable text only; it
-never reaches the answer, and it can never be quoted.
-→ *Qualifier: measured here, it improves **ranking** and worsens **packing**, and
-which of those you see depends entirely on how you measure. At a fixed number of
-passages it wins clearly (+4 of 93 at three passages, +5 at five). At a fixed
-token budget — the way this project reports — it loses, because the ~66-token
-prefix is charged against the budget and roughly a fifth fewer passages fit. Same
-index, opposite conclusion. Hence the feature is built and switched off.*
+never reaches the answer, and it can never be quoted. **On.**
+→ *Qualifier: it was measured as a loss first, and the loss was in the
+measurement. A prefix improves **ranking** and worsens **packing**, and while the
+budget charged a passage for its prefix, the second effect swamped the first — the
+same index read −10 or +8 at a 250-token budget depending purely on that
+bookkeeping. Quote the gain only alongside the correction that made it visible.*
 
 **Strict fill** — the rule that retrieval never exceeds the token budget, even when
 that means returning nothing at all.
 → *Qualifier: returning nothing is a finding, not a bug — 7 of 442 parents are
 individually larger than a 1,500-token budget, so no amount of ranking helps.*
+
+**Cost basis** — which text a passage is charged for when filling a budget: the
+text it **delivers** to the model, or the text it was **indexed** under (which
+also includes its heading trail and any contextual prefix). This project charges
+delivery.
+→ *Qualifier: it charged index text until recently, and a large passage was always
+charged delivery — so the small unit paid for words nobody reads and the large one
+did not, in the one comparison the measure exists to make fair. Every figure
+published before the correction was measured the old way. Both settings still run,
+and the reports say which one produced them.*
 
 **Starved by budget** — the case where passages ranked correctly and none fit. A
 distinct condition from "nothing was found", because the two have opposite fixes:
@@ -91,25 +99,36 @@ raise the budget, versus look at the retriever.
 ## The measurements
 
 **`child_strict`** — the fraction of test questions where every fact needed to
-answer was inside the retrieved children. **Currently 79/92 = 86%.**
-→ *Qualifier: at a 1,500-token budget, on five of seven question types. Two types
-have no test items at all.*
+answer was inside the retrieved children. **Currently 82/92 = 89%**, up from
+79/92 = 86%.
+→ *Qualifier: at a 1,500-token budget, on five of seven question types; two types
+have no test items at all. The move from 86% to 89% is **entirely the contextual
+prefix** — at this budget the accounting correction that shipped alongside it
+changes nothing (79 → 79). At tighter budgets the split is the other way round.
+Neither figure is recoverable from the other, which is why all four are kept.*
 
 **`source_hit`** — the fraction where the correct *document* was retrieved,
-regardless of which passage. **Currently 92/92 = 100%.**
-→ *Qualifier: this is why no reranker was added. The right document always
-surfaces, so every remaining failure is ranking within a document — and reranking
-reorders documents that are already correct.*
+regardless of which passage. **Currently 91/92 = 99%** at the working budget, and
+100% at larger ones.
+→ *Qualifier: this is why no reranker was added — the right document essentially
+always surfaces, so nearly every remaining failure is ranking within a document,
+and reranking reorders documents that are already correct. It is also why the
+contextual prefix was the right thing to try instead. **The figure was 100% until
+that prefix shipped**, and the one question it now loses is instructive: its
+answer is a line in a bibliography, and every bibliography in the collection now
+carries a prefix saying roughly the same thing, so the rare words the question
+depended on stopped standing out. A prefix helps a passage that cannot describe
+itself and hurts one whose value is being unlike its neighbours.*
 
 **Faithfulness** — the fraction of answers whose every claim is supported by the
-sources given to the model. **Currently 74/74 = 100%.**
+sources given to the model. **Currently 78/78 = 100%.**
 → *Qualifier: **over answers only.** Refusals are counted separately, and this is
 close to tautological anyway — the model is confined to the supplied sources and a
 citation checker already rejects unverifiable quotes before anything is scored. It
 detects regressions; it is not a quality score.*
 
-**Abstention rate** — how often the system declines to answer. **Currently 18/92 =
-20%**, and **29%** on questions about tables and figures.
+**Abstention rate** — how often the system declines to answer. **Currently 14/92 =
+15%**, and **21%** on questions about tables and figures — down from 20% and 29%.
 → *Qualifier: this must never share a denominator with faithfulness. Pooled, the
 first report read "99% supported" — because a refusal asserts nothing and so
 asserts nothing false, and the score therefore improved whenever the system
@@ -185,10 +204,12 @@ therefore "on five of seven".*
 systems fail: content missing entirely, retrieved but not ranked, ranked but not
 fitted into the context, present but unused by the model, wrong format, wrong
 specificity, incomplete.
-→ *Qualifier: **all 23 measured failures here are FP2 or FP3** — evidence exists
-and was not delivered — and **none are FP4**. Zero FP4 across 23 chances is a
-strong negative result: it rules out prompt engineering, context reordering and
-reader fine-tuning, because each improves a step that is not failing.*
+→ *Qualifier: **all 15 measured failures here are FP2 or FP3** — evidence exists
+and was not delivered — and **none are FP4**. Zero FP4 is a strong negative
+result: it rules out prompt engineering, context reordering and reader
+fine-tuning, because each improves a step that is not failing. It was zero out of
+23 before the contextual prefix and is zero out of 15 after, which is the same
+conclusion with less room left for it to hide in.*
 
 ---
 

@@ -1,18 +1,18 @@
 {
  "stamp": {
-  "pipeline_fingerprint": "6fd55e19a82a7c28",
+  "pipeline_fingerprint": "4d54ab24999d336e",
   "parser_version": "pymupdf4llm@1.28+lines-detector@1+quadcorr-unset+cleanhdr@2+pagetextrepair@3+bboxflags@1",
   "chunker_version": "header_aware_parent@3",
   "token_budget": 1500
  },
- "n": 18,
+ "n": 14,
  "rows": [
   {
    "question": "What model and baseline are evaluated in Figure 1 for performance across document positions in a 20-document context?",
    "stratum": "table_or_image",
    "cause": "evidence_partial",
    "n_parents": 3,
-   "needles_found": 1,
+   "needles_found": 2,
    "needles_total": 3,
    "sources": [
     "lost-in-the-middle.pdf"
@@ -22,12 +22,11 @@
    "question": "Which evaluated model line in Figure 5 corresponds to the dashed coral line with dots?",
    "stratum": "table_or_image",
    "cause": "evidence_absent",
-   "n_parents": 5,
+   "n_parents": 3,
    "needles_found": 0,
    "needles_total": 0,
    "sources": [
     "assets/lost-in-the-middle_p5.png",
-    "benchmark-report.pdf",
     "lost-in-the-middle.pdf"
    ]
   },
@@ -35,19 +34,18 @@
    "question": "What mechanism do the authors propose as an exploratory approach that follows the information scent contained in higher-level community summaries?",
    "stratum": "simple_factual",
    "cause": "evidence_absent",
-   "n_parents": 3,
+   "n_parents": 2,
    "needles_found": 0,
    "needles_total": 1,
    "sources": [
-    "graphrag-local-to-global.pdf",
-    "raptor.pdf"
+    "graphrag-local-to-global.pdf"
    ]
   },
   {
    "question": "In the example LLM-generated assessment on the News article dataset, which system won the evaluation metric 'Directness'?",
    "stratum": "table_or_image",
    "cause": "evidence_partial",
-   "n_parents": 4,
+   "n_parents": 3,
    "needles_found": 1,
    "needles_total": 2,
    "sources": [
@@ -57,23 +55,32 @@
   {
    "question": "In Table 6 under the Diversity metric, what are the Mean 1 and Mean 2 scores for the pairwise comparison of C0 vs C1 on the News Articles dataset?",
    "stratum": "table_or_image",
-   "cause": "evidence_absent",
-   "n_parents": 4,
+   "cause": "starved_by_budget",
+   "n_parents": 0,
    "needles_found": 0,
    "needles_total": 2,
-   "sources": [
-    "graphrag-local-to-global.pdf"
-   ]
+   "sources": []
   },
   {
-   "question": "What accuracy score does Ragas achieve for faithfulness in pairwise comparisons on the WikiEval dataset?",
+   "question": "What is the ROUGE score achieved by SBERT with RAPTOR on NarrativeQA when using UnifiedQA-3B as the language model?",
    "stratum": "table_or_image",
    "cause": "evidence_partial",
    "n_parents": 5,
    "needles_found": 1,
    "needles_total": 2,
    "sources": [
-    "ragas.pdf"
+    "raptor.pdf"
+   ]
+  },
+  {
+   "question": "On the QuALITY dev dataset, what accuracy does RAPTOR achieve when paired with the GPT-3 language model?",
+   "stratum": "table_or_image",
+   "cause": "evidence_partial",
+   "n_parents": 5,
+   "needles_found": 1,
+   "needles_total": 2,
+   "sources": [
+    "raptor.pdf"
    ]
   },
   {
@@ -99,96 +106,43 @@
    ]
   },
   {
-   "question": "What is the performance score of RAPTOR for Story 3 when querying 3 layers starting from Layer 2?",
-   "stratum": "table_or_image",
-   "cause": "evidence_absent",
-   "n_parents": 5,
-   "needles_found": 0,
-   "needles_total": 2,
-   "sources": [
-    "raptor.pdf"
-   ]
-  },
-  {
-   "question": "What percentage of retrieved nodes come from Layer 4 for the NarrativeQA dataset when using DPR as the retriever?",
-   "stratum": "table_or_image",
-   "cause": "evidence_partial",
-   "n_parents": 5,
-   "needles_found": 1,
-   "needles_total": 2,
-   "sources": [
-    "raptor.pdf"
-   ]
-  },
-  {
-   "question": "When using BM25 as the retriever, what percentage of nodes retrieved for the Quality dataset are from Layer 1?",
-   "stratum": "table_or_image",
-   "cause": "evidence_partial",
-   "n_parents": 5,
-   "needles_found": 1,
-   "needles_total": 2,
-   "sources": [
-    "raptor.pdf"
-   ]
-  },
-  {
-   "question": "In the SELF-RAG inference algorithm, which reflection token is predicted when Retrieve equals 'No'?",
-   "stratum": "multi_hop",
+   "question": "What are the two stages GraphRAG uses an LLM for when building its graph index?",
+   "stratum": "simple_factual",
    "cause": "evidence_absent",
    "n_parents": 2,
    "needles_found": 0,
-   "needles_total": 2,
+   "needles_total": 1,
    "sources": [
-    "self-rag.pdf"
+    "graphrag-local-to-global.pdf"
    ]
   },
   {
-   "question": "According to the reward prediction accuracy comparison using GPT-4 predictions as ground truth, what accuracy does FLAN-3B achieve on the ISREL reward prediction task?",
-   "stratum": "table_or_image",
-   "cause": "evidence_partial",
-   "n_parents": 1,
-   "needles_found": 1,
-   "needles_total": 2,
+   "question": "What is the arXiv preprint identifier for the paper titled 'MultiHop-RAG: Benchmarking retrieval-augmented generation for multi-hop queries' by Tang and Yang?",
+   "stratum": "exact_identifier",
+   "cause": "evidence_absent",
+   "n_parents": 2,
+   "needles_found": 0,
+   "needles_total": 1,
    "sources": [
-    "self-rag.pdf"
+    "raptor.pdf"
    ]
   },
   {
    "question": "What is the URL for the open-source code repository associated with the HyDE paper?",
    "stratum": "exact_identifier",
-   "cause": "starved_by_budget",
-   "n_parents": 0,
-   "needles_found": 0,
-   "needles_total": 1,
-   "sources": []
-  },
-  {
-   "question": "What contact email address is provided for the authors of the RAPTOR paper published at ICLR 2024?",
-   "stratum": "exact_identifier",
-   "cause": "evidence_absent",
-   "n_parents": 4,
-   "needles_found": 0,
-   "needles_total": 1,
-   "sources": [
-    "raptor.pdf"
-   ]
-  },
-  {
-   "question": "What is the title of the paper published by Jeff Johnson, Matthijs Douze, and Herv\u00e9 J\u00e9gou in the IEEE Transactions on Big Data in 2019?",
-   "stratum": "exact_identifier",
    "cause": "evidence_absent",
    "n_parents": 1,
    "needles_found": 0,
    "needles_total": 1,
    "sources": [
-    "hnsw.pdf"
+    "hyde.pdf"
    ]
   },
   {
    "question": "What parameter sizes were evaluated for SELF-RAG in the experiments described in the introductory paper?",
    "stratum": "simple_factual",
    "cause": "evidence_absent",
-   "n_parents": 1,
+   "n_parents": 2,
    "needles_found": 0,
    "needles_total": 1,
    "sources": [
@@ -199,7 +153,7 @@
    "question": "Into what two categories are reflection tokens classified in the SELF-RAG framework?",
    "stratum": "simple_factual",
    "cause": "evidence_absent",
-   "n_parents": 2,
+   "n_parents": 3,
    "needles_found": 0,
    "needles_total": 1,
    "sources": [

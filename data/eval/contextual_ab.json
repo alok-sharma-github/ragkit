@@ -1,197 +1,271 @@
 {
   "meta": {
-    "a": {
+    "contextual": {
       "index": "numpy_index",
-      "n_children": 814,
-      "contextualized": 0,
-      "fingerprint": "6fd55e19a82a7c28"
-    },
-    "b": {
-      "index": "numpy_index_ctx",
       "n_children": 814,
       "contextualized": 814,
       "fingerprint": "4d54ab24999d336e"
+    },
+    "breadcrumb": {
+      "index": "numpy_index_breadcrumb",
+      "n_children": 814,
+      "contextualized": 0,
+      "fingerprint": "6fd55e19a82a7c28"
     }
   },
-  "n_items": 93,
-  "population_note": "every golden item with a needle; the eval's headline population is smaller (quarantined fixture and out-of-scope items excluded)",
-  "fixed_k": {
-    "3": {
-      "a": 67,
-      "b": 71,
-      "delta": 4
-    },
-    "5": {
-      "a": 73,
-      "b": 78,
-      "delta": 5
-    },
-    "10": {
-      "a": 84,
-      "b": 83,
-      "delta": -1
-    },
-    "20": {
-      "a": 89,
-      "b": 89,
-      "delta": 0
-    },
-    "40": {
-      "a": 92,
-      "b": 93,
-      "delta": 1
-    }
-  },
-  "by_cost": {
-    "embed_text": {
-      "250": {
-        "a": 27,
-        "a_mean_tokens": 111,
-        "a_no_delivery": 29,
-        "b": 16,
-        "b_mean_tokens": 98,
-        "b_no_delivery": 44,
-        "delta": -11
+  "note": "2x2: rows are the FEATURE (breadcrumb vs contextual prefix), columns are the ACCOUNTING (a child charged its index text vs the text it delivers). Old published figures are breadcrumb/indexed; what ships now is contextual/delivered.",
+  "cells": {
+    "contextual": {
+      "indexed": {
+        "250": {
+          "child_strict": 15,
+          "child_strict_label": "15/92 = 16%",
+          "parent_strict": 27,
+          "parent_strict_label": "27/92 = 29%",
+          "source_hit": "46/92 = 50%",
+          "n": 92,
+          "mean_child_tokens": 55,
+          "child_no_delivery": 46
+        },
+        "500": {
+          "child_strict": 56,
+          "child_strict_label": "56/92 = 61%",
+          "parent_strict": 51,
+          "parent_strict_label": "51/92 = 55%",
+          "source_hit": "90/92 = 98%",
+          "n": 92,
+          "mean_child_tokens": 242,
+          "child_no_delivery": 0
+        },
+        "1000": {
+          "child_strict": 74,
+          "child_strict_label": "74/92 = 80%",
+          "parent_strict": 63,
+          "parent_strict_label": "63/92 = 68%",
+          "source_hit": "91/92 = 99%",
+          "n": 92,
+          "mean_child_tokens": 568,
+          "child_no_delivery": 0
+        },
+        "1500": {
+          "child_strict": 79,
+          "child_strict_label": "79/92 = 86%",
+          "parent_strict": 75,
+          "parent_strict_label": "75/92 = 82%",
+          "source_hit": "91/92 = 99%",
+          "n": 92,
+          "mean_child_tokens": 910,
+          "child_no_delivery": 0
+        },
+        "3000": {
+          "child_strict": 84,
+          "child_strict_label": "84/92 = 91%",
+          "parent_strict": 84,
+          "parent_strict_label": "84/92 = 91%",
+          "source_hit": "91/92 = 99%",
+          "n": 92,
+          "mean_child_tokens": 1932,
+          "child_no_delivery": 0
+        },
+        "6000": {
+          "child_strict": 89,
+          "child_strict_label": "89/92 = 97%",
+          "parent_strict": 88,
+          "parent_strict_label": "88/92 = 96%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 4019,
+          "child_no_delivery": 0
+        }
       },
-      "500": {
-        "a": 56,
-        "a_mean_tokens": 390,
-        "a_no_delivery": 0,
-        "b": 56,
-        "b_mean_tokens": 371,
-        "b_no_delivery": 0,
-        "delta": 0
-      },
-      "1000": {
-        "a": 74,
-        "a_mean_tokens": 883,
-        "a_no_delivery": 0,
-        "b": 75,
-        "b_mean_tokens": 863,
-        "b_no_delivery": 0,
-        "delta": 1
-      },
-      "1500": {
-        "a": 80,
-        "a_mean_tokens": 1390,
-        "a_no_delivery": 0,
-        "b": 80,
-        "b_mean_tokens": 1363,
-        "b_no_delivery": 0,
-        "delta": 0
-      },
-      "3000": {
-        "a": 89,
-        "a_mean_tokens": 2879,
-        "a_no_delivery": 0,
-        "b": 85,
-        "b_mean_tokens": 2854,
-        "b_no_delivery": 0,
-        "delta": -4
-      },
-      "6000": {
-        "a": 91,
-        "a_mean_tokens": 5901,
-        "a_no_delivery": 0,
-        "b": 90,
-        "b_mean_tokens": 5856,
-        "b_no_delivery": 0,
-        "delta": -1
+      "delivered": {
+        "250": {
+          "child_strict": 38,
+          "child_strict_label": "38/92 = 41%",
+          "parent_strict": 27,
+          "parent_strict_label": "27/92 = 29%",
+          "source_hit": "69/92 = 75%",
+          "n": 92,
+          "mean_child_tokens": 135,
+          "child_no_delivery": 21
+        },
+        "500": {
+          "child_strict": 66,
+          "child_strict_label": "66/92 = 72%",
+          "parent_strict": 51,
+          "parent_strict_label": "51/92 = 55%",
+          "source_hit": "90/92 = 98%",
+          "n": 92,
+          "mean_child_tokens": 388,
+          "child_no_delivery": 0
+        },
+        "1000": {
+          "child_strict": 77,
+          "child_strict_label": "77/92 = 84%",
+          "parent_strict": 63,
+          "parent_strict_label": "63/92 = 68%",
+          "source_hit": "91/92 = 99%",
+          "n": 92,
+          "mean_child_tokens": 896,
+          "child_no_delivery": 0
+        },
+        "1500": {
+          "child_strict": 82,
+          "child_strict_label": "82/92 = 89%",
+          "parent_strict": 75,
+          "parent_strict_label": "75/92 = 82%",
+          "source_hit": "91/92 = 99%",
+          "n": 92,
+          "mean_child_tokens": 1395,
+          "child_no_delivery": 0
+        },
+        "3000": {
+          "child_strict": 87,
+          "child_strict_label": "87/92 = 95%",
+          "parent_strict": 84,
+          "parent_strict_label": "84/92 = 91%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 2882,
+          "child_no_delivery": 0
+        },
+        "6000": {
+          "child_strict": 91,
+          "child_strict_label": "91/92 = 99%",
+          "parent_strict": 88,
+          "parent_strict_label": "88/92 = 96%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 5875,
+          "child_no_delivery": 0
+        }
       }
     },
-    "display_text": {
-      "250": {
-        "a": 31,
-        "a_mean_tokens": 131,
-        "a_no_delivery": 22,
-        "b": 40,
-        "b_mean_tokens": 138,
-        "b_no_delivery": 19,
-        "delta": 9
+    "breadcrumb": {
+      "indexed": {
+        "250": {
+          "child_strict": 25,
+          "child_strict_label": "25/92 = 27%",
+          "parent_strict": 21,
+          "parent_strict_label": "21/92 = 23%",
+          "source_hit": "60/92 = 65%",
+          "n": 92,
+          "mean_child_tokens": 99,
+          "child_no_delivery": 31
+        },
+        "500": {
+          "child_strict": 55,
+          "child_strict_label": "55/92 = 60%",
+          "parent_strict": 42,
+          "parent_strict_label": "42/92 = 46%",
+          "source_hit": "91/92 = 99%",
+          "n": 92,
+          "mean_child_tokens": 357,
+          "child_no_delivery": 0
+        },
+        "1000": {
+          "child_strict": 73,
+          "child_strict_label": "73/92 = 79%",
+          "parent_strict": 58,
+          "parent_strict_label": "58/92 = 63%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 831,
+          "child_no_delivery": 0
+        },
+        "1500": {
+          "child_strict": 79,
+          "child_strict_label": "79/92 = 86%",
+          "parent_strict": 71,
+          "parent_strict_label": "71/92 = 77%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 1312,
+          "child_no_delivery": 0
+        },
+        "3000": {
+          "child_strict": 88,
+          "child_strict_label": "88/92 = 96%",
+          "parent_strict": 84,
+          "parent_strict_label": "84/92 = 91%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 2731,
+          "child_no_delivery": 0
+        },
+        "6000": {
+          "child_strict": 90,
+          "child_strict_label": "90/92 = 98%",
+          "parent_strict": 87,
+          "parent_strict_label": "87/92 = 95%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 5616,
+          "child_no_delivery": 0
+        }
       },
-      "500": {
-        "a": 59,
-        "a_mean_tokens": 391,
-        "a_no_delivery": 0,
-        "b": 67,
-        "b_mean_tokens": 392,
-        "b_no_delivery": 0,
-        "delta": 8
-      },
-      "1000": {
-        "a": 77,
-        "a_mean_tokens": 892,
-        "a_no_delivery": 0,
-        "b": 78,
-        "b_mean_tokens": 894,
-        "b_no_delivery": 0,
-        "delta": 1
-      },
-      "1500": {
-        "a": 80,
-        "a_mean_tokens": 1396,
-        "a_no_delivery": 0,
-        "b": 83,
-        "b_mean_tokens": 1392,
-        "b_no_delivery": 0,
-        "delta": 3
-      },
-      "3000": {
-        "a": 89,
-        "a_mean_tokens": 2909,
-        "a_no_delivery": 0,
-        "b": 88,
-        "b_mean_tokens": 2881,
-        "b_no_delivery": 0,
-        "delta": -1
-      },
-      "6000": {
-        "a": 91,
-        "a_mean_tokens": 5886,
-        "a_no_delivery": 0,
-        "b": 92,
-        "b_mean_tokens": 5875,
-        "b_no_delivery": 0,
-        "delta": 1
+      "delivered": {
+        "250": {
+          "child_strict": 30,
+          "child_strict_label": "30/92 = 33%",
+          "parent_strict": 22,
+          "parent_strict_label": "22/92 = 24%",
+          "source_hit": "68/92 = 74%",
+          "n": 92,
+          "mean_child_tokens": 130,
+          "child_no_delivery": 23
+        },
+        "500": {
+          "child_strict": 58,
+          "child_strict_label": "58/92 = 63%",
+          "parent_strict": 42,
+          "parent_strict_label": "42/92 = 46%",
+          "source_hit": "91/92 = 99%",
+          "n": 92,
+          "mean_child_tokens": 386,
+          "child_no_delivery": 0
+        },
+        "1000": {
+          "child_strict": 76,
+          "child_strict_label": "76/92 = 83%",
+          "parent_strict": 58,
+          "parent_strict_label": "58/92 = 63%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 892,
+          "child_no_delivery": 0
+        },
+        "1500": {
+          "child_strict": 79,
+          "child_strict_label": "79/92 = 86%",
+          "parent_strict": 71,
+          "parent_strict_label": "71/92 = 77%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 1396,
+          "child_no_delivery": 0
+        },
+        "3000": {
+          "child_strict": 88,
+          "child_strict_label": "88/92 = 96%",
+          "parent_strict": 84,
+          "parent_strict_label": "84/92 = 91%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 2908,
+          "child_no_delivery": 0
+        },
+        "6000": {
+          "child_strict": 90,
+          "child_strict_label": "90/92 = 98%",
+          "parent_strict": 87,
+          "parent_strict_label": "87/92 = 95%",
+          "source_hit": "92/92 = 100%",
+          "n": 92,
+          "mean_child_tokens": 5886,
+          "child_no_delivery": 0
+        }
       }
-    }
-  },
-  "by_stratum_at_k10": {
-    "a": {
-      "exact_identifier": [
-        17,
-        19
-      ],
-      "table_or_image": [
-        35,
-        39
-      ],
-      "simple_factual": [
-        30,
-        33
-      ],
-      "multi_hop": [
-        2,
-        2
-      ]
-    },
-    "b": {
-      "exact_identifier": [
-        17,
-        19
-      ],
-      "table_or_image": [
-        36,
-        39
-      ],
-      "simple_factual": [
-        28,
-        33
-      ],
-      "multi_hop": [
-        2,
-        2
-      ]
     }
   }
 }

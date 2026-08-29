@@ -344,7 +344,20 @@ class NumpyIndex:
         for rank, i in enumerate(order):
             child = self.children[i]
             if unit == "child":
-                cost = count_tokens(child.embed_text or child.display_text)
+                # CHARGED WHAT IT DELIVERS. This read `child.embed_text`, and
+                # embed_text is the body plus a heading trail plus (now) a
+                # model-written situating sentence -- none of which reaches the
+                # model. Meanwhile the parent branch below charges display_text.
+                # So the child unit paid for its own enrichment and the parent
+                # unit paid for nothing equivalent, in the one comparison budget
+                # normalisation exists to make fair. ADR A-13.
+                #
+                # Harmless while the extra text was a ~9% breadcrumb; decisive at
+                # 22%. The old basis is still selectable, because every published
+                # figure predating this line was measured under it.
+                text = (child.display_text if config.CHILD_COST_BASIS == "delivered"
+                        else (child.embed_text or child.display_text))
+                cost = count_tokens(text)
             else:
                 parent = self.parents.get(child.parent_id or "")
                 target = parent or child

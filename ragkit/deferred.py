@@ -140,53 +140,42 @@ def review() -> dict[str, Any]:
             evidence=f"human_verified={(ev or {}).get('golden_set', {}).get('human_verified', 0)}",
         ),
         Deferral(
-            name="contextual_prefixes_enabled",
-            guide_module="M5",
+            name="parent_charged_for_index_text",
+            guide_module="M9",
             decision=(
-                "LLM-written contextual prefixes are BUILT and MEASURED; the "
-                "serving flag is off."
+                "A child is charged the text it DELIVERS, not the text it was "
+                "indexed under. Both bases stay selectable."
             ),
             because=(
-                "this is no longer 'not built' -- the old deferral expired on its "
-                "own predicate, the feature was implemented, and the whole corpus "
-                "was contextualised and scored against the index it would replace. "
-                "At a fixed k it does exactly what it claims (+4 at k=3, +5 at k=5). "
-                "At a fixed TOKEN BUDGET it loses, because search_budget charges a "
-                "child its embed_text and the prefix is ~66 tokens on a ~300-token "
-                "body -- so a fifth fewer children fit. Turning it on today would "
-                "make the product worse on the metric the product reports, for a "
-                "reason that is about the metric rather than the feature (A-13)"
+                "search_budget charged a parent its display_text and a child its "
+                "embed_text, so the small unit paid for its own heading trail and "
+                "contextual prefix while the large unit paid for nothing "
+                "equivalent -- in the one comparison budget normalisation exists "
+                "to make fair. Harmless at a ~9% breadcrumb, decisive at a "
+                "66-token prefix: the same index read -10 or +8 at a 250-token "
+                "budget on the choice of basis alone"
             ),
             revisit_when=(
-                "the child cost function charges delivery rather than index text. "
-                "Under that accounting the same two indexes read +9 at 250, +8 at "
-                "500 and +3 at 1500 -- a clear win at the budgets a deployment "
-                "actually runs at. The flag should flip in the same change that "
-                "corrects the accounting, and not before"
+                "a retrieval unit is delivered to the model WITH its enrichment "
+                "attached -- e.g. if a child ever became the delivered unit and "
+                "the situating sentence were shown as context. Then the prefix "
+                "IS delivered text and charging it becomes correct again"
             ),
             cost_if_wrong=(
-                "a measured retrieval gain is left on the table at tight budgets. "
-                "Bounded and cheap to reverse: every prefix is cached, so rebuilding "
-                "the contextualised index costs 23 seconds and zero API calls"
+                "every figure published before the correction was measured under "
+                "the old basis. Kept re-runnable rather than restated: "
+                "RAGKIT_CHILD_COST_BASIS=indexed still works, the eval records "
+                "which basis produced a number, and the CI gate refuses to "
+                "compare across them"
             ),
-            # `contextualize_skipped` is no longer an orphan -- it has a writer in
-            # pipeline.ingest now. It sat in this tuple being excused as "waiting,
-            # not forgotten" for as long as the feature was deferred, which is
-            # exactly as long as that excuse was true.
             orphans=(),
-            # NO PREDICATE, and for the reason the two entries below give: nothing
-            # in data/eval can observe "somebody changed the cost function". A
-            # proxy -- say, child_strict moving -- would fire on any unrelated
-            # improvement, which is a correlation standing in for a condition.
-            # This file exists to refuse that.
+            # No predicate: nothing in data/eval can observe "the delivered unit
+            # changed". Left False and said so, rather than wired to a proxy.
             expired=False,
             evidence=(
-                "measured over 93 golden items with needles: fixed-k +4 @k=3, "
-                "+5 @k=5; fixed-budget (embed_text cost) -11 @250, 0 @1500; "
-                "fixed-budget (display_text cost) +9 @250, +3 @1500. "
-                "1,032,463 input tokens, 0 refusals, mean prefix 66 tokens. "
-                "See data/eval/contextual_ab.json and index numpy_index_ctx "
-                "(fingerprint 4d54ab24999d336e)"
+                "2x2 in data/eval/contextual_ab.json: child_strict at 250 tokens "
+                "reads 25 / 30 / 15 / 38 across breadcrumb-indexed, "
+                "breadcrumb-delivered, contextual-indexed, contextual-delivered"
             ),
         ),
         Deferral(

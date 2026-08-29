@@ -1,6 +1,6 @@
 {
   "degradations": [],
-  "pipeline_fingerprint": "6fd55e19a82a7c28",
+  "pipeline_fingerprint": "4d54ab24999d336e",
   "parser_version": "pymupdf4llm@1.28+lines-detector@1+quadcorr-unset+cleanhdr@2+pagetextrepair@3+bboxflags@1",
   "chunker_version": "header_aware_parent@3",
   "n_children": 814,

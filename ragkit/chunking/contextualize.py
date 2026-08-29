@@ -212,9 +212,20 @@ class ContextStats:
             "prefixes_cached": self.prefixes_cached,
             "prefixes_skipped": self.prefixes_skipped,
             "skip_reasons": dict(self.skip_reasons),
-            "prompt_tokens": self.usage.prompt_tokens,
-            "output_tokens": self.usage.output_tokens,
-            "cached_tokens": self.usage.cached_tokens,
+            # NAMED FOR WHAT THEY ANSWER, which is "what did THIS RUN spend" and
+            # NOT "what did this index cost". Prefixes are cached, so a rebuild
+            # reports zero -- correctly, and misleadingly to anyone reading a
+            # field called `prompt_tokens` as the price of the index. The first
+            # build of this corpus spent 1,032,463 in and 55,660 out; a rebuild
+            # spends nothing. Two questions, and the name now says which one is
+            # being answered. A footnote would have been cheaper and would have
+            # been read later than the field.
+            "this_run_prompt_tokens": self.usage.prompt_tokens,
+            "this_run_output_tokens": self.usage.output_tokens,
+            "this_run_cached_tokens": self.usage.cached_tokens,
+            "note": ("token counts are for THIS RUN only; cached prefixes cost "
+                     "nothing, so a rebuild reports zero regardless of what the "
+                     "index originally cost"),
             "mean_prefix_tokens": round(sum(self.prefix_tokens) / n) if n else 0,
             "max_prefix_tokens": max(self.prefix_tokens) if self.prefix_tokens else 0,
             # THE NUMBER THAT DECIDES WHETHER THIS HELPED OR HURT. A prefix is

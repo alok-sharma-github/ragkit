@@ -1,5 +1,5 @@
 {
-  "seconds": 4.0,
+  "seconds": 4.5,
   "regression_tests": {
     "What is the Precision@5 for the BM25_ONLY method in the Meridian Retri": {
       "passes_at_budget": 250,
@@ -27,88 +27,38 @@
     "250": {
       "child_strict": {
         "n": 92,
-        "hits": 25,
-        "rate": 0.272,
+        "hits": 38,
+        "rate": 0.413,
         "sufficient": true,
         "ci95": [
-          0.191,
-          0.37
+          0.318,
+          0.515
         ],
-        "label": "25/92 = 27%"
+        "label": "38/92 = 41%"
       },
       "child_partial": {
         "n": 92,
-        "hits": 44,
-        "rate": 0.478,
+        "hits": 53,
+        "rate": 0.576,
         "sufficient": true,
         "ci95": [
-          0.379,
-          0.579
+          0.474,
+          0.672
         ],
-        "label": "44/92 = 48%"
+        "label": "53/92 = 58%"
       },
       "parent_strict": {
         "n": 92,
-        "hits": 21,
-        "rate": 0.228,
+        "hits": 27,
+        "rate": 0.293,
         "sufficient": true,
         "ci95": [
-          0.154,
-          0.324
+          0.21,
+          0.393
         ],
-        "label": "21/92 = 23%"
+        "label": "27/92 = 29%"
       },
       "parent_partial": {
-        "n": 92,
-        "hits": 40,
-        "rate": 0.435,
-        "sufficient": true,
-        "ci95": [
-          0.338,
-          0.537
-        ],
-        "label": "40/92 = 43%"
-      },
-      "source_hit": {
-        "n": 92,
-        "hits": 60,
-        "rate": 0.652,
-        "sufficient": true,
-        "ci95": [
-          0.551,
-          0.742
-        ],
-        "label": "60/92 = 65%"
-      },
-      "mean_child_tokens": 98,
-      "mean_parent_tokens": 84,
-      "child_no_delivery": 31,
-      "parent_no_delivery": 45
-    },
-    "500": {
-      "child_strict": {
-        "n": 92,
-        "hits": 55,
-        "rate": 0.598,
-        "sufficient": true,
-        "ci95": [
-          0.496,
-          0.692
-        ],
-        "label": "55/92 = 60%"
-      },
-      "child_partial": {
-        "n": 92,
-        "hits": 73,
-        "rate": 0.793,
-        "sufficient": true,
-        "ci95": [
-          0.7,
-          0.864
-        ],
-        "label": "73/92 = 79%"
-      },
-      "parent_strict": {
         "n": 92,
         "hits": 42,
         "rate": 0.457,
@@ -119,218 +69,68 @@
         ],
         "label": "42/92 = 46%"
       },
-      "parent_partial": {
-        "n": 92,
-        "hits": 62,
-        "rate": 0.674,
-        "sufficient": true,
-        "ci95": [
-          0.573,
-          0.761
-        ],
-        "label": "62/92 = 67%"
-      },
       "source_hit": {
         "n": 92,
-        "hits": 91,
-        "rate": 0.989,
+        "hits": 69,
+        "rate": 0.75,
         "sufficient": true,
         "ci95": [
-          0.941,
-          0.998
+          0.653,
+          0.827
         ],
-        "label": "91/92 = 99%"
+        "label": "69/92 = 75%"
       },
-      "mean_child_tokens": 357,
-      "mean_parent_tokens": 236,
-      "child_no_delivery": 0,
-      "parent_no_delivery": 22
+      "mean_child_tokens": 135,
+      "mean_parent_tokens": 94,
+      "child_no_delivery": 21,
+      "parent_no_delivery": 39
     },
-    "1000": {
+    "500": {
       "child_strict": {
         "n": 92,
-        "hits": 73,
-        "rate": 0.793,
+        "hits": 66,
+        "rate": 0.717,
         "sufficient": true,
         "ci95": [
-          0.7,
-          0.864
+          0.618,
+          0.799
         ],
-        "label": "73/92 = 79%"
+        "label": "66/92 = 72%"
       },
       "child_partial": {
         "n": 92,
-        "hits": 84,
-        "rate": 0.913,
+        "hits": 80,
+        "rate": 0.87,
         "sufficient": true,
         "ci95": [
-          0.838,
-          0.955
+          0.786,
+          0.924
         ],
-        "label": "84/92 = 91%"
+        "label": "80/92 = 87%"
       },
       "parent_strict": {
         "n": 92,
-        "hits": 58,
-        "rate": 0.63,
+        "hits": 51,
+        "rate": 0.554,
         "sufficient": true,
         "ci95": [
-          0.528,
-          0.722
+          0.453,
+          0.652
         ],
-        "label": "58/92 = 63%"
+        "label": "51/92 = 55%"
       },
       "parent_partial": {
         "n": 92,
-        "hits": 73,
-        "rate": 0.793,
+        "hits": 63,
+        "rate": 0.685,
         "sufficient": true,
         "ci95": [
-          0.7,
-          0.864
+          0.584,
+          0.771
         ],
-        "label": "73/92 = 79%"
+        "label": "63/92 = 68%"
       },
       "source_hit": {
-        "n": 92,
-        "hits": 92,
-        "rate": 1.0,
-        "sufficient": true,
-        "ci95": [
-          0.96,
-          1.0
-        ],
-        "label": "92/92 = 100%"
-      },
-      "mean_child_tokens": 834,
-      "mean_parent_tokens": 588,
-      "child_no_delivery": 0,
-      "parent_no_delivery": 9
-    },
-    "1500": {
-      "child_strict": {
-        "n": 92,
-        "hits": 78,
-        "rate": 0.848,
-        "sufficient": true,
-        "ci95": [
-          0.761,
-          0.907
-        ],
-        "label": "78/92 = 85%"
-      },
-      "child_partial": {
-        "n": 92,
-        "hits": 84,
-        "rate": 0.913,
-        "sufficient": true,
-        "ci95": [
-          0.838,
-          0.955
-        ],
-        "label": "84/92 = 91%"
-      },
-      "parent_strict": {
-        "n": 92,
-        "hits": 71,
-        "rate": 0.772,
-        "sufficient": true,
-        "ci95": [
-          0.676,
-          0.846
-        ],
-        "label": "71/92 = 77%"
-      },
-      "parent_partial": {
-        "n": 92,
-        "hits": 81,
-        "rate": 0.88,
-        "sufficient": true,
-        "ci95": [
-          0.798,
-          0.932
-        ],
-        "label": "81/92 = 88%"
-      },
-      "source_hit": {
-        "n": 92,
-        "hits": 92,
-        "rate": 1.0,
-        "sufficient": true,
-        "ci95": [
-          0.96,
-          1.0
-        ],
-        "label": "92/92 = 100%"
-      },
-      "mean_child_tokens": 1314,
-      "mean_parent_tokens": 1166,
-      "child_no_delivery": 0,
-      "parent_no_delivery": 1
-    },
-    "3000": {
-      "child_strict": {
-        "n": 92,
-        "hits": 88,
-        "rate": 0.957,
-        "sufficient": true,
-        "ci95": [
-          0.893,
-          0.983
-        ],
-        "label": "88/92 = 96%"
-      },
-      "child_partial": {
-        "n": 92,
-        "hits": 89,
-        "rate": 0.967,
-        "sufficient": true,
-        "ci95": [
-          0.908,
-          0.989
-        ],
-        "label": "89/92 = 97%"
-      },
-      "parent_strict": {
-        "n": 92,
-        "hits": 84,
-        "rate": 0.913,
-        "sufficient": true,
-        "ci95": [
-          0.838,
-          0.955
-        ],
-        "label": "84/92 = 91%"
-      },
-      "parent_partial": {
-        "n": 92,
-        "hits": 85,
-        "rate": 0.924,
-        "sufficient": true,
-        "ci95": [
-          0.851,
-          0.963
-        ],
-        "label": "85/92 = 92%"
-      },
-      "source_hit": {
-        "n": 92,
-        "hits": 92,
-        "rate": 1.0,
-        "sufficient": true,
-        "ci95": [
-          0.96,
-          1.0
-        ],
-        "label": "92/92 = 100%"
-      },
-      "mean_child_tokens": 2730,
-      "mean_parent_tokens": 2544,
-      "child_no_delivery": 0,
-      "parent_no_delivery": 0
-    },
-    "6000": {
-      "child_strict": {
         "n": 92,
         "hits": 90,
         "rate": 0.978,
@@ -341,6 +141,206 @@
         ],
         "label": "90/92 = 98%"
       },
+      "mean_child_tokens": 388,
+      "mean_parent_tokens": 226,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 22
+    },
+    "1000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 77,
+        "rate": 0.837,
+        "sufficient": true,
+        "ci95": [
+          0.748,
+          0.899
+        ],
+        "label": "77/92 = 84%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 85,
+        "rate": 0.924,
+        "sufficient": true,
+        "ci95": [
+          0.851,
+          0.963
+        ],
+        "label": "85/92 = 92%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 63,
+        "rate": 0.685,
+        "sufficient": true,
+        "ci95": [
+          0.584,
+          0.771
+        ],
+        "label": "63/92 = 68%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 75,
+        "rate": 0.815,
+        "sufficient": true,
+        "ci95": [
+          0.724,
+          0.881
+        ],
+        "label": "75/92 = 82%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "mean_child_tokens": 896,
+      "mean_parent_tokens": 621,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 9
+    },
+    "1500": {
+      "child_strict": {
+        "n": 92,
+        "hits": 82,
+        "rate": 0.891,
+        "sufficient": true,
+        "ci95": [
+          0.811,
+          0.94
+        ],
+        "label": "82/92 = 89%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 85,
+        "rate": 0.924,
+        "sufficient": true,
+        "ci95": [
+          0.851,
+          0.963
+        ],
+        "label": "85/92 = 92%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 75,
+        "rate": 0.815,
+        "sufficient": true,
+        "ci95": [
+          0.724,
+          0.881
+        ],
+        "label": "75/92 = 82%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 84,
+        "rate": 0.913,
+        "sufficient": true,
+        "ci95": [
+          0.838,
+          0.955
+        ],
+        "label": "84/92 = 91%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "mean_child_tokens": 1395,
+      "mean_parent_tokens": 1182,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 1
+    },
+    "3000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 87,
+        "rate": 0.946,
+        "sufficient": true,
+        "ci95": [
+          0.879,
+          0.977
+        ],
+        "label": "87/92 = 95%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 88,
+        "rate": 0.957,
+        "sufficient": true,
+        "ci95": [
+          0.893,
+          0.983
+        ],
+        "label": "88/92 = 96%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 84,
+        "rate": 0.913,
+        "sufficient": true,
+        "ci95": [
+          0.838,
+          0.955
+        ],
+        "label": "84/92 = 91%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 86,
+        "rate": 0.935,
+        "sufficient": true,
+        "ci95": [
+          0.865,
+          0.97
+        ],
+        "label": "86/92 = 93%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 2882,
+      "mean_parent_tokens": 2577,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 0
+    },
+    "6000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
       "child_partial": {
         "n": 92,
         "hits": 91,
@@ -354,14 +354,14 @@
       },
       "parent_strict": {
         "n": 92,
-        "hits": 87,
-        "rate": 0.946,
+        "hits": 88,
+        "rate": 0.957,
         "sufficient": true,
         "ci95": [
-          0.879,
-          0.977
+          0.893,
+          0.983
         ],
-        "label": "87/92 = 95%"
+        "label": "88/92 = 96%"
       },
       "parent_partial": {
         "n": 92,
@@ -385,8 +385,8 @@
         ],
         "label": "92/92 = 100%"
       },
-      "mean_child_tokens": 5613,
-      "mean_parent_tokens": 5528,
+      "mean_child_tokens": 5875,
+      "mean_parent_tokens": 5632,
       "child_no_delivery": 0,
       "parent_no_delivery": 0
     },
@@ -415,25 +415,25 @@
       },
       "parent_strict": {
         "n": 92,
-        "hits": 91,
-        "rate": 0.989,
+        "hits": 92,
+        "rate": 1.0,
         "sufficient": true,
         "ci95": [
-          0.941,
-          0.998
+          0.96,
+          1.0
         ],
-        "label": "91/92 = 99%"
+        "label": "92/92 = 100%"
       },
       "parent_partial": {
         "n": 92,
-        "hits": 91,
-        "rate": 0.989,
+        "hits": 92,
+        "rate": 1.0,
         "sufficient": true,
         "ci95": [
-          0.941,
-          0.998
+          0.96,
+          1.0
         ],
-        "label": "91/92 = 99%"
+        "label": "92/92 = 100%"
       },
       "source_hit": {
         "n": 92,
@@ -446,8 +446,8 @@
         ],
         "label": "92/92 = 100%"
       },
-      "mean_child_tokens": 11324,
-      "mean_parent_tokens": 11548,
+      "mean_child_tokens": 11896,
+      "mean_parent_tokens": 11533,
       "child_no_delivery": 0,
       "parent_no_delivery": 0
     }
@@ -491,14 +491,17 @@
   "index_provenance": {
     "parser_version": "pymupdf4llm@1.28+lines-detector@1+quadcorr-unset+cleanhdr@2+pagetextrepair@3+bboxflags@1",
     "chunker_version": "header_aware_parent@3",
-    "pipeline_fingerprint": "6fd55e19a82a7c28",
+    "pipeline_fingerprint": "4d54ab24999d336e",
     "strategy": "header_aware_parent",
     "dim": 768,
-    "n_children": 802,
+    "n_children": 814,
+    "child_cost_basis": "delivered",
     "uniform_provenance": true,
+    "uniform_contextualization": true,
+    "n_contextualized": 814,
     "child_text_source": {
       "gemini_caption": 11,
-      "markdown": 788,
+      "markdown": 800,
       "page_text_clip": 3
     },
     "n_header_missing": 3,
@@ -544,16 +547,38 @@
     "headline": {
       "child_strict": {
         "n": 92,
-        "hits": 78,
-        "rate": 0.848,
+        "hits": 82,
+        "rate": 0.891,
         "sufficient": true,
         "ci95": [
-          0.761,
-          0.907
+          0.811,
+          0.94
         ],
-        "label": "78/92 = 85%"
+        "label": "82/92 = 89%"
       },
       "child_partial": {
+        "n": 92,
+        "hits": 85,
+        "rate": 0.924,
+        "sufficient": true,
+        "ci95": [
+          0.851,
+          0.963
+        ],
+        "label": "85/92 = 92%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 75,
+        "rate": 0.815,
+        "sufficient": true,
+        "ci95": [
+          0.724,
+          0.881
+        ],
+        "label": "75/92 = 82%"
+      },
+      "parent_partial": {
         "n": 92,
         "hits": 84,
         "rate": 0.913,
@@ -564,41 +589,19 @@
         ],
         "label": "84/92 = 91%"
       },
-      "parent_strict": {
-        "n": 92,
-        "hits": 71,
-        "rate": 0.772,
-        "sufficient": true,
-        "ci95": [
-          0.676,
-          0.846
-        ],
-        "label": "71/92 = 77%"
-      },
-      "parent_partial": {
-        "n": 92,
-        "hits": 81,
-        "rate": 0.88,
-        "sufficient": true,
-        "ci95": [
-          0.798,
-          0.932
-        ],
-        "label": "81/92 = 88%"
-      },
       "source_hit": {
         "n": 92,
-        "hits": 92,
-        "rate": 1.0,
+        "hits": 91,
+        "rate": 0.989,
         "sufficient": true,
         "ci95": [
-          0.96,
-          1.0
+          0.941,
+          0.998
         ],
-        "label": "92/92 = 100%"
+        "label": "91/92 = 99%"
       },
-      "mean_child_tokens": 1314,
-      "mean_parent_tokens": 1166,
+      "mean_child_tokens": 1395,
+      "mean_parent_tokens": 1182,
       "child_no_delivery": 0,
       "parent_no_delivery": 1
     },
@@ -629,70 +632,70 @@
         },
         "parent_strict": {
           "n": 19,
-          "hits": 15,
-          "rate": 0.789,
+          "hits": 17,
+          "rate": 0.895,
           "sufficient": true,
           "ci95": [
-            0.567,
-            0.915
+            0.686,
+            0.971
           ],
-          "label": "15/19 = 79%"
+          "label": "17/19 = 89%"
         },
         "parent_partial": {
           "n": 19,
-          "hits": 15,
-          "rate": 0.789,
+          "hits": 17,
+          "rate": 0.895,
           "sufficient": true,
           "ci95": [
-            0.567,
-            0.915
+            0.686,
+            0.971
           ],
-          "label": "15/19 = 79%"
+          "label": "17/19 = 89%"
         },
         "source_hit": {
           "n": 19,
-          "hits": 19,
-          "rate": 1.0,
+          "hits": 18,
+          "rate": 0.947,
           "sufficient": true,
           "ci95": [
-            0.832,
-            1.0
+            0.754,
+            0.991
           ],
-          "label": "19/19 = 100%"
+          "label": "18/19 = 95%"
         },
-        "mean_child_tokens": 1302,
-        "mean_parent_tokens": 1023,
+        "mean_child_tokens": 1396,
+        "mean_parent_tokens": 1262,
         "child_no_delivery": 0,
-        "parent_no_delivery": 1
+        "parent_no_delivery": 0
       },
       "multi_hop": {
         "child_strict": {
           "n": 2,
-          "hits": 1,
+          "hits": 2,
           "rate": null,
           "sufficient": false,
-          "label": "1 of 2"
+          "label": "2 of 2"
         },
         "child_partial": {
           "n": 2,
-          "hits": 1,
+          "hits": 2,
           "rate": null,
           "sufficient": false,
-          "label": "1 of 2"
+          "label": "2 of 2"
         },
         "parent_strict": {
           "n": 2,
-          "hits": 1,
+          "hits": 2,
           "rate": null,
           "sufficient": false,
-          "label": "1 of 2"
+          "label": "2 of 2"
         },
         "parent_partial": {
           "n": 2,
-          "hits": 1,
+          "hits": 2,
           "rate": null,
           "sufficient": false,
-          "label": "1 of 2"
+          "label": "2 of 2"
         },
         "source_hit": {
           "n": 2,
@@ -701,33 +704,33 @@
           "sufficient": false,
           "label": "2 of 2"
         },
-        "mean_child_tokens": 1360,
-        "mean_parent_tokens": 1181,
+        "mean_child_tokens": 1268,
+        "mean_parent_tokens": 1477,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
       "simple_factual": {
         "child_strict": {
           "n": 33,
-          "hits": 29,
-          "rate": 0.879,
+          "hits": 28,
+          "rate": 0.848,
           "sufficient": true,
           "ci95": [
-            0.727,
-            0.952
+            0.691,
+            0.933
           ],
-          "label": "29/33 = 88%"
+          "label": "28/33 = 85%"
         },
         "child_partial": {
           "n": 33,
-          "hits": 29,
-          "rate": 0.879,
+          "hits": 28,
+          "rate": 0.848,
           "sufficient": true,
           "ci95": [
-            0.727,
-            0.952
+            0.691,
+            0.933
           ],
-          "label": "29/33 = 88%"
+          "label": "28/33 = 85%"
         },
         "parent_strict": {
           "n": 33,
@@ -762,44 +765,44 @@
           ],
           "label": "33/33 = 100%"
         },
-        "mean_child_tokens": 1286,
-        "mean_parent_tokens": 1134,
+        "mean_child_tokens": 1400,
+        "mean_parent_tokens": 1161,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
       "table_or_image": {
         "child_strict": {
           "n": 38,
-          "hits": 31,
-          "rate": 0.816,
+          "hits": 35,
+          "rate": 0.921,
           "sufficient": true,
           "ci95": [
-            0.666,
-            0.908
+            0.792,
+            0.973
           ],
-          "label": "31/38 = 82%"
+          "label": "35/38 = 92%"
         },
         "child_partial": {
           "n": 38,
-          "hits": 37,
-          "rate": 0.974,
+          "hits": 38,
+          "rate": 1.0,
           "sufficient": true,
           "ci95": [
-            0.865,
-            0.995
+            0.908,
+            1.0
           ],
-          "label": "37/38 = 97%"
+          "label": "38/38 = 100%"
         },
         "parent_strict": {
           "n": 38,
-          "hits": 27,
-          "rate": 0.711,
+          "hits": 28,
+          "rate": 0.737,
           "sufficient": true,
           "ci95": [
-            0.552,
-            0.83
+            0.58,
+            0.85
           ],
-          "label": "27/38 = 71%"
+          "label": "28/38 = 74%"
         },
         "parent_partial": {
           "n": 38,
@@ -823,10 +826,10 @@
           ],
           "label": "38/38 = 100%"
         },
-        "mean_child_tokens": 1342,
-        "mean_parent_tokens": 1265,
+        "mean_child_tokens": 1396,
+        "mean_parent_tokens": 1145,
         "child_no_delivery": 0,
-        "parent_no_delivery": 0
+        "parent_no_delivery": 1
       }
     },
     "by_anchor": {
@@ -866,24 +869,46 @@
           "sufficient": false,
           "label": "3 of 3"
         },
-        "mean_child_tokens": 1304,
-        "mean_parent_tokens": 1161,
+        "mean_child_tokens": 1445,
+        "mean_parent_tokens": 1153,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
       "needle": {
         "child_strict": {
           "n": 89,
-          "hits": 75,
-          "rate": 0.843,
+          "hits": 79,
+          "rate": 0.888,
           "sufficient": true,
           "ci95": [
-            0.753,
-            0.904
+            0.805,
+            0.938
           ],
-          "label": "75/89 = 84%"
+          "label": "79/89 = 89%"
         },
         "child_partial": {
+          "n": 89,
+          "hits": 82,
+          "rate": 0.921,
+          "sufficient": true,
+          "ci95": [
+            0.846,
+            0.961
+          ],
+          "label": "82/89 = 92%"
+        },
+        "parent_strict": {
+          "n": 89,
+          "hits": 72,
+          "rate": 0.809,
+          "sufficient": true,
+          "ci95": [
+            0.715,
+            0.877
+          ],
+          "label": "72/89 = 81%"
+        },
+        "parent_partial": {
           "n": 89,
           "hits": 81,
           "rate": 0.91,
@@ -894,41 +919,19 @@
           ],
           "label": "81/89 = 91%"
         },
-        "parent_strict": {
-          "n": 89,
-          "hits": 68,
-          "rate": 0.764,
-          "sufficient": true,
-          "ci95": [
-            0.666,
-            0.84
-          ],
-          "label": "68/89 = 76%"
-        },
-        "parent_partial": {
-          "n": 89,
-          "hits": 78,
-          "rate": 0.876,
-          "sufficient": true,
-          "ci95": [
-            0.792,
-            0.93
-          ],
-          "label": "78/89 = 88%"
-        },
         "source_hit": {
           "n": 89,
-          "hits": 89,
-          "rate": 1.0,
+          "hits": 88,
+          "rate": 0.989,
           "sufficient": true,
           "ci95": [
-            0.959,
-            1.0
+            0.939,
+            0.998
           ],
-          "label": "89/89 = 100%"
+          "label": "88/89 = 99%"
         },
-        "mean_child_tokens": 1314,
-        "mean_parent_tokens": 1166,
+        "mean_child_tokens": 1393,
+        "mean_parent_tokens": 1183,
         "child_no_delivery": 0,
         "parent_no_delivery": 1
       }
@@ -970,8 +973,8 @@
           "sufficient": false,
           "label": "2 of 2"
         },
-        "mean_child_tokens": 1174,
-        "mean_parent_tokens": 1202,
+        "mean_child_tokens": 1454,
+        "mean_parent_tokens": 1204,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
@@ -1011,8 +1014,8 @@
           "sufficient": false,
           "label": "2 of 2"
         },
-        "mean_child_tokens": 1332,
-        "mean_parent_tokens": 1042,
+        "mean_child_tokens": 1421,
+        "mean_parent_tokens": 1192,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
@@ -1033,10 +1036,10 @@
         },
         "parent_strict": {
           "n": 2,
-          "hits": 1,
+          "hits": 2,
           "rate": null,
           "sufficient": false,
-          "label": "1 of 2"
+          "label": "2 of 2"
         },
         "parent_partial": {
           "n": 2,
@@ -1052,8 +1055,8 @@
           "sufficient": false,
           "label": "2 of 2"
         },
-        "mean_child_tokens": 1245,
-        "mean_parent_tokens": 1169,
+        "mean_child_tokens": 1458,
+        "mean_parent_tokens": 1190,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
@@ -1093,22 +1096,22 @@
           "sufficient": false,
           "label": "2 of 2"
         },
-        "mean_child_tokens": 1434,
-        "mean_parent_tokens": 1160,
+        "mean_child_tokens": 1356,
+        "mean_parent_tokens": 1292,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
       "graphrag-local-to-global.pdf": {
         "child_strict": {
           "n": 19,
-          "hits": 16,
-          "rate": 0.842,
+          "hits": 15,
+          "rate": 0.789,
           "sufficient": true,
           "ci95": [
-            0.624,
-            0.945
+            0.567,
+            0.915
           ],
-          "label": "16/19 = 84%"
+          "label": "15/19 = 79%"
         },
         "child_partial": {
           "n": 19,
@@ -1123,14 +1126,14 @@
         },
         "parent_strict": {
           "n": 19,
-          "hits": 14,
-          "rate": 0.737,
+          "hits": 12,
+          "rate": 0.632,
           "sufficient": true,
           "ci95": [
-            0.512,
-            0.882
+            0.41,
+            0.809
           ],
-          "label": "14/19 = 74%"
+          "label": "12/19 = 63%"
         },
         "parent_partial": {
           "n": 19,
@@ -1145,27 +1148,27 @@
         },
         "source_hit": {
           "n": 19,
-          "hits": 19,
-          "rate": 1.0,
+          "hits": 18,
+          "rate": 0.947,
           "sufficient": true,
           "ci95": [
-            0.832,
-            1.0
+            0.754,
+            0.991
           ],
-          "label": "19/19 = 100%"
+          "label": "18/19 = 95%"
         },
-        "mean_child_tokens": 1305,
-        "mean_parent_tokens": 1151,
+        "mean_child_tokens": 1386,
+        "mean_parent_tokens": 1054,
         "child_no_delivery": 0,
-        "parent_no_delivery": 0
+        "parent_no_delivery": 1
       },
       "hnsw.pdf": {
         "child_strict": {
           "n": 6,
-          "hits": 5,
+          "hits": 6,
           "rate": null,
           "sufficient": false,
-          "label": "5 of 6"
+          "label": "6 of 6"
         },
         "child_partial": {
           "n": 6,
@@ -1195,8 +1198,8 @@
           "sufficient": false,
           "label": "6 of 6"
         },
-        "mean_child_tokens": 1293,
-        "mean_parent_tokens": 1231,
+        "mean_child_tokens": 1383,
+        "mean_parent_tokens": 1242,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
@@ -1236,22 +1239,22 @@
           "sufficient": false,
           "label": "7 of 7"
         },
-        "mean_child_tokens": 1313,
-        "mean_parent_tokens": 988,
+        "mean_child_tokens": 1364,
+        "mean_parent_tokens": 1205,
         "child_no_delivery": 0,
-        "parent_no_delivery": 1
+        "parent_no_delivery": 0
       },
       "lost-in-the-middle.pdf": {
         "child_strict": {
           "n": 15,
-          "hits": 13,
-          "rate": 0.867,
+          "hits": 15,
+          "rate": 1.0,
           "sufficient": true,
           "ci95": [
-            0.621,
-            0.963
+            0.796,
+            1.0
           ],
-          "label": "13/15 = 87%"
+          "label": "15/15 = 100%"
         },
         "child_partial": {
           "n": 15,
@@ -1297,8 +1300,8 @@
           ],
           "label": "15/15 = 100%"
         },
-        "mean_child_tokens": 1298,
-        "mean_parent_tokens": 1252,
+        "mean_child_tokens": 1400,
+        "mean_parent_tokens": 1206,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
@@ -1338,18 +1341,18 @@
           "sufficient": false,
           "label": "2 of 2"
         },
-        "mean_child_tokens": 1186,
-        "mean_parent_tokens": 1352,
+        "mean_child_tokens": 1452,
+        "mean_parent_tokens": 1318,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
       "ragas.pdf": {
         "child_strict": {
           "n": 3,
-          "hits": 2,
+          "hits": 3,
           "rate": null,
           "sufficient": false,
-          "label": "2 of 3"
+          "label": "3 of 3"
         },
         "child_partial": {
           "n": 3,
@@ -1360,10 +1363,10 @@
         },
         "parent_strict": {
           "n": 3,
-          "hits": 2,
+          "hits": 3,
           "rate": null,
           "sufficient": false,
-          "label": "2 of 3"
+          "label": "3 of 3"
         },
         "parent_partial": {
           "n": 3,
@@ -1379,46 +1382,13 @@
           "sufficient": false,
           "label": "3 of 3"
         },
-        "mean_child_tokens": 1341,
-        "mean_parent_tokens": 1281,
+        "mean_child_tokens": 1448,
+        "mean_parent_tokens": 1197,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
       "raptor.pdf": {
         "child_strict": {
-          "n": 18,
-          "hits": 14,
-          "rate": 0.778,
-          "sufficient": true,
-          "ci95": [
-            0.548,
-            0.91
-          ],
-          "label": "14/18 = 78%"
-        },
-        "child_partial": {
-          "n": 18,
-          "hits": 16,
-          "rate": 0.889,
-          "sufficient": true,
-          "ci95": [
-            0.672,
-            0.969
-          ],
-          "label": "16/18 = 89%"
-        },
-        "parent_strict": {
-          "n": 18,
-          "hits": 13,
-          "rate": 0.722,
-          "sufficient": true,
-          "ci95": [
-            0.491,
-            0.875
-          ],
-          "label": "13/18 = 72%"
-        },
-        "parent_partial": {
           "n": 18,
           "hits": 15,
           "rate": 0.833,
@@ -1428,6 +1398,39 @@
             0.942
           ],
           "label": "15/18 = 83%"
+        },
+        "child_partial": {
+          "n": 18,
+          "hits": 17,
+          "rate": 0.944,
+          "sufficient": true,
+          "ci95": [
+            0.742,
+            0.99
+          ],
+          "label": "17/18 = 94%"
+        },
+        "parent_strict": {
+          "n": 18,
+          "hits": 15,
+          "rate": 0.833,
+          "sufficient": true,
+          "ci95": [
+            0.608,
+            0.942
+          ],
+          "label": "15/18 = 83%"
+        },
+        "parent_partial": {
+          "n": 18,
+          "hits": 17,
+          "rate": 0.944,
+          "sufficient": true,
+          "ci95": [
+            0.742,
+            0.99
+          ],
+          "label": "17/18 = 94%"
         },
         "source_hit": {
           "n": 18,
@@ -1440,8 +1443,8 @@
           ],
           "label": "18/18 = 100%"
         },
-        "mean_child_tokens": 1347,
-        "mean_parent_tokens": 1144,
+        "mean_child_tokens": 1406,
+        "mean_parent_tokens": 1202,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       },
@@ -1470,25 +1473,25 @@
         },
         "parent_strict": {
           "n": 14,
-          "hits": 10,
-          "rate": 0.714,
+          "hits": 12,
+          "rate": 0.857,
           "sufficient": true,
           "ci95": [
-            0.454,
-            0.883
+            0.601,
+            0.96
           ],
-          "label": "10/14 = 71%"
+          "label": "12/14 = 86%"
         },
         "parent_partial": {
           "n": 14,
-          "hits": 11,
-          "rate": 0.786,
+          "hits": 12,
+          "rate": 0.857,
           "sufficient": true,
           "ci95": [
-            0.524,
-            0.924
+            0.601,
+            0.96
           ],
-          "label": "11/14 = 79%"
+          "label": "12/14 = 86%"
         },
         "source_hit": {
           "n": 14,
@@ -1501,8 +1504,8 @@
           ],
           "label": "14/14 = 100%"
         },
-        "mean_child_tokens": 1334,
-        "mean_parent_tokens": 1145,
+        "mean_child_tokens": 1373,
+        "mean_parent_tokens": 1223,
         "child_no_delivery": 0,
         "parent_no_delivery": 0
       }
@@ -1541,12 +1544,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 5,
+      "n_children": 6,
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1192,
-      "parent_tokens": 1242,
+      "child_tokens": 1436,
+      "parent_tokens": 1245,
       "text_sources": [
         "gemini_caption",
         "markdown"
@@ -1569,11 +1572,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
+      "n_children": 8,
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1155,
+      "child_tokens": 1473,
       "parent_tokens": 1162,
       "text_sources": [
         "gemini_caption",
@@ -1599,13 +1602,14 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
+      "n_children": 7,
       "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1312,
-      "parent_tokens": 994,
+      "child_tokens": 1398,
+      "parent_tokens": 1304,
       "text_sources": [
+        "gemini_caption",
         "markdown"
       ],
       "skipped": ""
@@ -1626,12 +1630,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
+      "n_children": 8,
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1353,
-      "parent_tokens": 1089,
+      "child_tokens": 1444,
+      "parent_tokens": 1081,
       "text_sources": [
         "gemini_caption",
         "markdown"
@@ -1646,7 +1650,7 @@
       "quarantined": false,
       "child_strict": true,
       "child_partial": true,
-      "parent_strict": false,
+      "parent_strict": true,
       "parent_partial": true,
       "needle_coverage": {
         "20 Total Retrieved Documents (~4K tokens)": "contained"
@@ -1654,14 +1658,13 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 10,
-      "n_parents": 7,
+      "n_children": 8,
+      "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1201,
-      "parent_tokens": 1083,
+      "child_tokens": 1425,
+      "parent_tokens": 1344,
       "text_sources": [
-        "gemini_caption",
         "markdown"
       ],
       "skipped": ""
@@ -1680,16 +1683,15 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 10,
-      "n_parents": 8,
+      "n_children": 8,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1289,
-      "parent_tokens": 1255,
+      "child_tokens": 1490,
+      "parent_tokens": 1037,
       "text_sources": [
         "gemini_caption",
-        "markdown",
-        "page_text_clip"
+        "markdown"
       ],
       "skipped": ""
     },
@@ -1709,12 +1711,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
-      "n_parents": 5,
+      "n_children": 10,
+      "n_parents": 6,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1436,
-      "parent_tokens": 1335,
+      "child_tokens": 1303,
+      "parent_tokens": 1409,
       "text_sources": [
         "gemini_caption",
         "markdown"
@@ -1736,11 +1738,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 8,
-      "n_parents": 3,
+      "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1432,
-      "parent_tokens": 986,
+      "child_tokens": 1408,
+      "parent_tokens": 1176,
       "text_sources": [
         "markdown"
       ],
@@ -1762,12 +1764,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 10,
-      "n_parents": 9,
+      "n_children": 14,
+      "n_parents": 13,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1308,
-      "parent_tokens": 1309,
+      "child_tokens": 1398,
+      "parent_tokens": 1399,
       "text_sources": [
         "markdown",
         "page_text_clip"
@@ -1790,14 +1792,15 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
-      "n_parents": 4,
+      "n_children": 14,
+      "n_parents": 11,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1160,
-      "parent_tokens": 723,
+      "child_tokens": 1366,
+      "parent_tokens": 1054,
       "text_sources": [
-        "markdown"
+        "markdown",
+        "page_text_clip"
       ],
       "skipped": ""
     },
@@ -1817,11 +1820,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 2,
-      "n_children": 9,
+      "n_children": 8,
       "n_parents": 0,
       "child_no_delivery": false,
       "parent_no_delivery": true,
-      "child_tokens": 1438,
+      "child_tokens": 1407,
       "parent_tokens": 0,
       "text_sources": [
         "markdown"
@@ -1848,8 +1851,8 @@
       "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1438,
-      "parent_tokens": 685,
+      "child_tokens": 1296,
+      "parent_tokens": 1225,
       "text_sources": [
         "markdown",
         "page_text_clip"
@@ -1864,7 +1867,7 @@
       "quarantined": false,
       "child_strict": true,
       "child_partial": true,
-      "parent_strict": true,
+      "parent_strict": false,
       "parent_partial": true,
       "needle_coverage": {
         "Table 2: Number of context units (community summaries for **C0-C3** and text chunks for **TS** )": "contained",
@@ -1873,12 +1876,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 3,
+      "n_children": 7,
+      "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1357,
-      "parent_tokens": 1368,
+      "child_tokens": 1254,
+      "parent_tokens": 558,
       "text_sources": [
         "markdown"
       ],
@@ -1904,7 +1907,7 @@
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1266,
+      "child_tokens": 1348,
       "parent_tokens": 1290,
       "text_sources": [
         "markdown"
@@ -1919,7 +1922,7 @@
       "quarantined": false,
       "child_strict": true,
       "child_partial": true,
-      "parent_strict": true,
+      "parent_strict": false,
       "parent_partial": true,
       "needle_coverage": {
         "Table 3: Average number of extracted claims, reported by condition and dataset type.": "contained",
@@ -1929,11 +1932,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 7,
-      "n_parents": 5,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1156,
-      "parent_tokens": 1364,
+      "child_tokens": 1318,
+      "parent_tokens": 1087,
       "text_sources": [
         "markdown"
       ],
@@ -1955,12 +1958,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 5,
+      "n_children": 6,
+      "n_parents": 1,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1252,
-      "parent_tokens": 1366,
+      "child_tokens": 1463,
+      "parent_tokens": 630,
       "text_sources": [
         "markdown"
       ],
@@ -1983,12 +1986,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
-      "n_parents": 7,
+      "n_children": 8,
+      "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1392,
-      "parent_tokens": 1129,
+      "child_tokens": 1277,
+      "parent_tokens": 930,
       "text_sources": [
         "markdown"
       ],
@@ -2010,12 +2013,12 @@
       "needle_fraction": 0.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 3,
+      "n_children": 7,
+      "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1268,
-      "parent_tokens": 1444,
+      "child_tokens": 1491,
+      "parent_tokens": 547,
       "text_sources": [
         "markdown"
       ],
@@ -2039,11 +2042,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 7,
-      "n_parents": 4,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1359,
-      "parent_tokens": 1345,
+      "child_tokens": 1469,
+      "parent_tokens": 715,
       "text_sources": [
         "markdown"
       ],
@@ -2065,11 +2068,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
+      "n_children": 6,
       "n_parents": 1,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1435,
+      "child_tokens": 1448,
       "parent_tokens": 1027,
       "text_sources": [
         "markdown"
@@ -2083,22 +2086,22 @@
       "anchor": "needle",
       "quarantined": false,
       "child_strict": false,
-      "child_partial": false,
+      "child_partial": true,
       "parent_strict": false,
       "parent_partial": false,
       "needle_coverage": {
         "Table 6: Pairwise comparisons of six conditions on four metrics across 125 questions and two datasets.": "absent",
-        "||C0|C1|49.76|50.24|-0.13|1|39.68|60.32|-3.61|**0.003**|": "absent"
+        "||C0|C1|49.76|50.24|-0.13|1|39.68|60.32|-3.61|**0.003**|": "contained"
       },
-      "needle_fraction": 0.0,
+      "needle_fraction": 0.5,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 4,
+      "n_children": 5,
+      "n_parents": 0,
       "child_no_delivery": false,
-      "parent_no_delivery": false,
-      "child_tokens": 1393,
-      "parent_tokens": 1400,
+      "parent_no_delivery": true,
+      "child_tokens": 1459,
+      "parent_tokens": 0,
       "text_sources": [
         "markdown"
       ],
@@ -2120,11 +2123,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 8,
+      "n_children": 7,
       "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1276,
+      "child_tokens": 1331,
       "parent_tokens": 1245,
       "text_sources": [
         "markdown"
@@ -2151,8 +2154,8 @@
       "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1395,
-      "parent_tokens": 1104,
+      "child_tokens": 1418,
+      "parent_tokens": 1500,
       "text_sources": [
         "markdown"
       ],
@@ -2164,23 +2167,23 @@
       "source_id": "hnsw.pdf",
       "anchor": "needle",
       "quarantined": false,
-      "child_strict": false,
+      "child_strict": true,
       "child_partial": true,
       "parent_strict": false,
       "parent_partial": true,
       "needle_coverage": {
         "|Hierarchical NSW|5.6 hours|64 Gb|_M_=16,_efConstruction_=500 (1)|": "contained",
-        "Parameters for comparison between Hierarchical NSW and Faiss on a 200M subset of 1B SIFT dataset.": "absent"
+        "Parameters for comparison between Hierarchical NSW and Faiss on a 200M subset of 1B SIFT dataset.": "contained"
       },
-      "needle_fraction": 0.5,
+      "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 5,
+      "n_children": 7,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1309,
-      "parent_tokens": 1489,
+      "child_tokens": 1368,
+      "parent_tokens": 1156,
       "text_sources": [
         "markdown"
       ],
@@ -2202,12 +2205,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 4,
+      "n_children": 8,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1365,
-      "parent_tokens": 1405,
+      "child_tokens": 1471,
+      "parent_tokens": 1251,
       "text_sources": [
         "markdown"
       ],
@@ -2230,11 +2233,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 7,
-      "n_parents": 7,
+      "n_parents": 6,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1458,
-      "parent_tokens": 1494,
+      "child_tokens": 1288,
+      "parent_tokens": 1289,
       "text_sources": [
         "markdown"
       ],
@@ -2257,12 +2260,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
+      "n_children": 9,
       "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1275,
-      "parent_tokens": 1226,
+      "child_tokens": 1392,
+      "parent_tokens": 999,
       "text_sources": [
         "markdown"
       ],
@@ -2285,11 +2288,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 9,
-      "n_parents": 5,
+      "n_parents": 9,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1318,
-      "parent_tokens": 1183,
+      "child_tokens": 1223,
+      "parent_tokens": 1327,
       "text_sources": [
         "markdown"
       ],
@@ -2311,12 +2314,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 8,
-      "n_parents": 5,
+      "n_children": 6,
+      "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1395,
-      "parent_tokens": 1255,
+      "child_tokens": 1363,
+      "parent_tokens": 1334,
       "text_sources": [
         "markdown"
       ],
@@ -2339,12 +2342,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 8,
-      "n_parents": 8,
+      "n_children": 9,
+      "n_parents": 7,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1320,
-      "parent_tokens": 1456,
+      "child_tokens": 1464,
+      "parent_tokens": 1431,
       "text_sources": [
         "markdown"
       ],
@@ -2366,12 +2369,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 6,
+      "n_children": 8,
+      "n_parents": 7,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1257,
-      "parent_tokens": 1362,
+      "child_tokens": 1418,
+      "parent_tokens": 1456,
       "text_sources": [
         "markdown"
       ],
@@ -2398,8 +2401,8 @@
       "n_parents": 6,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1284,
-      "parent_tokens": 1416,
+      "child_tokens": 1430,
+      "parent_tokens": 1349,
       "text_sources": [
         "markdown"
       ],
@@ -2421,11 +2424,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
+      "n_children": 8,
       "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1347,
+      "child_tokens": 1340,
       "parent_tokens": 1052,
       "text_sources": [
         "markdown"
@@ -2449,12 +2452,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 8,
+      "n_children": 9,
       "n_parents": 8,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1338,
-      "parent_tokens": 1338,
+      "child_tokens": 1386,
+      "parent_tokens": 1187,
       "text_sources": [
         "markdown"
       ],
@@ -2477,12 +2480,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 7,
+      "n_children": 10,
+      "n_parents": 9,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1306,
-      "parent_tokens": 1445,
+      "child_tokens": 1492,
+      "parent_tokens": 1492,
       "text_sources": [
         "markdown"
       ],
@@ -2494,23 +2497,23 @@
       "source_id": "lost-in-the-middle.pdf",
       "anchor": "needle",
       "quarantined": false,
-      "child_strict": false,
+      "child_strict": true,
       "child_partial": true,
       "parent_strict": false,
       "parent_partial": true,
       "needle_coverage": {
-        "Table 6: Model performance when evaluated on the multi-document QA task with 20 total retrieved documents.": "absent",
+        "Table 6: Model performance when evaluated on the multi-document QA task with 20 total retrieved documents.": "contained",
         "|LongChat-13B (16K)|68.6%|57.4%|55.3%|52.5%|55.0%|": "contained"
       },
-      "needle_fraction": 0.5,
+      "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
+      "n_children": 9,
       "n_parents": 6,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1271,
-      "parent_tokens": 1449,
+      "child_tokens": 1487,
+      "parent_tokens": 1184,
       "text_sources": [
         "markdown"
       ],
@@ -2522,25 +2525,24 @@
       "source_id": "lost-in-the-middle.pdf",
       "anchor": "needle",
       "quarantined": false,
-      "child_strict": false,
+      "child_strict": true,
       "child_partial": true,
       "parent_strict": false,
       "parent_partial": true,
       "needle_coverage": {
-        "Table 7: Model performance when evaluated on the multi-document QA task with 30 total retrieved documents.": "absent",
+        "Table 7: Model performance when evaluated on the multi-document QA task with 30 total retrieved documents.": "contained",
         "|GPT-3.5-Turbo (16K)|73.4%|55.1%|50.5%|50.9%|51.8%|54.9%|63.7%|": "contained"
       },
-      "needle_fraction": 0.5,
+      "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 5,
+      "n_children": 8,
+      "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1370,
-      "parent_tokens": 1205,
+      "child_tokens": 1320,
+      "parent_tokens": 792,
       "text_sources": [
-        "gemini_caption",
         "markdown"
       ],
       "skipped": ""
@@ -2561,13 +2563,14 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 30,
-      "n_parents": 24,
+      "n_children": 17,
+      "n_parents": 12,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1137,
-      "parent_tokens": 1461,
+      "child_tokens": 1442,
+      "parent_tokens": 1225,
       "text_sources": [
+        "gemini_caption",
         "markdown"
       ],
       "skipped": ""
@@ -2588,12 +2591,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 31,
-      "n_parents": 18,
+      "n_children": 35,
+      "n_parents": 9,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1235,
-      "parent_tokens": 1243,
+      "child_tokens": 1462,
+      "parent_tokens": 1410,
       "text_sources": [
         "markdown",
         "page_text_clip"
@@ -2606,23 +2609,23 @@
       "source_id": "ragas.pdf",
       "anchor": "needle",
       "quarantined": false,
-      "child_strict": false,
+      "child_strict": true,
       "child_partial": true,
-      "parent_strict": false,
+      "parent_strict": true,
       "parent_partial": true,
       "needle_coverage": {
         "Table 1: Agreement with human annotators in pairwise comparisons of faithfulness, answer relevance and context relevance, using the WikEval dataset (accuracy).": "contained",
-        "|Ragas|**0.95**|**0.78**|**0.70**|": "absent"
+        "|Ragas|**0.95**|**0.78**|**0.70**|": "contained"
       },
-      "needle_fraction": 0.5,
+      "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
+      "n_children": 8,
       "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1383,
-      "parent_tokens": 1499,
+      "child_tokens": 1444,
+      "parent_tokens": 903,
       "text_sources": [
         "markdown"
       ],
@@ -2643,12 +2646,12 @@
       },
       "needle_fraction": 1.0,
       "source_hit": true,
-      "rank_first_hit": 0,
-      "n_children": 5,
+      "rank_first_hit": 2,
+      "n_children": 6,
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1190,
+      "child_tokens": 1403,
       "parent_tokens": 1196,
       "text_sources": [
         "markdown"
@@ -2672,12 +2675,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 10,
-      "n_parents": 6,
+      "n_children": 9,
+      "n_parents": 7,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1397,
-      "parent_tokens": 1442,
+      "child_tokens": 1445,
+      "parent_tokens": 1273,
       "text_sources": [
         "markdown"
       ],
@@ -2700,12 +2703,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 10,
-      "n_parents": 9,
+      "n_children": 12,
+      "n_parents": 10,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1412,
-      "parent_tokens": 1412,
+      "child_tokens": 1491,
+      "parent_tokens": 1431,
       "text_sources": [
         "markdown"
       ],
@@ -2728,12 +2731,12 @@
       "needle_fraction": 0.5,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
-      "n_parents": 8,
+      "n_children": 10,
+      "n_parents": 6,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1400,
-      "parent_tokens": 1458,
+      "child_tokens": 1460,
+      "parent_tokens": 946,
       "text_sources": [
         "markdown"
       ],
@@ -2757,11 +2760,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 10,
-      "n_parents": 9,
+      "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1436,
-      "parent_tokens": 1413,
+      "child_tokens": 1410,
+      "parent_tokens": 782,
       "text_sources": [
         "markdown"
       ],
@@ -2784,12 +2787,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 14,
-      "n_parents": 10,
+      "n_children": 13,
+      "n_parents": 13,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1385,
-      "parent_tokens": 835,
+      "child_tokens": 1247,
+      "parent_tokens": 1247,
       "text_sources": [
         "markdown"
       ],
@@ -2816,8 +2819,8 @@
       "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1349,
-      "parent_tokens": 1433,
+      "child_tokens": 1324,
+      "parent_tokens": 1423,
       "text_sources": [
         "markdown"
       ],
@@ -2839,12 +2842,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
-      "n_parents": 4,
+      "n_children": 13,
+      "n_parents": 12,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1256,
-      "parent_tokens": 483,
+      "child_tokens": 1478,
+      "parent_tokens": 1217,
       "text_sources": [
         "markdown"
       ],
@@ -2871,8 +2874,8 @@
       "n_parents": 16,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1388,
-      "parent_tokens": 1388,
+      "child_tokens": 1361,
+      "parent_tokens": 1361,
       "text_sources": [
         "markdown"
       ],
@@ -2898,8 +2901,8 @@
       "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1207,
-      "parent_tokens": 681,
+      "child_tokens": 1314,
+      "parent_tokens": 573,
       "text_sources": [
         "markdown"
       ],
@@ -2922,12 +2925,12 @@
       "needle_fraction": 0.5,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
+      "n_children": 11,
       "n_parents": 8,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1327,
-      "parent_tokens": 1308,
+      "child_tokens": 1472,
+      "parent_tokens": 1424,
       "text_sources": [
         "markdown"
       ],
@@ -2950,12 +2953,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 15,
+      "n_children": 17,
       "n_parents": 15,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1344,
-      "parent_tokens": 1344,
+      "child_tokens": 1483,
+      "parent_tokens": 1289,
       "text_sources": [
         "markdown"
       ],
@@ -2978,12 +2981,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 13,
-      "n_parents": 11,
+      "n_children": 16,
+      "n_parents": 12,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1266,
-      "parent_tokens": 939,
+      "child_tokens": 1446,
+      "parent_tokens": 1372,
       "text_sources": [
         "markdown"
       ],
@@ -3006,12 +3009,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 15,
+      "n_children": 16,
       "n_parents": 13,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1335,
-      "parent_tokens": 1320,
+      "child_tokens": 1465,
+      "parent_tokens": 1421,
       "text_sources": [
         "markdown"
       ],
@@ -3036,11 +3039,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 8,
-      "n_parents": 5,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1315,
-      "parent_tokens": 1327,
+      "child_tokens": 1422,
+      "parent_tokens": 1272,
       "text_sources": [
         "markdown"
       ],
@@ -3052,23 +3055,23 @@
       "source_id": "self-rag.pdf",
       "anchor": "needle",
       "quarantined": false,
-      "child_strict": false,
-      "child_partial": false,
-      "parent_strict": false,
-      "parent_partial": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
       "needle_coverage": {
-        "**else if**<br>**Retrieve** ==No**then**": "absent",
-        "_Mgen_ predicts<br>**ISUSE** given_x, yt_|_\u25b7_Critique": "absent"
+        "**else if**<br>**Retrieve** ==No**then**": "contained",
+        "_Mgen_ predicts<br>**ISUSE** given_x, yt_|_\u25b7_Critique": "contained"
       },
-      "needle_fraction": 0.0,
+      "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 8,
-      "n_parents": 2,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1399,
-      "parent_tokens": 1105,
+      "child_tokens": 1294,
+      "parent_tokens": 1460,
       "text_sources": [
         "markdown"
       ],
@@ -3091,12 +3094,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 3,
+      "n_children": 8,
+      "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1440,
-      "parent_tokens": 1231,
+      "child_tokens": 1498,
+      "parent_tokens": 1142,
       "text_sources": [
         "markdown"
       ],
@@ -3118,12 +3121,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 25,
-      "n_parents": 2,
+      "n_children": 13,
+      "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1276,
-      "parent_tokens": 1181,
+      "child_tokens": 1345,
+      "parent_tokens": 1272,
       "text_sources": [
         "markdown",
         "page_text_clip"
@@ -3146,12 +3149,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 3,
+      "n_children": 10,
+      "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1349,
-      "parent_tokens": 1316,
+      "child_tokens": 1415,
+      "parent_tokens": 614,
       "text_sources": [
         "markdown",
         "page_text_clip"
@@ -3174,12 +3177,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 8,
+      "n_children": 11,
       "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1414,
-      "parent_tokens": 879,
+      "child_tokens": 1326,
+      "parent_tokens": 1256,
       "text_sources": [
         "markdown"
       ],
@@ -3193,7 +3196,7 @@
       "quarantined": false,
       "child_strict": true,
       "child_partial": true,
-      "parent_strict": false,
+      "parent_strict": true,
       "parent_partial": true,
       "needle_coverage": {
         "|FLAN-3B|85.6|73.1|**82.0**|72.1|": "contained",
@@ -3203,11 +3206,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 11,
-      "n_parents": 1,
+      "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1254,
-      "parent_tokens": 575,
+      "child_tokens": 1336,
+      "parent_tokens": 664,
       "text_sources": [
         "markdown"
       ],
@@ -3233,8 +3236,8 @@
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1430,
-      "parent_tokens": 1187,
+      "child_tokens": 1369,
+      "parent_tokens": 829,
       "text_sources": [
         "markdown"
       ],
@@ -3256,12 +3259,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 2,
+      "n_children": 8,
+      "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1321,
-      "parent_tokens": 1257,
+      "child_tokens": 1242,
+      "parent_tokens": 1494,
       "text_sources": [
         "markdown"
       ],
@@ -3275,20 +3278,20 @@
       "quarantined": false,
       "child_strict": true,
       "child_partial": true,
-      "parent_strict": false,
-      "parent_partial": false,
+      "parent_strict": true,
+      "parent_partial": true,
       "needle_coverage": {
         "In our pipeline, we use Leiden community detection (Traag et al., 2019) in a hierarchical manner, recursively detecting sub-communities": "contained"
       },
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 3,
+      "n_children": 10,
+      "n_parents": 6,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1175,
-      "parent_tokens": 1004,
+      "child_tokens": 1482,
+      "parent_tokens": 1377,
       "text_sources": [
         "markdown"
       ],
@@ -3310,12 +3313,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 2,
+      "n_children": 7,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1197,
-      "parent_tokens": 653,
+      "child_tokens": 1374,
+      "parent_tokens": 1464,
       "text_sources": [
         "markdown"
       ],
@@ -3337,12 +3340,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 2,
+      "n_children": 8,
+      "n_parents": 6,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1280,
-      "parent_tokens": 367,
+      "child_tokens": 1393,
+      "parent_tokens": 1150,
       "text_sources": [
         "markdown"
       ],
@@ -3364,12 +3367,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 5,
-      "n_parents": 3,
+      "n_children": 6,
+      "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1166,
-      "parent_tokens": 675,
+      "child_tokens": 1271,
+      "parent_tokens": 1313,
       "text_sources": [
         "markdown"
       ],
@@ -3381,22 +3384,22 @@
       "source_id": "graphrag-local-to-global.pdf",
       "anchor": "needle",
       "quarantined": false,
-      "child_strict": true,
-      "child_partial": true,
-      "parent_strict": true,
-      "parent_partial": true,
+      "child_strict": false,
+      "child_partial": false,
+      "parent_strict": false,
+      "parent_partial": false,
       "needle_coverage": {
-        "Tang, Y. and Yang, Y. (2024). MultiHop-RAG: Benchmarking retrieval-augmented generation for multi-hop queries. _arXiv preprint arXiv:2401.15391_ .": "contained"
+        "Tang, Y. and Yang, Y. (2024). MultiHop-RAG: Benchmarking retrieval-augmented generation for multi-hop queries. _arXiv preprint arXiv:2401.15391_ .": "absent"
       },
-      "needle_fraction": 1.0,
-      "source_hit": true,
-      "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 1,
+      "needle_fraction": 0.0,
+      "source_hit": false,
+      "rank_first_hit": null,
+      "n_children": 19,
+      "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1387,
-      "parent_tokens": 1162,
+      "child_tokens": 1485,
+      "parent_tokens": 1444,
       "text_sources": [
         "markdown"
       ],
@@ -3418,12 +3421,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 1,
+      "n_children": 7,
+      "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1366,
-      "parent_tokens": 1162,
+      "child_tokens": 1437,
+      "parent_tokens": 1493,
       "text_sources": [
         "markdown"
       ],
@@ -3451,7 +3454,7 @@
       "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1309,
+      "child_tokens": 1338,
       "parent_tokens": 1289,
       "text_sources": [
         "markdown"
@@ -3478,7 +3481,7 @@
       "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1287,
+      "child_tokens": 1417,
       "parent_tokens": 1389,
       "text_sources": [
         "markdown"
@@ -3506,7 +3509,7 @@
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1244,
+      "child_tokens": 1274,
       "parent_tokens": 980,
       "text_sources": [
         "markdown"
@@ -3529,12 +3532,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 2,
+      "n_children": 7,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1168,
-      "parent_tokens": 1164,
+      "child_tokens": 1438,
+      "parent_tokens": 1318,
       "text_sources": [
         "markdown"
       ],
@@ -3556,12 +3559,12 @@
       "needle_fraction": 0.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 0,
+      "n_children": 7,
+      "n_parents": 1,
       "child_no_delivery": false,
-      "parent_no_delivery": true,
-      "child_tokens": 1336,
-      "parent_tokens": 0,
+      "parent_no_delivery": false,
+      "child_tokens": 1484,
+      "parent_tokens": 1417,
       "text_sources": [
         "markdown"
       ],
@@ -3583,11 +3586,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
+      "n_children": 9,
       "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1325,
+      "child_tokens": 1357,
       "parent_tokens": 1431,
       "text_sources": [
         "markdown"
@@ -3610,12 +3613,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 8,
-      "n_parents": 4,
+      "n_children": 14,
+      "n_parents": 10,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1149,
-      "parent_tokens": 343,
+      "child_tokens": 1342,
+      "parent_tokens": 1403,
       "text_sources": [
         "markdown"
       ],
@@ -3637,12 +3640,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 2,
+      "n_children": 9,
+      "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1331,
-      "parent_tokens": 1241,
+      "child_tokens": 1464,
+      "parent_tokens": 570,
       "text_sources": [
         "markdown"
       ],
@@ -3664,11 +3667,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
+      "n_children": 7,
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1268,
+      "child_tokens": 1431,
       "parent_tokens": 1167,
       "text_sources": [
         "markdown"
@@ -3692,11 +3695,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 8,
-      "n_parents": 4,
+      "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1337,
-      "parent_tokens": 980,
+      "child_tokens": 1493,
+      "parent_tokens": 1327,
       "text_sources": [
         "markdown"
       ],
@@ -3719,11 +3722,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 9,
-      "n_parents": 2,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1437,
-      "parent_tokens": 1427,
+      "child_tokens": 1398,
+      "parent_tokens": 1018,
       "text_sources": [
         "gemini_caption",
         "markdown"
@@ -3746,12 +3749,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
-      "n_parents": 3,
+      "n_children": 8,
+      "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1126,
-      "parent_tokens": 359,
+      "child_tokens": 1386,
+      "parent_tokens": 819,
       "text_sources": [
         "markdown"
       ],
@@ -3773,12 +3776,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 6,
+      "n_children": 8,
+      "n_parents": 7,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1324,
-      "parent_tokens": 1446,
+      "child_tokens": 1246,
+      "parent_tokens": 1347,
       "text_sources": [
         "markdown"
       ],
@@ -3800,12 +3803,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
+      "n_children": 9,
       "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1083,
-      "parent_tokens": 1420,
+      "child_tokens": 1347,
+      "parent_tokens": 1129,
       "text_sources": [
         "markdown"
       ],
@@ -3828,11 +3831,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 9,
-      "n_parents": 1,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1450,
-      "parent_tokens": 1148,
+      "child_tokens": 1496,
+      "parent_tokens": 1493,
       "text_sources": [
         "markdown"
       ],
@@ -3855,11 +3858,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 8,
-      "n_parents": 6,
+      "n_parents": 5,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1403,
-      "parent_tokens": 1322,
+      "child_tokens": 1422,
+      "parent_tokens": 1196,
       "text_sources": [
         "markdown"
       ],
@@ -3871,22 +3874,22 @@
       "source_id": "raptor.pdf",
       "anchor": "needle",
       "quarantined": false,
-      "child_strict": false,
-      "child_partial": false,
-      "parent_strict": false,
-      "parent_partial": false,
+      "child_strict": true,
+      "child_partial": true,
+      "parent_strict": true,
+      "parent_partial": true,
       "needle_coverage": {
-        "Parth Sarthi, Salman Abdullah, Aditi Tuli, Shubh Khanna, Anna Goldie, Christopher D. Manning Stanford University psarthi@cs.stanford.edu": "absent"
+        "Parth Sarthi, Salman Abdullah, Aditi Tuli, Shubh Khanna, Anna Goldie, Christopher D. Manning Stanford University psarthi@cs.stanford.edu": "contained"
       },
-      "needle_fraction": 0.0,
+      "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
-      "n_parents": 4,
+      "n_children": 11,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1279,
-      "parent_tokens": 1197,
+      "child_tokens": 1294,
+      "parent_tokens": 1205,
       "text_sources": [
         "markdown"
       ],
@@ -3909,11 +3912,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 9,
-      "n_parents": 5,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1393,
-      "parent_tokens": 1434,
+      "child_tokens": 1325,
+      "parent_tokens": 1468,
       "text_sources": [
         "markdown"
       ],
@@ -3927,20 +3930,20 @@
       "quarantined": false,
       "child_strict": true,
       "child_partial": true,
-      "parent_strict": false,
-      "parent_partial": false,
+      "parent_strict": true,
+      "parent_partial": true,
       "needle_coverage": {
         "Jeff Johnson, Matthijs Douze, and Herv\u00b4e J\u00b4egou. Billion-Scale Similarity Search with GPUs. IEEE Transactions on Big Data , 7(3):535\u2013547, 2019.": "contained"
       },
       "needle_fraction": 1.0,
       "source_hit": true,
-      "rank_first_hit": 2,
-      "n_children": 6,
+      "rank_first_hit": 0,
+      "n_children": 8,
       "n_parents": 1,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1376,
-      "parent_tokens": 326,
+      "child_tokens": 1454,
+      "parent_tokens": 1146,
       "text_sources": [
         "markdown"
       ],
@@ -3962,11 +3965,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 7,
+      "n_children": 9,
       "n_parents": 4,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1298,
+      "child_tokens": 1421,
       "parent_tokens": 855,
       "text_sources": [
         "markdown"
@@ -3989,14 +3992,15 @@
       "needle_fraction": 0.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 8,
-      "n_parents": 1,
+      "n_children": 10,
+      "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1416,
-      "parent_tokens": 963,
+      "child_tokens": 1486,
+      "parent_tokens": 1422,
       "text_sources": [
-        "markdown"
+        "markdown",
+        "page_text_clip"
       ],
       "skipped": ""
     },
@@ -4006,22 +4010,22 @@
       "source_id": "self-rag.pdf",
       "anchor": "needle",
       "quarantined": false,
-      "child_strict": true,
-      "child_partial": true,
+      "child_strict": false,
+      "child_partial": false,
       "parent_strict": false,
       "parent_partial": false,
       "needle_coverage": {
-        "Reflection tokens are categorized into retrieval and critique tokens to indicate the need for retrieval and its generation quality respectively": "contained"
+        "Reflection tokens are categorized into retrieval and critique tokens to indicate the need for retrieval and its generation quality respectively": "absent"
       },
-      "needle_fraction": 1.0,
+      "needle_fraction": 0.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
-      "n_parents": 2,
+      "n_children": 9,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1272,
-      "parent_tokens": 1105,
+      "child_tokens": 1405,
+      "parent_tokens": 1272,
       "text_sources": [
         "markdown"
       ],
@@ -4043,12 +4047,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 20,
-      "n_parents": 15,
+      "n_children": 21,
+      "n_parents": 14,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1216,
-      "parent_tokens": 1294,
+      "child_tokens": 1375,
+      "parent_tokens": 1162,
       "text_sources": [
         "markdown"
       ],
@@ -4070,12 +4074,12 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 24,
-      "n_parents": 14,
+      "n_children": 9,
+      "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1277,
-      "parent_tokens": 1162,
+      "child_tokens": 1267,
+      "parent_tokens": 1452,
       "text_sources": [
         "markdown"
       ],
@@ -4097,11 +4101,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 9,
+      "n_children": 7,
       "n_parents": 3,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1309,
+      "child_tokens": 1438,
       "parent_tokens": 1243,
       "text_sources": [
         "markdown"
@@ -4125,11 +4129,11 @@
       "source_hit": true,
       "rank_first_hit": 0,
       "n_children": 8,
-      "n_parents": 4,
+      "n_parents": 6,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1401,
-      "parent_tokens": 1190,
+      "child_tokens": 1252,
+      "parent_tokens": 1437,
       "text_sources": [
         "markdown"
       ],
@@ -4151,11 +4155,11 @@
       "needle_fraction": 1.0,
       "source_hit": true,
       "rank_first_hit": 0,
-      "n_children": 6,
+      "n_children": 8,
       "n_parents": 2,
       "child_no_delivery": false,
       "parent_no_delivery": false,
-      "child_tokens": 1333,
+      "child_tokens": 1359,
       "parent_tokens": 1458,
       "text_sources": [
         "markdown"

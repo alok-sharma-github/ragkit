@@ -65,111 +65,111 @@
   },
   "n": 92,
   "n_failed_verdicts": 0,
-  "n_answered": 74,
-  "n_abstained": 17,
+  "n_answered": 78,
+  "n_abstained": 13,
   "n_starved": 1,
   "supported": {
-    "n": 74,
-    "hits": 74,
+    "n": 78,
+    "hits": 78,
     "rate": 1.0,
-    "label": "74/74 = 100%"
+    "label": "78/78 = 100%"
   },
   "partly": {
-    "n": 74,
+    "n": 78,
     "hits": 0,
     "rate": 0.0,
-    "label": "0/74 = 0%"
+    "label": "0/78 = 0%"
   },
   "unsupported": {
-    "n": 74,
+    "n": 78,
     "hits": 0,
     "rate": 0.0,
-    "label": "0/74 = 0%"
+    "label": "0/78 = 0%"
   },
   "answers_question": {
-    "n": 74,
-    "hits": 74,
+    "n": 78,
+    "hits": 78,
     "rate": 1.0,
-    "label": "74/74 = 100%"
+    "label": "78/78 = 100%"
   },
   "abstention_rate": {
     "n": 92,
-    "hits": 18,
-    "rate": 0.196,
-    "label": "18/92 = 20%"
+    "hits": 14,
+    "rate": 0.152,
+    "label": "14/92 = 15%"
   },
   "abstention_by_stratum": {
     "exact_identifier": {
       "n": 19,
-      "hits": 3,
-      "rate": 0.158,
-      "label": "3/19 = 16%"
+      "hits": 2,
+      "rate": 0.105,
+      "label": "2/19 = 11%"
     },
     "multi_hop": {
       "n": 2,
-      "hits": 1,
+      "hits": 0,
       "rate": null,
-      "label": "1 of 2"
+      "label": "0 of 2"
     },
     "simple_factual": {
       "n": 33,
-      "hits": 3,
-      "rate": 0.091,
-      "label": "3/33 = 9%"
+      "hits": 4,
+      "rate": 0.121,
+      "label": "4/33 = 12%"
     },
     "table_or_image": {
       "n": 38,
-      "hits": 11,
-      "rate": 0.289,
-      "label": "11/38 = 29%"
+      "hits": 8,
+      "rate": 0.211,
+      "label": "8/38 = 21%"
     }
   },
   "by_text_source": {
     "gemini_caption,markdown": {
       "supported": {
-        "n": 4,
-        "hits": 4,
+        "n": 3,
+        "hits": 3,
         "rate": null,
-        "label": "4 of 4"
+        "label": "3 of 3"
       },
       "answers_question": {
-        "n": 4,
-        "hits": 4,
+        "n": 3,
+        "hits": 3,
         "rate": null,
-        "label": "4 of 4"
+        "label": "3 of 3"
       }
     },
     "markdown": {
       "supported": {
-        "n": 67,
-        "hits": 67,
+        "n": 73,
+        "hits": 73,
         "rate": 1.0,
-        "label": "67/67 = 100%"
+        "label": "73/73 = 100%"
       },
       "answers_question": {
-        "n": 67,
-        "hits": 67,
+        "n": 73,
+        "hits": 73,
         "rate": 1.0,
-        "label": "67/67 = 100%"
+        "label": "73/73 = 100%"
       }
     },
     "markdown,page_text_clip": {
       "supported": {
-        "n": 3,
-        "hits": 3,
+        "n": 2,
+        "hits": 2,
         "rate": null,
-        "label": "3 of 3"
+        "label": "2 of 2"
       },
       "answers_question": {
-        "n": 3,
-        "hits": 3,
+        "n": 2,
+        "hits": 2,
         "rate": null,
-        "label": "3 of 3"
+        "label": "2 of 2"
       }
     }
   },
   "stamp": {
-    "pipeline_fingerprint": "6fd55e19a82a7c28",
+    "pipeline_fingerprint": "4d54ab24999d336e",
     "parser_version": "pymupdf4llm@1.28+lines-detector@1+quadcorr-unset+cleanhdr@2+pagetextrepair@3+bboxflags@1",
     "chunker_version": "header_aware_parent@3",
     "token_budget": 1500
@@ -227,7 +227,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 2,
       "starved_by_budget": false
     },
     {
@@ -315,15 +315,15 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
       "question": "What mechanism do the authors propose as an exploratory approach that follows the information scent contained in higher-level community summaries?",
       "stratum": "simple_factual",
       "text_source": "markdown",
-      "faithfulness": "supported",
-      "answers_question": true,
+      "faithfulness": "unsupported",
+      "answers_question": false,
       "failed": false,
       "abstained": true,
       "citations_verified": 0,
@@ -348,19 +348,19 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 0,
       "starved_by_budget": false
     },
     {
       "question": "In Table 6 under the Diversity metric, what are the Mean 1 and Mean 2 scores for the pairwise comparison of C0 vs C1 on the News Articles dataset?",
       "stratum": "table_or_image",
-      "text_source": "markdown",
+      "text_source": "",
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
       "abstained": true,
       "citations_verified": 0,
-      "starved_by_budget": false
+      "starved_by_budget": true
     },
     {
       "question": "What is the brute-force (BF) search time and dimensionality (d) for the CoPhIR dataset listed in Table 1?",
@@ -414,7 +414,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 3,
       "starved_by_budget": false
     },
     {
@@ -425,7 +425,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -458,13 +458,13 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 4,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
       "question": "According to the evaluation on multi-document QA experiments, how much would it have cost to evaluate GPT-4 on the full multi-document QA and key-value retrieval experiments?",
       "stratum": "simple_factual",
-      "text_source": "gemini_caption,markdown",
+      "text_source": "markdown",
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
@@ -480,7 +480,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -552,7 +552,7 @@
     {
       "question": "What is the lead time and model compatibility for part number PN-8891-B?",
       "stratum": "table_or_image",
-      "text_source": "markdown,page_text_clip",
+      "text_source": "markdown",
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
@@ -567,8 +567,8 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": true,
-      "citations_verified": 0,
+      "abstained": false,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -586,11 +586,11 @@
       "question": "What is the ROUGE score achieved by SBERT with RAPTOR on NarrativeQA when using UnifiedQA-3B as the language model?",
       "stratum": "table_or_image",
       "text_source": "markdown",
-      "faithfulness": "supported",
-      "answers_question": true,
+      "faithfulness": "unsupported",
+      "answers_question": false,
       "failed": false,
-      "abstained": false,
-      "citations_verified": 2,
+      "abstained": true,
+      "citations_verified": 0,
       "starved_by_budget": false
     },
     {
@@ -611,8 +611,8 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": false,
-      "citations_verified": 1,
+      "abstained": true,
+      "citations_verified": 0,
       "starved_by_budget": false
     },
     {
@@ -645,7 +645,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 0,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -699,7 +699,7 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": true,
+      "abstained": false,
       "citations_verified": 0,
       "starved_by_budget": false
     },
@@ -710,7 +710,7 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": true,
+      "abstained": false,
       "citations_verified": 0,
       "starved_by_budget": false
     },
@@ -718,11 +718,11 @@
       "question": "When using BM25 as the retriever, what percentage of nodes retrieved for the Quality dataset are from Layer 1?",
       "stratum": "table_or_image",
       "text_source": "markdown",
-      "faithfulness": "unsupported",
-      "answers_question": false,
+      "faithfulness": "supported",
+      "answers_question": true,
       "failed": false,
-      "abstained": true,
-      "citations_verified": 0,
+      "abstained": false,
+      "citations_verified": 2,
       "starved_by_budget": false
     },
     {
@@ -733,7 +733,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 7,
+      "citations_verified": 8,
       "starved_by_budget": false
     },
     {
@@ -743,7 +743,7 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": true,
+      "abstained": false,
       "citations_verified": 0,
       "starved_by_budget": false
     },
@@ -798,8 +798,8 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": true,
-      "citations_verified": 0,
+      "abstained": false,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -809,8 +809,8 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": false,
-      "citations_verified": 4,
+      "abstained": true,
+      "citations_verified": 0,
       "starved_by_budget": false
     },
     {
@@ -832,7 +832,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -875,8 +875,8 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": false,
-      "citations_verified": 1,
+      "abstained": true,
+      "citations_verified": 0,
       "starved_by_budget": false
     },
     {
@@ -898,7 +898,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 4,
       "starved_by_budget": false
     },
     {
@@ -920,7 +920,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 3,
+      "citations_verified": 2,
       "starved_by_budget": false
     },
     {
@@ -937,13 +937,13 @@
     {
       "question": "What is the URL for the open-source code repository associated with the HyDE paper?",
       "stratum": "exact_identifier",
-      "text_source": "",
+      "text_source": "markdown",
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
       "abstained": true,
       "citations_verified": 0,
-      "starved_by_budget": true
+      "starved_by_budget": false
     },
     {
       "question": "How can HyDE be utilized practically as a search system evolves from its initial launch and its dense retriever grows stronger?",
@@ -997,7 +997,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 1,
+      "citations_verified": 2,
       "starved_by_budget": false
     },
     {
@@ -1063,7 +1063,7 @@
       "answers_question": true,
       "failed": false,
       "abstained": false,
-      "citations_verified": 2,
+      "citations_verified": 4,
       "starved_by_budget": false
     },
     {
@@ -1073,8 +1073,8 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": true,
-      "citations_verified": 0,
+      "abstained": false,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -1095,8 +1095,8 @@
       "faithfulness": "supported",
       "answers_question": true,
       "failed": false,
-      "abstained": true,
-      "citations_verified": 0,
+      "abstained": false,
+      "citations_verified": 1,
       "starved_by_budget": false
     },
     {
@@ -1114,8 +1114,8 @@
       "question": "What parameter sizes were evaluated for SELF-RAG in the experiments described in the introductory paper?",
       "stratum": "simple_factual",
       "text_source": "markdown",
-      "faithfulness": "supported",
-      "answers_question": true,
+      "faithfulness": "unsupported",
+      "answers_question": false,
       "failed": false,
       "abstained": true,
       "citations_verified": 0,
