@@ -499,6 +499,7 @@ def status(request: Request) -> dict[str, Any]:
             # would have re-enabled deletion in the same motion. Uploads are on;
             # deleting the shared corpus is still refused.
             "uploads_enabled": config.DEMO_ALLOW_UPLOADS,
+            "accept": ",".join(config.UPLOAD_EXTENSIONS),
             # THE ONE CLAIM A VISITOR CANNOT CHECK.
             #
             # Every other promise this product makes is verifiable from the
@@ -517,7 +518,7 @@ def status(request: Request) -> dict[str, Any]:
             # Verified rather than assumed: a session's upload was unreachable
             # from both the sidebar and retrieval after a redeploy.
             "upload_limits": (
-                f"PDF only, up to {config.MAX_UPLOAD_PAGES} pages and "
+                f"{config.UPLOAD_FORMATS_HUMAN}, up to {config.MAX_UPLOAD_PAGES} pages and "
                 f"{config.MAX_UPLOAD_BYTES // (1024 * 1024)} MB. Your upload is "
                 f"visible only to you. Uploads expire after "
                 f"{config.UPLOAD_TTL_SECONDS // 3600} hour and are deleted when "
@@ -840,7 +841,10 @@ def inspector() -> dict[str, Any]:
 # Extensions with a loader. Anything else is rejected at upload rather than
 # accepted and silently never indexed -- a file that appears in the corpus and
 # answers nothing is worse than a refusal, because the user believes it is there.
-ALLOWED = {".pdf", ".docx", ".png", ".jpg", ".jpeg", ".webp"}
+# Read from config so the API, the file picker and the visitor-facing sentence
+# cannot drift apart again. The BYTES are what the probe judges; this is only
+# what is offered.
+ALLOWED = set(config.UPLOAD_EXTENSIONS)
 MAX_UPLOAD_BYTES = 64 * 1024 * 1024
 
 

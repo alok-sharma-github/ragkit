@@ -150,10 +150,13 @@ function Uploader({
   readOnly,
   readOnlyWhy,
   limits,
+  accept,
 }: {
   onDone: () => void;
   readOnly: boolean;
   readOnlyWhy: string;
+  // The extension list the server offers, so the picker cannot drift from it.
+  accept: string;
   // The server's own sentence about what it accepts and how long it keeps it.
   // Rendered rather than restated, so the limit a visitor reads and the limit
   // that refuses them cannot drift apart.
@@ -302,7 +305,7 @@ function Uploader({
             ? (stage
                 ? `${stage}${tot > 1 && cur > 0 ? ` — ${cur} of ${tot} passages` : detail ? ` — ${detail}` : ""}`
                 : "uploading…")
-            : "Drop a PDF here, or click to browse"}
+            : "Drop a file here, or click to browse"}
         </div>
         {running && frac > 0 && (
           <div className="mt-2">
@@ -330,11 +333,15 @@ function Uploader({
           </div>
         )}
       </div>
+      {/* `accept` comes FROM THE SERVER, not a literal. The picker said ".pdf"
+          while the API accepted six extensions -- so the control hid formats
+          the pipeline reads, and the corpus's own DOCX and PNGs were
+          unreachable by upload. */}
       <input
         ref={inputRef}
         type="file"
         multiple
-        accept=".pdf"
+        accept={accept || ".pdf"}
         className="hidden"
         onChange={(e) => {
           const files = Array.from(e.target.files ?? []);
@@ -597,6 +604,7 @@ export function App() {
             readOnly={status?.demo?.uploads_enabled === false}
             readOnlyWhy={status?.demo?.why ?? ""}
             limits={status?.demo?.upload_limits ?? ""}
+            accept={status?.demo?.accept ?? ""}
           />
         </div>
 

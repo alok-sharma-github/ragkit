@@ -162,6 +162,7 @@ export interface StatusResponse {
     // Distinct from read_only on purpose: the demo refuses deletion and
     // accepts uploads, so one flag cannot drive both controls.
     uploads_enabled?: boolean;
+    accept?: string;
     upload_limits?: string;
     why: string;
     rate_limit: string;

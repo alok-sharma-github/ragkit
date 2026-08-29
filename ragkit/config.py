@@ -823,6 +823,27 @@ WRITE_TOKEN = os.getenv("RAGKIT_WRITE_TOKEN", "")
 # five-page file can be a decompression bomb or one page with 200k vector paths --
 # passing any page cap and hanging the parser. The wall clock and the address-space
 # limit do not care what shape the file is.
+# WHAT AN UPLOAD MAY BE, in one place because three disagreed.
+#
+# `ALLOWED` in the API listed six extensions, the probe refused anything without
+# a %PDF- header, and the UI's file picker said ".pdf". So the API advertised
+# formats the guard rejected and the UI hid formats the pipeline reads -- and the
+# corpus itself contains a DOCX and four PNGs, which made the gap visible to
+# anyone who looked at the sidebar and then at the upload control.
+#
+# The probe checks the BYTES, not this list; this is what the API and the file
+# picker agree to offer.
+UPLOAD_EXTENSIONS = (".pdf", ".docx", ".png", ".jpg", ".jpeg", ".webp")
+UPLOAD_FORMATS_HUMAN = "PDF, Word (.docx) and images"
+
+# Images fail by PIXEL COUNT, not page count: a 40 KB PNG can declare
+# 30,000 x 30,000 and expand to gigabytes on decode. Checked from the header.
+MAX_IMAGE_MEGAPIXELS = float(os.getenv("RAGKIT_MAX_IMAGE_MEGAPIXELS", "40"))
+# A DOCX is a ZIP, and the threat is what it unpacks to -- knowable from the
+# archive directory without extracting a byte.
+MAX_UNPACKED_MB = float(os.getenv("RAGKIT_MAX_UNPACKED_MB", "300"))
+MAX_ZIP_RATIO = float(os.getenv("RAGKIT_MAX_ZIP_RATIO", "200"))
+
 MAX_UPLOAD_PAGES = int(os.getenv("RAGKIT_MAX_UPLOAD_PAGES", "20"))
 MAX_UPLOAD_BYTES = int(os.getenv("RAGKIT_MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
 # Complexity a page count cannot see.

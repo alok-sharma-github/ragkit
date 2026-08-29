@@ -59,9 +59,20 @@ def _visitor_message(r: dict) -> str:
     """One sentence: which limit, and what would work instead."""
     code = r.get("code")
     limit, actual = r.get("limit"), r.get("actual")
-    if code == "not_a_pdf":
-        return ("That file is not a PDF. This demo reads PDFs -- try exporting "
-                "your document as one.")
+    if code in ("not_a_pdf", "unsupported_type"):
+        return ("That file is not something this reads. PDF, Word (.docx) and "
+                "images (PNG, JPEG, WebP) all work -- try exporting your "
+                "document as one of those.")
+    if code == "image_too_large":
+        return (f"That image is {actual} megapixels and this demo accepts up to "
+                f"{limit:.0f}. A smaller or downscaled copy will work.")
+    if code == "archive_bomb":
+        return (f"That Word document unpacks to {actual} MB, which is more than "
+                "this demo will open. It usually means a very large embedded "
+                "image -- removing it, or saving as PDF, will work.")
+    if code == "unsafe_archive":
+        return ("That Word document contains an entry with an unsafe path, so it "
+                "was not opened. Re-saving it from Word will normally fix that.")
     if code == "encrypted":
         return ("That PDF is password protected, so its text cannot be read. "
                 "Remove the password and upload it again.")
@@ -131,6 +142,12 @@ def check_upload(path: str | Path) -> UploadVerdict:
         "RAGKIT_MAX_UPLOAD_OBJECTS": str(config.MAX_UPLOAD_OBJECTS),
         "RAGKIT_PARSE_MEM_MB": str(config.PARSE_MEM_MB),
         "RAGKIT_PARSE_CPU_SECONDS": str(config.PARSE_TIMEOUT_SECONDS),
+        # Per-family limits. Enumerated like the rest: the probe must be handed
+        # every number it enforces, because a limit it cannot see is a limit
+        # that silently falls back to a default nobody chose.
+        "RAGKIT_MAX_IMAGE_MEGAPIXELS": str(config.MAX_IMAGE_MEGAPIXELS),
+        "RAGKIT_MAX_UNPACKED_MB": str(config.MAX_UNPACKED_MB),
+        "RAGKIT_MAX_ZIP_RATIO": str(config.MAX_ZIP_RATIO),
     }
     try:
         proc = subprocess.run(
