@@ -44,7 +44,15 @@ experiments/out/
 # Editor and tooling noise
 .idea/
 .vscode/
-.claude/
+
+# .claude holds BOTH kinds of file, so it cannot be ignored wholesale -- the same
+# runtime-versus-build distinction that had to be untangled under data/index/.
+#
+# CLAUDE.md is project configuration: instructions every collaborator should get,
+# and ignoring it means the next person works to different rules and nothing says
+# so. The lock file is a running process's state.
+.claude/*
+!.claude/CLAUDE.md
 
 # --------------------------------------------------------------------------
 # RUNTIME STATE under data/index/ -- tracked by accident, now excluded.
