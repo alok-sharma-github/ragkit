@@ -133,17 +133,21 @@ export interface SourceDetail {
   table_continuation_suspect: boolean;
 }
 
+/** One entry in the corpus listing. Named so the sidebar can fold page renders
+ *  under the PDF they were extracted from rather than listing them as peers. */
+export interface Doc {
+  source_id: string;
+  title: string;
+  doc_type: string;
+  pages: number;
+  chunks: number;
+  tables: number;
+  continuation_suspects: number;
+  state: "READY" | "SEARCHABLE_INCOMPLETE";
+}
+
 export interface StatusResponse {
-  documents: {
-    source_id: string;
-    title: string;
-    doc_type: string;
-    pages: number;
-    chunks: number;
-    tables: number;
-    continuation_suspects: number;
-    state: "READY" | "SEARCHABLE_INCOMPLETE";
-  }[];
+  documents: Doc[];
   tombstones: Record<string, any>;
   index: Record<string, any>;
   models: Record<string, string>;

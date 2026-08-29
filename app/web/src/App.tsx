@@ -13,7 +13,7 @@ import {
   api,
   type AskResponse,
   type Conversation,
-  type Job,
+  type Doc,
   type StatusResponse,
 } from "./api";
 import { AnswerView } from "./components/Answer";
@@ -23,6 +23,22 @@ import { DegradationBanner, Spinner } from "./components/primitives";
 type Screen = "answers" | "inspector";
 
 /* ------------------------------------------------------------------- sidebar */
+
+/** One sentence naming what the preloaded corpus IS, derived not hardcoded.
+ *
+ * Derived, because a hardcoded description becomes a lie the moment somebody
+ * changes the corpus -- and the description of a document set is exactly the
+ * kind of claim this project refuses to state without a source. It counts what
+ * is actually indexed and says so; only the SUBJECT is a fixed string, and that
+ * is the one part a file listing genuinely cannot know.
+ */
+function corpusBlurb(status: StatusResponse | null): string {
+  if (!status) return "";
+  const n = status.documents.filter((d) => d.doc_type !== "image").length;
+  if (!n) return "Nothing is loaded yet — add a document to begin.";
+  return `${n} papers and manuals on retrieval systems, already indexed — ` +
+    `ask a question without uploading anything.`;
+}
 
 function DocumentList({
   status,
@@ -37,20 +53,42 @@ function DocumentList({
   readOnly: boolean;
 }) {
   if (!status) return <Spinner label="loading corpus" />;
-  const byType = status.documents.reduce<Record<string, number>>((a, d) => {
-    a[d.doc_type] = (a[d.doc_type] ?? 0) + 1;
-    return a;
-  }, {});
+
+  // PAGE RENDERS BELONG TO THEIR PDF, not beside it.
+  //
+  // `assets/lost-in-the-middle_p1.png` is a page image extracted FROM
+  // lost-in-the-middle.pdf. Listed as a peer it reads as a separate document, so
+  // the corpus opened with four PNGs -- alphabetically first, least meaningful,
+  // and occupying the top of the only column a visitor reads. Folding them under
+  // their source is not cosmetic: a list that misrepresents what the corpus
+  // CONTAINS is the same class of error as a metric that misrepresents what was
+  // measured.
+  const parentOf = (d: Doc): string | null => {
+    if (d.doc_type !== "image") return null;
+    const stem = d.source_id.split("/").pop()?.replace(/\.[^.]+$/, "") ?? "";
+    const base = stem.replace(/_p\d+$/, "");
+    const owner = status.documents.find(
+      (o) => o.doc_type !== "image" && o.source_id.replace(/\.[^.]+$/, "") === base,
+    );
+    return owner ? owner.source_id : null;
+  };
+  const renders = new Map<string, Doc[]>();
+  const top: Doc[] = [];
+  for (const d of status.documents) {
+    const owner = parentOf(d);
+    if (owner) renders.set(owner, [...(renders.get(owner) ?? []), d]);
+    else top.push(d);
+  }
+  const nRenders = status.documents.length - top.length;
+
   return (
     <div>
       <div className="text-[11px] text-ink-400">
-        {status.documents.length} documents ·{" "}
-        {Object.entries(byType)
-          .map(([k, v]) => `${v} ${k}`)
-          .join(", ")}
+        {top.length} documents
+        {nRenders ? ` · ${nRenders} page images` : ""}
       </div>
       <ul className="mt-2 space-y-1.5">
-        {status.documents.map((d) => (
+        {top.map((d) => (
           <li key={d.source_id} className="group">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -61,6 +99,9 @@ function DocumentList({
                   {d.tables ? ` · ${d.tables} tables` : ""}
                   {d.continuation_suspects
                     ? ` · ${d.continuation_suspects} table may span pages`
+                    : ""}
+                  {renders.get(d.source_id)?.length
+                    ? ` · ${renders.get(d.source_id)!.length} page images`
                     : ""}
                 </div>
               </div>
@@ -107,125 +148,128 @@ function Uploader({
   onDone,
   readOnly,
   readOnlyWhy,
+  limits,
 }: {
   onDone: () => void;
   readOnly: boolean;
   readOnlyWhy: string;
+  // The server's own sentence about what it accepts and how long it keeps it.
+  // Rendered rather than restated, so the limit a visitor reads and the limit
+  // that refuses them cannot drift apart.
+  limits: string;
 }) {
-  const [job, setJob] = useState<Job | null>(null);
+  // NO JOB POLLER any more. Upload indexes in the same request, so there is no
+  // background job to watch -- and the poller's only caller was the /api/ingest
+  // kick-off a demo refuses. Removed rather than left dormant: an unused poller
+  // is one more thing that looks like it is doing something.
   const [msg, setMsg] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+  const [over, setOver] = useState(false);
+  const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const poll = useCallback((id: string) => {
-    const tick = async () => {
-      const j = await api.job(id);
-      setJob(j);
-      if (j.state === "queued" || j.state === "running") setTimeout(tick, 1500);
-      else {
-        onDone();
-        if (j.state === "failed") setMsg(j.error?.split("\n")[0] ?? "ingest failed");
-      }
-    };
-    tick();
-  }, [onDone]);
 
   const send = async (files: File[]) => {
     setMsg(null);
-    const up = await api.upload(files);
-    if (up.rejected.length) {
-      setMsg(up.rejected.map((r) => `${r.name}: ${r.reason}`).join(" · "));
-    }
-    if (up.saved.length) {
-      const { job } = await api.ingest();
-      setJob(job);
-      poll(job.id);
+    setNote(null);
+    setBusy(true);
+    try {
+      const up: any = await api.upload(files);
+      if (up.rejected?.length) {
+        setMsg(up.rejected.map((r: any) => `${r.name}: ${r.reason}`).join(" · "));
+      }
+      if (up.saved?.length) {
+        // UPLOAD NOW INDEXES IN THE SAME CALL, so there is nothing to kick off
+        // afterwards. This used to POST /api/ingest -- a corpus-wide rebuild
+        // that a demo refuses with 403, which meant a successful upload was
+        // immediately followed by a failure the visitor could do nothing about.
+        if (up.indexed?.added) {
+          setNote(`indexed — ask a question about ${up.saved[0].name}`);
+          onDone();
+        } else if (up.indexed?.error) {
+          setMsg("stored, but could not be indexed — try a text-based PDF");
+        }
+      }
+    } catch {
+      setMsg("upload failed — check the file and try again");
+    } finally {
+      setBusy(false);
     }
   };
 
-  const running = job && (job.state === "queued" || job.state === "running");
-
-  // READ-ONLY DEPLOYMENT: replace the control, do not disable it.
+  // A DROP ZONE, not a button. Upload is the action that turns a demo corpus
+  // into the visitor's own tool, so it gets the affordance that says "put your
+  // file here" rather than one that says "browse".
   //
-  // A dropzone that accepts a file and then 403s is a worse experience than no
-  // dropzone at all -- the user has already committed an action before learning
-  // it was never available. Stating the reason in its place also answers the
-  // question the absence would otherwise raise ("is this half-built?").
+  // READ-ONLY DEPLOYMENT: replace the control, do not disable it. A dropzone
+  // that accepts a file and then 403s is worse than no dropzone -- the user has
+  // already committed before learning it was never allowed.
   if (readOnly) {
     return (
-      <div className="rounded-md border border-dashed border-paper-500 bg-paper-100 px-3 py-4">
-        <p className="text-[12px] font-medium text-ink-600">Upload is disabled here</p>
-        <p className="mt-1 text-[10px] leading-snug text-ink-400">
-          {readOnlyWhy ||
-            "this deployment shares one free-tier Gemini key, so upload, re-ingest and delete are disabled"}
-          . The indexed corpus below is fully queryable. To use the full ingest
-          pipeline, clone the repo and run it against your own key.
-        </p>
+      <div className="rounded-md border border-dashed border-paper-400 bg-paper-50 px-3 py-3">
+        <div className="text-[11px] font-semibold text-ink-500">
+          Uploads are off on this deployment
+        </div>
+        <div className="mt-1 text-[11px] leading-relaxed text-ink-400">
+          {readOnlyWhy || "this deployment is read-only"}
+        </div>
       </div>
     );
   }
 
+  const running = busy;
+
   return (
     <div>
       <div
-        onDragOver={(e) => e.preventDefault()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setOver(true);
+        }}
+        onDragLeave={() => setOver(false)}
         onDrop={(e) => {
           e.preventDefault();
-          send(Array.from(e.dataTransfer.files));
+          setOver(false);
+          const files = Array.from(e.dataTransfer.files);
+          if (files.length) send(files);
         }}
-        className="rounded-md border border-dashed border-paper-500 bg-paper-100 px-3 py-4 text-center"
+        onClick={() => inputRef.current?.click()}
+        className={`cursor-pointer rounded-md border border-dashed px-3 py-4 text-center transition ${
+          over
+            ? "border-quote-600 bg-quote-600/5"
+            : "border-paper-400 bg-paper-50 hover:border-ink-400"
+        }`}
       >
-        <p className="text-[12px] text-ink-500">
-          Drop files here, or{" "}
-          <button
-            onClick={() => inputRef.current?.click()}
-            className="text-quote-600 underline"
-          >
-            browse
-          </button>
-        </p>
-        <p className="mt-1 text-[10px] leading-snug text-ink-400">
-          PDF, Word, images. A large PDF takes a couple of minutes and blocks the
-          queue — progress is per document, because the parser emits nothing until
-          a document finishes.
-        </p>
-        <input
-          ref={inputRef}
-          type="file"
-          multiple
-          hidden
-          accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"
-          onChange={(e) => e.target.files && send(Array.from(e.target.files))}
-        />
+        <div className="text-[12px] font-semibold text-quote-600">
+          {running ? "Reading your document…" : "Add your documents"}
+        </div>
+        <div className="mt-1 text-[11px] leading-relaxed text-ink-400">
+          {running
+            ? "this takes a few seconds per page"
+            : "Drop a PDF here, or click to browse"}
+        </div>
       </div>
-
-      {running && (
-        <div className="mt-2 rounded border border-paper-400 bg-paper-50 px-2.5 py-2">
-          <div className="flex items-center justify-between text-[11px] text-ink-600">
-            <span>
-              {job!.state === "queued" ? "queued" : job!.progress.stage || "working"}
-            </span>
-            <span className="tabular-nums text-ink-400">
-              {job!.progress.total
-                ? `${job!.progress.current}/${job!.progress.total}`
-                : ""}
-            </span>
-          </div>
-          {job!.progress.detail && (
-            <div className="truncate text-[11px] text-ink-400">{job!.progress.detail}</div>
-          )}
-        </div>
+      <input
+        ref={inputRef}
+        type="file"
+        multiple
+        accept=".pdf"
+        className="hidden"
+        onChange={(e) => {
+          const files = Array.from(e.target.files ?? []);
+          if (files.length) send(files);
+          e.target.value = "";
+        }}
+      />
+      {/* THE LIMITS, BEFORE THEY REFUSE ANYTHING. A cap a visitor discovers by
+          hitting it is indistinguishable from a bug. */}
+      {limits && (
+        <p className="mt-1.5 text-[10.5px] leading-relaxed text-ink-400">{limits}</p>
       )}
-      {job?.state === "done" && job.result && (
-        <div className="mt-2 text-[11px] text-ink-500">
-          indexed {job.result.children} passages from {job.result.sources} sources
-          {job.result.provenance_ok === false && (
-            <span className="ml-1 text-red-800">· provenance check FAILED</span>
-          )}
-        </div>
-      )}
-      {msg && <div className="mt-2 text-[11px] text-chart-600">{msg}</div>}
+      {note && <p className="mt-1.5 text-[11px] text-quote-600">{note}</p>}
+      {msg && <p className="mt-1.5 text-[11px] leading-relaxed text-chart-600">{msg}</p>}
     </div>
   );
+
 }
 
 function ConversationList({
@@ -297,6 +341,10 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [mode, setMode] = useState<"dense" | "sparse" | "rrf">("dense");
   const [budget, setBudget] = useState(1500);
+  // The corpus list is collapsed by default: it is reference material, not
+  // an action, and open-by-default is what pushed upload off-screen.
+  const [docsOpen, setDocsOpen] = useState(false);
+  const [advanced, setAdvanced] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -403,27 +451,53 @@ export function App() {
           ))}
         </nav>
 
+        {/* UPLOAD FIRST, and the ordering is the point.
+            The list of documents a visitor did NOT add was on top, sorted
+            alphabetically, opening with four page images and filling the column
+            -- so the one control that makes this THEIR tool sat below the fold.
+            The most valuable action was invisible and the least actionable
+            content was dominant. */}
+        <div className="mt-5">
+          <Uploader
+            onDone={refresh}
+            /* uploads_enabled, NOT read_only. The demo refuses deletion and
+               accepts uploads; driving both controls off one flag is what
+               made "turn on uploads" look like a one-line change. */
+            readOnly={status?.demo?.uploads_enabled === false}
+            readOnlyWhy={status?.demo?.why ?? ""}
+            limits={status?.demo?.upload_limits ?? ""}
+          />
+        </div>
+
+        {/* WHAT THIS CORPUS IS ABOUT, in one line. A visitor saw hnsw.pdf,
+            hyde.pdf, raptor.pdf and had no way to know these are retrieval
+            papers, or that the demo is preloaded so they can try it WITHOUT
+            uploading anything. "15 documents · 4 image, 10 pdf" is an inventory;
+            it says nothing about what the inventory is about. */}
         <div className="mt-5">
           <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-500">
-            Your documents
+            Already loaded
           </div>
-          <div className="mt-2">
-            <DocumentList
-              status={status}
-              onRemove={removeDoc}
-              readOnly={!!status?.demo?.read_only}
-            />
-          </div>
-          <div className="mt-3">
-            <Uploader
-              onDone={refresh}
-              /* uploads_enabled, NOT read_only. The demo refuses deletion and
-                 accepts uploads; driving both controls off one flag is what
-                 made "turn on uploads" look like a one-line change. */
-              readOnly={status?.demo?.uploads_enabled === false}
-              readOnlyWhy={status?.demo?.why ?? ""}
-            />
-          </div>
+          <p className="mt-1 text-[11px] leading-relaxed text-ink-500">
+            {corpusBlurb(status)}
+          </p>
+          <button
+            onClick={() => setDocsOpen((v) => !v)}
+            className="mt-1.5 text-[11px] text-ink-400 hover:text-ink-900"
+          >
+            {docsOpen ? "hide the list" : "see the list"}
+          </button>
+          {/* SCROLLS WITHIN ITSELF. Collapsed by default, and even open it
+              cannot push the upload control off-screen again. */}
+          {docsOpen && (
+            <div className="mt-2 max-h-64 overflow-y-auto pr-1">
+              <DocumentList
+                status={status}
+                onRemove={removeDoc}
+                readOnly={!!status?.demo?.read_only}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-5">
@@ -460,20 +534,63 @@ export function App() {
           <>
             <div className="min-h-0 flex-1 overflow-y-auto">
               {turns.length === 0 ? (
+                /* SHOW THE BEHAVIOUR, THEN NAME THE NOTATION.
+                   This screen used to open with a colour legend -- "blue is
+                   quoted text, amber is a chart the assistant read for you" --
+                   which is the key to a map nobody has been shown. It answered a
+                   question the visitor had not asked yet. The worked example
+                   below comes first, and the sentence explaining the colours
+                   comes after the colours have done something. */
                 <div className="mx-auto max-w-2xl px-6 py-12">
-                  <h2 className="font-serif text-[22px] text-ink-900">
+                  <h2 className="font-serif text-[22px] leading-snug text-ink-900">
                     Answers from your documents, with receipts.
                   </h2>
                   <p className="mt-2 text-[13px] leading-relaxed text-ink-500">
-                    There is no general knowledge here. If it isn't in what you add,
-                    the answer is “not in your documents.”
+                    There is no general knowledge here. If it isn't in what you
+                    add, the answer is “not in your documents.”
                   </p>
-                  <p className="mt-4 text-[12px] leading-relaxed text-ink-500">
-                    Every claim links to where it came from —{" "}
-                    <span className="text-quote-600">blue</span> is quoted text,{" "}
-                    <span className="text-chart-600">amber</span> is a chart the
-                    assistant read for you, and grey means it came from this
-                    conversation rather than a document.
+
+                  <div className="mt-7 rounded-md border border-paper-400 bg-paper-50 p-5">
+                    <span className="rounded-sm border border-dashed border-paper-400 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-400">
+                      Example — not your documents yet
+                    </span>
+                    <p className="mt-3 text-[12px] text-ink-400">
+                      What notice period does the services contract require?
+                    </p>
+                    <p className="mt-2 font-serif text-[15.5px] leading-[1.8] text-ink-900">
+                      Either party may terminate with 60 days' written notice,
+                      <span className="ml-1 align-super rounded-sm border border-quote-600/40 px-1 text-[10px] font-sans text-quote-600">
+                        1
+                      </span>{" "}
+                      and the fee schedule steps down after year two.
+                      <span className="ml-1 align-super rounded-sm border border-chart-600/45 bg-chart-600/[0.07] px-1 text-[10px] font-sans text-chart-600">
+                        Fig 1
+                      </span>
+                    </p>
+                    <p className="mt-2.5 text-[11.5px] leading-relaxed text-ink-400">
+                      Every claim links to the exact place it came from —{" "}
+                      <span className="text-quote-600">blue</span> is quoted text,{" "}
+                      <span className="text-chart-600">amber</span> is a chart or
+                      table the assistant read for you.
+                    </p>
+                    <div className="mt-3.5 border-t border-paper-300 pt-3">
+                      <span className="rounded-sm border border-paper-400 px-1.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-600">
+                        Found — not quoted
+                      </span>
+                      <p className="mt-2 font-serif text-[14.5px] text-ink-900">
+                        “It's in your documents. I won't quote it.”
+                      </p>
+                      <p className="mt-1.5 text-[11.5px] text-ink-400">
+                        When it can't verify something, it hands you the source
+                        instead of a guess.
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="mt-6 text-[13px] leading-relaxed text-ink-500">
+                    {status?.documents.length
+                      ? "Ask a question below — the corpus on the left is already indexed. Or add your own document to see it answer from that instead."
+                      : "Add a document on the left to begin."}
                   </p>
                 </div>
               ) : (
@@ -517,32 +634,50 @@ export function App() {
                   {busy ? "…" : "Ask"}
                 </button>
               </div>
+              {/* DEVELOPER CONTROLS, BEHIND A TOGGLE.
+                  `retrieval: dense | BM25 | RRF` and `budget: 1500 tokens` sat
+                  permanently under the composer. A first-time visitor has no
+                  basis for choosing between those, and 1500 is a number they
+                  cannot reason about -- so the two most prominent controls on
+                  the screen were ones only their author could use. They belong
+                  to the Inspector's audience, not this one, and they stay
+                  reachable because the comparison they enable is real. */}
               <div className="mt-1.5 flex flex-wrap items-center gap-3 text-[11px] text-ink-400">
-                <label className="flex items-center gap-1">
-                  retrieval
-                  <select
-                    value={mode}
-                    onChange={(e) => setMode(e.target.value as any)}
-                    className="rounded border border-paper-400 bg-paper-50 px-1 py-0.5"
-                  >
-                    <option value="dense">dense</option>
-                    <option value="sparse">BM25</option>
-                    <option value="rrf">RRF</option>
-                  </select>
-                </label>
-                <label className="flex items-center gap-1">
-                  budget
-                  <input
-                    type="number"
-                    value={budget}
-                    step={500}
-                    min={250}
-                    max={12000}
-                    onChange={(e) => setBudget(Number(e.target.value))}
-                    className="w-20 rounded border border-paper-400 bg-paper-50 px-1 py-0.5 tabular-nums"
-                  />
-                  tokens
-                </label>
+                <button
+                  onClick={() => setAdvanced((v) => !v)}
+                  className="rounded px-1 text-ink-400 hover:bg-paper-200 hover:text-ink-900"
+                >
+                  {advanced ? "hide retrieval settings" : "retrieval settings"}
+                </button>
+                {advanced && (
+                  <>
+                    <label className="flex items-center gap-1">
+                      retrieval
+                      <select
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value as any)}
+                        className="rounded border border-paper-400 bg-paper-50 px-1 py-0.5"
+                      >
+                        <option value="dense">dense</option>
+                        <option value="sparse">BM25</option>
+                        <option value="rrf">RRF</option>
+                      </select>
+                    </label>
+                    <label className="flex items-center gap-1">
+                      budget
+                      <input
+                        type="number"
+                        value={budget}
+                        step={500}
+                        min={250}
+                        max={12000}
+                        onChange={(e) => setBudget(Number(e.target.value))}
+                        className="w-20 rounded border border-paper-400 bg-paper-50 px-1 py-0.5 tabular-nums"
+                      />
+                      tokens
+                    </label>
+                  </>
+                )}
                 {turns.length > 0 && last?.conversation?.drift && (
                   <span
                     title={last.conversation.drift.note}
