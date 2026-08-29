@@ -215,6 +215,95 @@ def _isolation_check(fp: str) -> list[Check]:
     ]
 
 
+def _contextual_prefix_check(fp: list[str]) -> list[Check]:
+    """Can a model-written situating sentence reach a quotation? Answered by TRYING.
+
+    THE PROPERTY THIS PROTECTS. A contextual prefix is written by a model, sits
+    directly against document prose, and travels with the chunk's real page
+    number. If it ever reached `verbatim_text`, the product would display
+    invented text as a quotation from a source, with a citation that opens the
+    right page -- indistinguishable from a real quote to anyone who has not read
+    the document. That is the image-caption failure, arriving through a new door.
+
+    WHY THIS IS EXECUTED AND NOT ASSERTED IN A COMMENT. The separation lives in
+    one line of `_make_child`, and this project has now shipped four things that
+    were correct, tested, and not on the request path. A property held in prose
+    is a property nobody will notice losing.
+
+    AND WHY THE POSITIONAL CHECK IS HERE TOO. `splitters` documents the
+    prefix-then-slice bug at length: enrichment applied before slicing lands on
+    child 0 alone, section openers become systematically more findable, nothing
+    errors, and aggregate recall rises. The contextual prefix is the second
+    enrichment to travel this path, so it gets the same check rather than the
+    same comment.
+    """
+    from ..chunking import splitters as S
+    from ..ingest.document import Block, ChunkKind, ChunkRole, Source, TextProvenance
+
+    MARK = "RECONCILE-SITUATING-PROBE"
+    body = " ".join(f"sentence{i} concerning the described method." for i in range(220))
+    src = Source(source_id="reconcile-probe", uri="probe.pdf", doc_type="pdf",
+                 content_hash="probe", title="Probe Document")
+    blocks = [Block(kind=ChunkKind.TEXT, text="# Results\n\n" + body, page=1,
+                    heading_path=("Results",))]
+
+    chunks = S.build_chunks(src, blocks, owner="", origin="corpus",
+                            contextualizer=lambda parent, piece: f"{MARK} {piece[:20]}")
+    kids = [c for c in chunks if c.role is ChunkRole.CHILD]
+    parents = [c for c in chunks if c.role is ChunkRole.PARENT]
+    if len(kids) < 2:
+        return [Check("Contextual prefix containment",
+                      "a model-written prefix never reaches quotable text",
+                      "probe produced fewer than 2 children", "NOT_MEASURED",
+                      fingerprint=fp)]
+
+    quotable = [MARK in ((c.verbatim_text or "") + c.display_text) for c in kids]
+    quotable += [MARK in ((c.verbatim_text or "") + c.display_text + c.embed_text)
+                 for c in parents]
+    leaked = sum(quotable)
+    with_prefix = sum(MARK in c.embed_text for c in kids)
+    prov_ok = all(c.text_provenance is TextProvenance.PREFIXED for c in kids)
+
+    plain = S.build_chunks(src, blocks, owner="", origin="corpus")
+    fp_moved = plain[0].pipeline_fingerprint != chunks[0].pipeline_fingerprint
+
+    return [
+        Check(
+            name="Contextual prefix containment",
+            rule="a model-written prefix reaches embed_text and nothing quotable",
+            observed=(f"{leaked} of {len(kids) + len(parents)} records carry it in "
+                      "quotable text" if leaked else
+                      "prefix present in embed_text only; quote and display are the body"),
+            state="FAILS" if leaked else "HOLDS",
+            n=len(kids) + len(parents), fingerprint=fp,
+            detail=("provenance is PREFIXED on every child"
+                    if prov_ok else "a child claimed VERBATIM while carrying a prefix"),
+            why="model-written text against document prose with a real page number "
+                "is a fabricated quotation that survives inspection",
+        ),
+        Check(
+            name="Contextual prefix has no positional bias",
+            rule="every child of a section gets its own prefix, not just child 0",
+            observed=f"{with_prefix} of {len(kids)} children carry a prefix",
+            state="HOLDS" if with_prefix == len(kids) else "FAILS",
+            n=len(kids), fingerprint=fp,
+            detail="prefix-then-slice would give child 0 alone the context and make "
+                   "section openers findable for reasons unrelated to relevance -- "
+                   "recall would RISE and the bias would read as a win",
+        ),
+        Check(
+            name="Contextual prefix moves the fingerprint",
+            rule="contextualised and plain indexes are not comparable, and say so",
+            observed=("fingerprint differs with and without the contextualiser"
+                      if fp_moved else "SAME fingerprint for two different indexes"),
+            state="HOLDS" if fp_moved else "FAILS",
+            n=2, fingerprint=fp,
+            detail="without this the gate would compare a contextualised run against "
+                   "a breadcrumb baseline and attribute the difference to the commit",
+        ),
+    ]
+
+
 def reconcile() -> dict[str, Any]:
     """Read the artifacts on disk and evaluate every invariant.
 
@@ -370,6 +459,7 @@ def reconcile() -> dict[str, Any]:
     # Isolation is executed, not asserted: two probe uploads are added to an
     # in-memory copy of the index and actually queried. Nothing is written to disk.
     checks.extend(_isolation_check(fp))
+    checks.extend(_contextual_prefix_check(fp))
 
     n_fail = sum(1 for c in checks if c.state == "FAILS")
     n_hold = sum(1 for c in checks if c.state == "HOLDS")

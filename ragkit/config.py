@@ -233,6 +233,22 @@ CHUNK_OVERLAP_RATIO = 0.12  # guide's starting point: 10-15%
 # the chunk never names the company or the quarter.
 CONTEXTUAL_PREFIX_MAX_TOKENS = 100
 
+# How much of the DOCUMENT the synopsis call sees, and how much of the PARENT
+# the per-chunk call sees. Both are truncations, and both are honest about what
+# they are: a synopsis is drawn from front matter and early sections, and a
+# situating sentence never reaches the tail of a long section. Sending the whole
+# thing would buy nothing measurable and cost per chunk.
+#
+# The truncated text is what gets hashed into the cache key, so changing either
+# number invalidates exactly the entries it should and no others.
+CONTEXT_SYNOPSIS_MAX_CHARS = 24_000     # ~6k tokens of the document head
+CONTEXT_PARENT_MAX_CHARS = 4_000        # ~1k tokens; p90 parent is ~800
+CONTEXT_PREFIX_MAX_WORDS = 60
+
+# OFF BY DEFAULT, and it stays off until the eval says it earned its place.
+# A flag that defaults on is a decision made by whoever forgot to set it.
+CONTEXTUAL_PREFIXES = os.getenv("RAGKIT_CONTEXTUAL_PREFIXES") == "1"
+
 # Implicit context caching is automatic on Gemini 2.5+ — nothing to enable.
 # But the minimum cacheable prefix on 3.x flash is 4096 tokens, so a document
 # shorter than that gets NO cache benefit and contextualising it costs full

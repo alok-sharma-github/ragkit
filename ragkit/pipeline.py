@@ -38,12 +38,14 @@ from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from . import config, gemini, limits
+from .chunking import contextualize
 from .chunking import splitters as S
 from .generate import answer as A
 from .index.numpy_index import Hit, NumpyIndex
 from .retrieve.query import CondensedQuery, condense
 from .ingest import loaders as L
 from .ingest.document import (
+    PUBLIC_OWNER,
     Chunk,
     ChunkRole,
     DocType,
@@ -54,7 +56,7 @@ from .ingest.document import (
 )
 
 
-def pipeline_version(strategy: str) -> PipelineVersion:
+def pipeline_version(strategy: str, *, contextual: bool = False) -> PipelineVersion:
     """Every index-time input that can change the output, in one fingerprint."""
     model = gemini.resolve_models()["embedding"]
     return PipelineVersion(
@@ -63,7 +65,12 @@ def pipeline_version(strategy: str) -> PipelineVersion:
         embed_model=model,
         embed_dim=config.EMBED_DIM,
         embed_scheme=gemini.task_scheme(model, "document").label,
-        contextualizer="breadcrumb-only",  # Session 4 replaces this
+        # The field was always here waiting for this; "Session 4 replaces this"
+        # is now replaced. Two indexes that differ only in whether an LLM wrote
+        # a sentence at the top of each child have different fingerprints, so
+        # the eval cannot silently compare them.
+        contextualizer=(S.CONTEXTUALIZER_LLM if contextual
+                        else S.CONTEXTUALIZER_BREADCRUMB),
     )
 
 
@@ -104,6 +111,24 @@ class IngestResult:
         return "\n".join(lines)
 
 
+def _contextual_estimate(strategy: str, files, caption_images: bool) -> IngestResult:
+    """What contextualising this corpus would cost, without calling anything."""
+    paths = list(files) if files is not None else L.corpus_files()
+    docs: dict[str, tuple[str, int]] = {}
+    for p in paths:
+        if L._LOADERS.get(p.suffix.lower()) is None:
+            continue
+        src, blocks, _diag = L.load(p, caption_images=caption_images)
+        chunks = S.build_chunks(src, blocks, strategy=strategy,
+                                owner=PUBLIC_OWNER, origin="corpus")
+        n_kids = sum(1 for c in chunks if c.role is ChunkRole.CHILD)
+        docs[src.source_id] = ('\n\n'.join(b.text for b in blocks if b.text.strip()),
+                               n_kids)
+    r = IngestResult()
+    r.index_report = {"contextualization_estimate": contextualize.estimate(docs)}
+    return r
+
+
 def ingest(
     *,
     strategy: str = "header_aware_parent",
@@ -121,6 +146,16 @@ def ingest(
     # deliberate acts, visible at the call site.
     owner: str,
     origin: str = "corpus",
+    # LLM-WRITTEN CONTEXTUAL PREFIXES (D-6, expired). Off unless asked for, and
+    # asked for explicitly at the call site rather than read from the
+    # environment here: this is the only paid-per-chunk stage in ingest, and a
+    # flag that turns spending on should be visible in the line that spends.
+    contextual: bool | None = None,
+    # Parse, chunk, and report what contextualising WOULD cost -- then stop
+    # before the first paid call. Useless without `contextual`, and ignored
+    # rather than an error, because "estimate an ingest that spends nothing" has
+    # an obvious answer.
+    estimate_only: bool = False,
 ) -> IngestResult:
     """Corpus -> index, with the manifest recording what each source produced.
 
@@ -133,7 +168,14 @@ def ingest(
     """
     t0 = time.time()
     config.ensure_dirs()
-    pipe = pipeline_version(strategy)
+    contextual = config.CONTEXTUAL_PREFIXES if contextual is None else contextual
+    ctx_stats = contextualize.ContextStats()
+    if contextual and estimate_only:
+        # THE NUMBER BEFORE THE BILL. Parsing is cached and free; chunking is
+        # free; so a full dry run up to the point of spending is cheap enough
+        # to be the default way of answering "what will this cost".
+        return _contextual_estimate(strategy, files, caption_images)
+    pipe = pipeline_version(strategy, contextual=contextual)
     manifest = Manifest()
     result = IngestResult()
 
@@ -175,8 +217,27 @@ def ingest(
                 # table with plausible numbers.
                 on_progress("parsing", len(result.per_file), len(paths), p.name)
             src, blocks, diag = L.load(p, caption_images=caption_images)
+
+            # ONE SYNOPSIS PER DOCUMENT, then a closure over it. The closure is
+            # what build_chunks calls, so the chunker never learns that Gemini
+            # exists -- the paid boundary stays in this file and in gemini.py,
+            # where the guard audit already looks for it.
+            situate = None
+            if contextual:
+                if on_progress:
+                    on_progress("contextualising", len(result.per_file), len(paths), p.name)
+                doc_text = '\n\n'.join(b.text for b in blocks if b.text.strip())
+                syn = contextualize.synopsis(src.title or src.source_id, doc_text,
+                                             stats=ctx_stats)
+
+                def situate(parent_text: str, body: str, _syn: str = syn) -> str:
+                    return contextualize.situate(doc_synopsis=_syn,
+                                                 parent_text=parent_text,
+                                                 body=body, stats=ctx_stats)
+
             chunks = S.build_chunks(src, blocks, strategy=strategy, pipeline=pipe,
-                                    owner=owner, origin=origin)
+                                    owner=owner, origin=origin,
+                                    contextualizer=situate)
             all_chunks.extend(chunks)
 
             kids = [c for c in chunks if c.role is ChunkRole.CHILD]
@@ -217,13 +278,20 @@ def ingest(
                     # source is never written is worse than a missing state: it
                     # looks live and always says the reassuring thing.
                     #
-                    # Contextual prefixes are deferred, so the ORIGINAL cause of
-                    # incompleteness cannot occur yet. A failed image caption
-                    # can, and it is the same kind of defect: the document is
-                    # indexed but part of it is unretrievable. An image with no
-                    # caption cannot match any query at all.
+                    # The ORIGINAL cause can now occur: contextual prefixes
+                    # are no longer deferred, and a refused or empty prefix
+                    # leaves a child indexed with breadcrumb context only. That
+                    # is a weaker chunk, not a broken one -- but a document
+                    # where SOME children got the paid treatment and others did
+                    # not is a mixed-provenance index, which is exactly what
+                    # this field exists to surface. A failed image caption
+                    # counts too, and is worse: an uncaptioned image cannot
+                    # match any query at all.
                     n_uncontextualized=(
-                        1 if "FAILED" in str(diag.get("detector", "")) else 0
+                        (1 if "FAILED" in str(diag.get("detector", "")) else 0)
+                        + sum(1 for c in chunks
+                              if c.role is ChunkRole.CHILD
+                              and contextual and not c.has_contextual_prefix)
                     ),
                 )
             )
@@ -253,6 +321,17 @@ def ingest(
         if on_progress:
             on_progress("embedding", len(paths), len(paths), f"{len(kids)} chunks")
         vecs, st = gemini.embed_texts([c.embed_text for c in kids], kind="document")
+        # ONE NOTICE, WITH BOTH NUMBERS. `contextualize_skipped` had a writer
+        # nowhere -- it was excused by the deferral audit as "waiting, not
+        # forgotten", which was true right up until the deferral was acted on.
+        # A degradation helper that nothing calls reports "no degradation".
+        if contextual and ctx_stats.prefixes_skipped:
+            attempted = (ctx_stats.prefixes_made + ctx_stats.prefixes_cached
+                         + ctx_stats.prefixes_skipped)
+            log.seen("contextualize", n=attempted)
+            log.report(limits.contextualize_skipped(
+                ctx_stats.prefixes_skipped, attempted),
+                n=ctx_stats.prefixes_skipped)
         if verbose:
             print(f"  {st.render()}")
         if on_progress:
@@ -264,7 +343,15 @@ def ingest(
             {
                 "parser_version": L.PARSER_VERSION,
                 "chunker_version": S.CHUNKER_VERSIONS[strategy],
+                "contextualizer": pipe.contextualizer,
                 "pipeline_fingerprint": pipe.fingerprint(),
+                # WHAT THE PAID STAGE ACTUALLY DID, next to the index it
+                # produced. Including mean prefix length, which is the number
+                # that decides whether this helped: a prefix is a fixed cost on
+                # every child, and at a fixed token budget a longer child means
+                # fewer children fit. Recall can fall while ranking improves,
+                # and an evaluation that measures recall@k cannot see it.
+                "contextualization": ctx_stats.to_json() if contextual else None,
                 "child_kind": dict(Counter(c.kind.value for c in kids)),
                 "child_text_source": dict(Counter(c.text_source for c in kids)),
                 "child_doc_type": dict(Counter(r["doc_type"] for r in result.per_file)),

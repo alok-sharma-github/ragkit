@@ -59,7 +59,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Iterable, Literal, Sequence
+from typing import Callable, Iterable, Literal, Sequence
 
 from .. import config
 from ..gemini import count_tokens
@@ -82,6 +82,13 @@ CHUNKER_VERSIONS: dict[str, str] = {
     "header_aware": "header_aware@1",
     "header_aware_parent": "header_aware_parent@3",
 }
+
+# What goes in PipelineVersion.contextualizer. Its own version string, because
+# the situating PROMPT can change without the splitter changing a line -- and
+# two indexes built by the same splitter from different prompts are not
+# comparable either.
+CONTEXTUALIZER_BREADCRUMB = "breadcrumb-only"
+CONTEXTUALIZER_LLM = "llm-prefix@1"
 
 # Paragraph, then line, then sentence, then word. Recursive splitting tries each
 # separator in turn and only falls through when a piece is still too big, so it
@@ -322,6 +329,13 @@ def _make_child(
     body: str,
     prefix: str,
     section: _Section,
+    # THE LLM-WRITTEN SITUATING SENTENCE, or "". Attached HERE and nowhere else,
+    # for exactly the reason the breadcrumb is: this file's whole design is that
+    # enrichment happens after slicing, per child. A contextual prefix applied
+    # before slicing would land on child 0 alone and make section openers
+    # systematically more findable -- the same positional bias, arriving through
+    # a new door.
+    context: str,
     ordinal: int,
     parent_id: str | None,
     position: int,
@@ -347,12 +361,22 @@ def _make_child(
     first = section.blocks[0]
     last = section.blocks[-1]
     kind = first.kind if len(section.blocks) == 1 else ChunkKind.TEXT
-    embed_text = prefix + body
+    # ORDER: breadcrumb, then situating sentence, then body. The body is last so
+    # that BM25's length normalisation sees the same shape it always did, and so
+    # a human reading embed_text can see where the document starts.
+    ctx = (context.strip() + "\n\n") if context.strip() else ""
+    embed_text = prefix + ctx + body
 
     # PREFIXED, not VERBATIM: the body is a contiguous span of the document and
     # is quotable; the prefix is assembled from headings and is not. So
     # `quote` stays the body and citation() reports highlightable=True for it.
-    prov = TextProvenance.PREFIXED if prefix else TextProvenance.VERBATIM
+    #
+    # A CONTEXTUAL PREFIX DOES NOT WEAKEN THIS, it is the case the state was
+    # built for. The situating sentence is model-written, sits against document
+    # prose, and carries the chunk's real page number -- the exact combination
+    # that makes a fabricated quotation look genuine. It goes into embed_text
+    # only; verbatim_text and display_text stay the body, unchanged.
+    prov = TextProvenance.PREFIXED if (prefix or ctx) else TextProvenance.VERBATIM
     if kind is ChunkKind.IMAGE_CAPTION:
         prov = TextProvenance.MODEL_GENERATED
 
@@ -367,6 +391,7 @@ def _make_child(
         position_within_parent=position,
         n_siblings=n_siblings,
         embed_text=embed_text,
+        has_contextual_prefix=bool(ctx),
         display_text=body,
         verbatim_text=None if prov is TextProvenance.MODEL_GENERATED else body,
         text_provenance=prov,
@@ -506,6 +531,13 @@ def build_chunks(
     parent_tokens: int | None = None,
     overlap_ratio: float | None = None,
     pipeline: PipelineVersion | None = None,
+    # (parent section text, sliced body) -> one situating sentence, or "".
+    #
+    # A CALLABLE RATHER THAN A FLAG, so this module never imports gemini. The
+    # chunker stays free, deterministic and testable, and the paid boundary
+    # stays where the audit already knows to look for it. Passing a lambda in a
+    # test gives contextual chunking with no API key and no spend.
+    contextualizer: Callable[[str, str], str] | None = None,
     # REQUIRED, and it propagates to every chunk this produces. There is exactly
     # one chunking entry point and two Chunk constructors, all in this file, so
     # this parameter is the whole surface: nothing can become searchable without
@@ -522,7 +554,22 @@ def build_chunks(
     parent_tokens = parent_tokens or config.CHUNK_PARENT_TOKENS
     ratio = config.CHUNK_OVERLAP_RATIO if overlap_ratio is None else overlap_ratio
     overlap = int(child_tokens * ratio)
-    pipeline = pipeline or PipelineVersion(chunker=CHUNKER_VERSIONS[strategy])
+    # THE FINGERPRINT RECORDS WHAT WAS APPLIED, not what the file can do.
+    #
+    # Contextual prefixes change embed_text, which changes chunk_ids, which
+    # means two indexes built from the same bytes are not comparable. The
+    # fingerprint has to say so -- that is its entire job. PipelineVersion
+    # already carries a `contextualizer` field for exactly this, so the fact
+    # goes there rather than into a second, parallel version string.
+    #
+    # And it is recorded ONLY when a contextualiser was actually passed. Moving
+    # the fingerprint for a run that produced a byte-identical index would
+    # invalidate a valid baseline and force a re-measurement that could only
+    # reproduce it.
+    pipeline = pipeline or PipelineVersion(
+        chunker=CHUNKER_VERSIONS[strategy],
+        contextualizer=CONTEXTUALIZER_LLM if contextualizer else CONTEXTUALIZER_BREADCRUMB,
+    )
 
     recursive = strategy != "fixed"
     header_aware = strategy in ("header_aware", "header_aware_parent")
@@ -555,11 +602,16 @@ def build_chunks(
         # THEN PREFIX, once per slice.
         prefix = _prefix_string(src, sec.heading_path) if (breadcrumbs and header_aware) else ""
         for pos, piece in enumerate(bodies):
+            # THEN CONTEXTUALISE, once per slice, with the slice in hand. Same
+            # position in the pipeline as the breadcrumb and for the same
+            # reason -- see _make_child.
+            ctx = contextualizer(body, piece) if contextualizer else ""
             chunks.append(
                 _make_child(
                 owner=owner,
                 origin=origin,
-                    src=src, body=piece, prefix=prefix, section=sec, ordinal=ordinal,
+                    src=src, body=piece, prefix=prefix, context=ctx,
+                    section=sec, ordinal=ordinal,
                     parent_id=parent.chunk_id if parent else None,
                     position=pos, n_siblings=len(bodies), pipeline=pipeline,
                 )

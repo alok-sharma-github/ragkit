@@ -82,6 +82,8 @@ def _index_provenance(idx: NumpyIndex) -> dict[str, Any]:
         "dim": idx.meta.get("dim"),
         "n_children": idx.meta.get("n_children_indexed"),
         "uniform_provenance": idx.meta.get("uniform_provenance"),
+        "uniform_contextualization": idx.meta.get("uniform_contextualization"),
+        "n_contextualized": idx.meta.get("n_contextualized"),
         "child_text_source": rep.get("child_text_source"),
         "n_header_missing": rep.get("n_header_missing"),
         "resolved_models": gemini.resolve_models(),
@@ -109,13 +111,32 @@ def run(
     idx = NumpyIndex.load(index_name)
     prov = _index_provenance(idx)
 
-    # Refusal 1.
+    # Refusal 1, and it took two fields to actually mean what it always said.
+    #
+    # The message below has always named contextualisation as the thing being
+    # refused. The check was `uniform_provenance`, which is computed over
+    # TextProvenance -- where a breadcrumb-only child and an LLM-contextualised
+    # child are both PREFIXED. So for as long as contextualisation was deferred
+    # the refusal was correct by accident, and the moment it shipped, the check
+    # would have waved through exactly the index its own error message
+    # describes. `uniform_contextualization` is the property; the other one is
+    # the property next to it.
     if config.EVAL_REFUSE_MIXED_PROVENANCE and prov.get("uniform_provenance") is False:
         raise RuntimeError(
-            "index has MIXED provenance (some chunks contextualised, some not). "
+            "index has MIXED TEXT PROVENANCE (some chunks verbatim, some prefixed). "
             "Scoring it as one population produces a diluted effect size of unknown "
             "magnitude. Re-run ingest to completion, or set "
             "EVAL_REFUSE_MIXED_PROVENANCE=False and accept an uninterpretable number."
+        )
+    if (config.EVAL_REFUSE_MIXED_PROVENANCE
+            and prov.get("uniform_contextualization") is False):
+        n_ctx = prov.get("n_contextualized")
+        raise RuntimeError(
+            f"index is HALF CONTEXTUALISED: {n_ctx} of {prov.get('n_children')} "
+            "children carry an LLM-written prefix and the rest do not. An A/B over "
+            "this measures a diluted effect of unknown size, which makes a real "
+            "technique look not-worth-the-cost -- a wrong conclusion from correct "
+            "arithmetic. Re-run ingest to completion."
         )
 
     budget = token_budget or HEADLINE_BUDGET
@@ -223,7 +244,9 @@ def run(
 def write_baseline(payload: dict[str, Any]) -> Path:
     prov = payload["index_provenance"]
     # Refusal 2.
-    if config.CI_BASELINE_REQUIRES_UNIFORM_PROVENANCE and prov.get("uniform_provenance") is False:
+    if config.CI_BASELINE_REQUIRES_UNIFORM_PROVENANCE and (
+            prov.get("uniform_provenance") is False
+            or prov.get("uniform_contextualization") is False):
         raise RuntimeError(
             "refusing to write a CI baseline from a mixed-provenance index. A "
             "baseline is a promise about what was measured."

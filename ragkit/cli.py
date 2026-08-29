@@ -67,7 +67,24 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         caption_images=not args.no_images,
         files=files,
         verbose=True,
+        # Stated at the call site, never inferred. This is the only stage in
+        # ingest that spends money per chunk, and the flag that turns it on is
+        # visible in the command that runs it.
+        contextual=args.contextual,
+        estimate_only=args.estimate,
+        index_name=args.index,
     )
+    if args.estimate:
+        est = r.index_report.get("contextualization_estimate", {})
+        print()
+        print("contextual prefixes -- estimated cost, nothing spent:")
+        for k, v in est.items():
+            print(f"  {k:32s} {v:>14,}" if isinstance(v, int) else f"  {k:32s} {v}")
+        # NO DOLLAR FIGURE PRINTED. Per-token prices are not in this repo and
+        # change without notice; a number quoted from memory would be the exact
+        # species of stale-prior error the model config comments already warn
+        # about. Tokens are what we measured, so tokens are what we report.
+        return 0
     print()
     print(r.render())
     # A failed provenance cross-check is a non-zero exit, not a printed note.
@@ -373,6 +390,15 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--no-images", action="store_true",
                    help="skip Gemini image captioning (images become unretrievable)")
     p.add_argument("--file", action="append", help="ingest only this file (repeatable)")
+    p.add_argument("--contextual", action="store_true",
+                   help="LLM-written situating prefix per chunk (D-6; ~$0.6 "
+                        "on this corpus, cached thereafter)")
+    p.add_argument("--estimate", action="store_true",
+                   help="with --contextual: report the token cost and stop "
+                        "before the first paid call")
+    p.add_argument("--index", default="numpy_index",
+                   help="index directory name; use a second name to build an "
+                        "A/B index without overwriting the measured one")
     p.set_defaults(fn=cmd_ingest)
 
     p = sub.add_parser("ask", help="answer one question with verified citations")

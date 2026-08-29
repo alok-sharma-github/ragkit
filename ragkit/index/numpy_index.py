@@ -185,6 +185,28 @@ class NumpyIndex:
                 for p in TextProvenance
                 if any(c.text_provenance is p for c in kids)
             },
+            # A SECOND UNIFORMITY, because the first one cannot see this.
+            #
+            # The eval refuses to score a mixed index, and states the reason as
+            # "if the index holds both contextualised and un-contextualised
+            # chunks, an A/B over it measures a diluted effect of unknown size".
+            # But `uniform_provenance` above is computed over TextProvenance,
+            # and a breadcrumb-only child and an LLM-contextualised child are
+            # BOTH `PREFIXED`. The two states collapse, so the check that was
+            # written to catch a half-contextualised index could not see one.
+            #
+            # The property asserted in the docstring was not the property being
+            # computed -- and the gap only appeared when contextualisation
+            # stopped being deferred. So it is computed directly now, over the
+            # field that actually records it.
+            "uniform_contextualization": len(
+                {
+                    c.has_contextual_prefix
+                    for c in kids
+                    if c.text_provenance is not TextProvenance.MODEL_GENERATED
+                }
+            ) <= 1,
+            "n_contextualized": sum(1 for c in kids if c.has_contextual_prefix),
         }
         if n_dropped:
             report["warning"] = (
