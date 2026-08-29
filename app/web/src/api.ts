@@ -136,6 +136,8 @@ export interface SourceDetail {
 /** One entry in the corpus listing. Named so the sidebar can fold page renders
  *  under the PDF they were extracted from rather than listing them as peers. */
 export interface Doc {
+  /** True when this is the caller's own upload, not the preloaded corpus. */
+  mine?: boolean;
   source_id: string;
   title: string;
   doc_type: string;
@@ -373,7 +375,10 @@ export const api = {
       { method: "DELETE" },
     ),
   job: (id: string) => req<Job>(`/api/jobs/${id}`),
-  jobs: () => req<{ active: Job | null; queued: number; jobs: Job[] }>("/api/jobs"),
+  jobs: () =>
+    req<{ active: Job | null; queued: number; mine: Job | null; jobs: Job[] }>(
+      "/api/jobs",
+    ),
 
   flag: (body: {
     verdict: "not_in_source" | "source_doesnt_say" | "source_is_fine" | "helpful";

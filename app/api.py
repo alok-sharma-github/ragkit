@@ -432,6 +432,11 @@ def status(request: Request) -> dict[str, Any]:
         if rec_owner and rec_owner != viewer:
             continue
         docs.append({
+            # WHOSE IT IS, so the UI can show a visitor their own upload
+            # separately from a corpus of fifteen files they did not add.
+            # Without this the two are indistinguishable in the listing, and a
+            # returning visitor cannot tell whether their document is there.
+            "mine": bool(rec_owner) and rec_owner == viewer,
             "source_id": sid,
             "title": rec.source.title,
             "doc_type": rec.source.doc_type.value,
@@ -1162,10 +1167,29 @@ def remove(source_id: str, purge_cache: bool = Query(default=True)) -> dict[str,
 
 
 @app.get("/api/jobs")
-def list_jobs(limit: int = Query(default=25, ge=1, le=200)) -> dict[str, Any]:
+def list_jobs(request: Request,
+              limit: int = Query(default=25, ge=1, le=200)) -> dict[str, Any]:
+    """Jobs, plus the caller's own unfinished upload if it has one.
+
+    RESUMABLE ACROSS A RELOAD, which is the point. The progress a visitor sees
+    lives in browser state, so closing the tab or refreshing lost it entirely:
+    they came back to a page that said nothing, with no way to tell whether a
+    four-minute upload had finished or failed. The work was still running on the
+    server the whole time -- there was simply nothing to ask.
+    """
+    owner = session_owner(request)
+    mine = None
+    if owner:
+        for j in jobs.STORE.list(limit=50):
+            if j.kind == "upload" and j.params.get("session") == owner:
+                # The most recent one, finished or not: "it finished twenty
+                # minutes ago" is as useful an answer as "it is still going".
+                mine = j.to_json()
+                break
     return {
         "active": (j.to_json() if (j := jobs.STORE.active()) else None),
         "queued": len(jobs.STORE.queued()),
+        "mine": mine,
         "jobs": [j.to_json() for j in jobs.STORE.list(limit=limit)],
     }
 

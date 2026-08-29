@@ -75,7 +75,9 @@ function DocumentList({
   };
   const renders = new Map<string, Doc[]>();
   const top: Doc[] = [];
-  for (const d of status.documents) {
+  // The visitor's own uploads are listed above, in their own section. Repeating
+  // them here would make one document look like two.
+  for (const d of status.documents.filter((x) => !x.mine)) {
     const owner = parentOf(d);
     if (owner) renders.set(owner, [...(renders.get(owner) ?? []), d]);
     else top.push(d);
@@ -178,6 +180,32 @@ function Uploader({
   // read the toggle should get the better answer. The one who is in a hurry can
   // say so.
   const [thorough, setThorough] = useState(true);
+
+  // RESUMED AFTER A RELOAD. All of the progress a visitor saw lived in this
+  // component's state, so refreshing or closing the tab lost it -- they came
+  // back to a page that said nothing about a four-minute upload, with no way to
+  // tell whether it had finished or failed. The work was on the server the
+  // whole time; there was simply nothing asking about it.
+  useEffect(() => {
+    let alive = true;
+    api
+      .jobs()
+      .then((r) => {
+        if (!alive || !r.mine) return;
+        setJob(r.mine);
+        if (r.mine.state === "queued" || r.mine.state === "running") {
+          setBusy(true);
+          poll(r.mine.id);
+        } else if (r.mine.state === "failed") {
+          setMsg(r.mine.error?.split(String.fromCharCode(10))[0] ?? "that document could not be read");
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Polls until the job settles. The interval is deliberately unhurried: the
@@ -469,6 +497,9 @@ export function App() {
   // The corpus list is collapsed by default: it is reference material, not
   // an action, and open-by-default is what pushed upload off-screen.
   const [docsOpen, setDocsOpen] = useState(false);
+  // Their uploads, separated from the corpus. `mine` is set by the server from
+  // the session cookie, so it survives a reload -- which is the whole point.
+  const mine = (status?.documents ?? []).filter((d) => d.mine);
   const [advanced, setAdvanced] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -607,6 +638,36 @@ export function App() {
             accept={status?.demo?.accept ?? ""}
           />
         </div>
+
+        {/* THEIR OWN DOCUMENTS, ALWAYS VISIBLE, ABOVE THE CORPUS.
+            Collapsing the document list was right for fifteen files a visitor
+            did not add, and wrong for the one they just uploaded: it hid the
+            only durable evidence that the upload worked. A friend uploaded a
+            file, watched the progress, came back later and had no way to tell
+            whether it had succeeded -- the answer was in a list behind a "see
+            the list" link, indistinguishable from the corpus. */}
+        {mine.length > 0 && (
+          <div className="mt-5">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-500">
+              Your documents
+            </div>
+            <ul className="mt-2 space-y-1.5">
+              {mine.map((d) => (
+                <li key={d.source_id} className="rounded-sm bg-quote-600/[0.06] px-2 py-1.5">
+                  <div className="truncate text-[12px] text-ink-900">{d.source_id}</div>
+                  <div className="text-[11px] tabular-nums text-quote-600">
+                    ready · {d.chunks} passages
+                    {d.pages ? ` · ${d.pages} pages` : ""}
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-1.5 text-[10.5px] leading-relaxed text-ink-400">
+              Only you can see {mine.length > 1 ? "these" : "this"} — ask a
+              question about {mine.length > 1 ? "them" : "it"} below.
+            </p>
+          </div>
+        )}
 
         {/* WHAT THIS CORPUS IS ABOUT, in one line. A visitor saw hnsw.pdf,
             hyde.pdf, raptor.pdf and had no way to know these are retrieval
