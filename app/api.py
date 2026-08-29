@@ -45,7 +45,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from ragkit import (budget, citations_index, config, conversations,
-                    feedback as fb, gemini, jobs, pipeline, upload_guard)
+                    feedback as fb, gemini, jobs, pipeline, sessions,
+                    upload_guard)
 from ragkit.eval import reconcile as R
 from ragkit.generate import answer as A
 from ragkit.index.fusion import explain as explain_fusion
@@ -368,6 +369,32 @@ def unlock(body: Unlock) -> JSONResponse:
     return r
 
 
+def session_owner(request: Request) -> str | None:
+    """The owner to retrieve as, from an untrusted cookie. None = public only.
+
+    `sessions.resolve` does the validating: shape, plus an identity check against
+    the public sentinel. Anything that fails becomes None, which means "public
+    corpus only" -- the safe direction. A bad cookie degrades a visitor to the
+    shared demo; it never promotes them into somebody else's documents.
+    """
+    return sessions.resolve(request.cookies.get(sessions.COOKIE))
+
+
+def _set_session_cookie(response: JSONResponse, session_id: str) -> None:
+    """Issue the session cookie.
+
+    HttpOnly is the load-bearing flag. The session id IS the secret -- 128 bits,
+    unguessable -- so the only realistic way it leaks is a script on the page
+    reading document.cookie. Unguessability protects against everything except a
+    value someone can simply read.
+    """
+    response.set_cookie(
+        sessions.COOKIE, session_id,
+        httponly=True, samesite="lax", secure=True,
+        max_age=config.UPLOAD_TTL_SECONDS, path="/",
+    )
+
+
 @app.get("/api/status")
 def status() -> dict[str, Any]:
     rep_path = config.DATA_EVAL / "index_report.json"
@@ -433,7 +460,7 @@ def status() -> dict[str, Any]:
 
 
 @app.post("/api/ask")
-def ask(req: AskRequest) -> dict[str, Any]:
+def ask(req: AskRequest, request: Request) -> dict[str, Any]:
     hyb = hybrid()
     budget = req.budget or config.TOKENS_CONTEXT_BUDGET
 
@@ -455,8 +482,12 @@ def ask(req: AskRequest) -> dict[str, Any]:
         t["embed"] = (time.time() - t0) * 1000
 
         t0 = time.time()
+        # WHO IS ASKING reaches retrieval. Without this the filter exists and is
+        # never given anyone to filter for, which is the same "correct but not on
+        # the request path" failure that let retrieve() leak in the first place.
         retrieved = hyb.retrieve(cq.search_query, qv, mode=req.mode,
-                                 token_budget=budget, unit="parent")
+                                 token_budget=budget, unit="parent",
+                                 owner=session_owner(request))
         parents = retrieved.parents[: req.sources]
         t["retrieve"] = (time.time() - t0) * 1000
     # else: route is conversation_only or ask_fresh. Retrieval is SKIPPED, not
