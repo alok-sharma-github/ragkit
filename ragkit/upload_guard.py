@@ -105,9 +105,28 @@ def check_upload(path: str | Path) -> UploadVerdict:
         r = {"code": "too_large", "limit": max_bytes, "actual": size}
         return UploadVerdict(False, "too_large", _visitor_message(r), bytes=size)
 
+    # A SCRUBBED ENVIRONMENT, not the parent's.
+    #
+    # This was `{**os.environ, ...}`, which handed the probe GEMINI_API_KEY, the
+    # AWS credentials, and everything else in the process environment. The
+    # subprocess exists because PyMuPDF is a C library parsing hostile input, and
+    # the failure being guarded against is memory corruption -- which RLIMIT_AS
+    # does not bound. If that ever becomes code execution, the boundary is the
+    # process, and a process holding the API key is a much worse boundary than
+    # one holding nothing.
+    #
+    # The probe needs four numbers and an encoding. Everything else it inherited
+    # was a credential it had no use for -- the difference between "an attacker
+    # can crash the parser" and "an attacker has your keys".
+    #
+    # Enumerated rather than filtered: a denylist of secret-looking names is the
+    # correlation-not-property mistake, and it fails open on the next variable
+    # somebody adds.
     env = {
-        **os.environ,
+        "PATH": os.environ.get("PATH", ""),
+        "SYSTEMROOT": os.environ.get("SYSTEMROOT", ""),   # Windows needs this
         "PYTHONIOENCODING": "utf-8",
+        "PYTHONPATH": str(config.ROOT),
         "RAGKIT_MAX_UPLOAD_PAGES": str(config.MAX_UPLOAD_PAGES),
         "RAGKIT_MAX_UPLOAD_OBJECTS": str(config.MAX_UPLOAD_OBJECTS),
         "RAGKIT_PARSE_MEM_MB": str(config.PARSE_MEM_MB),

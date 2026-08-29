@@ -292,6 +292,63 @@ distances, so no code path can produce another tenant's chunk and then discard i
 answer sits in tenant B's documents, and retrieval returns nothing. A measured
 claim, not "we implemented permissions".
 
+### D-19 · Strangers may upload documents to the public demo — an accepted risk
+
+**The decision.** The public demo accepts PDF uploads from anyone, ingests them
+into a session-scoped sandbox, and purges them on a timer.
+
+**Why, and it is not "because uploads are a nice feature."** This system's
+differentiator is that it refuses to quote what it cannot verify. On *our* corpus
+that behaviour is invisible: a visitor has no way to know the tables are broken,
+so `FOUND — NOT QUOTED` reads as a limitation. On *their* document they know
+exactly what is in it, and the identical behaviour reads as a catch. **The refusal
+state is only impressive to someone who can check it.** An examiner uploading
+their own file is also the customer research, done in ten minutes rather than five
+conversations.
+
+**What was measured before deciding**, because the original objection was cost and
+it turned out to be the wrong constraint:
+
+| per 50-page upload | |
+|---|---|
+| vectors | 0.8 MB |
+| embedding | $0.0077 |
+| ingest wall clock | ~8 s/page — **the binding constraint** |
+
+Twenty concurrent sessions is 16 MB against 360 MB of headroom. A hundred uploads
+a day is $1.50. Neither is close to binding, so the caps are sized by *how long a
+visitor will wait*, not by memory or money.
+
+**The mitigations, and what each one actually bounds:**
+
+| mitigation | bounds |
+|---|---|
+| all parsing in a subprocess | the API process never touches hostile bytes |
+| `RLIMIT_AS`, `RLIMIT_CPU` | runaway allocation and CPU inside the probe |
+| wall-clock timeout in the parent | a hang the child's own limits cannot stop |
+| scrubbed environment | what a compromised probe can reach — no API key, no AWS credentials |
+| page / size / object caps | wait time, and complexity a page count cannot see |
+| active-content refusal | `/JavaScript`, `/Launch`, `/EmbeddedFile`, `/RichMedia` |
+| quarantine before admission | a refused file is never briefly indexable |
+| session ownership + TTL purge | who can retrieve it, and for how long |
+
+**What this does NOT cover, stated plainly.** PyMuPDF is a C library, and PDF
+parsers have a long history of memory-safety bugs — a property of the format, not
+of this library. **`RLIMIT_AS` bounds allocation; it does not bound memory
+corruption.** If a malformed PDF achieves code execution inside the probe, the
+only thing containing it is the process boundary and the scrubbed environment. It
+is not sandboxed further: no separate user, no namespace, no seccomp filter, and
+the probe can still read the container's filesystem.
+
+That is an accepted risk with real mitigations, not a solved problem. Saying so is
+stronger than implying otherwise, and it is the sentence to re-read before
+widening what the demo accepts.
+
+**Reverses when:** the demo carries anything worth stealing beyond a corpus of
+public papers, or a customer's documents share a deployment with strangers'
+uploads. Either makes the process boundary too thin, and the next step is a
+separate unprivileged container for the probe.
+
 ---
 
 # Part 2 — Arguments
@@ -368,6 +425,28 @@ to be a leaf.
 
 Same shape as asserting `partial ≥ strict`: **assert the property the operation
 preserves, not the one that looked equal on your test case.**
+
+### The shortest demonstration of this in the project
+
+The session resolver validates an untrusted cookie two ways: a shape rule (22
+urlsafe characters) and an identity check against `PUBLIC_OWNER`. The shape rule
+already excludes `""`, so the identity check looks redundant.
+
+It was tested rather than argued. `PUBLIC_OWNER` was changed to
+`"public_corpus_shared__"` — 22 characters — and the resolver re-run:
+
+```
+regex accepts it : True     ← the shape check now passes the sentinel
+resolve() returns: None     ← the identity check still rejects it
+```
+
+The regex **correlates** with "not the public sentinel". The identity check **is**
+that property. With only the regex, a visitor could set `owner` to the public
+sentinel and publish their own upload to every other visitor — and nothing would
+have announced that the protection had lapsed, because the rule that lapsed was
+still passing its own tests.
+
+Correlation is acceptable in a report and disqualifying in a gate.
 
 ## A-5 · Every diagnostic must name its cause, not its symptom
 
