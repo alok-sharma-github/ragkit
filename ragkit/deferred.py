@@ -240,6 +240,52 @@ def review() -> dict[str, Any]:
             ),
         ),
         Deferral(
+            name="sweep_on_upload_couples_visitors",
+            guide_module="M14",
+            decision=(
+                "Expired sessions are purged at the start of an UPLOAD, not on a "
+                "timer and not from the sweep endpoint."
+            ),
+            because=(
+                "purge_expired() had exactly one caller -- POST "
+                "/api/sessions/sweep -- which a demo refuses categorically, so on "
+                "the one deployment where strangers upload the TTL never ran "
+                "while the UI promised deletion. A timer was rejected when the "
+                "sweep was designed, and the reason still holds: a thread that "
+                "deletes documents has no request to attribute it to and nowhere "
+                "for its failures to surface. An upload is the only event that "
+                "makes the session set grow, so it is where the bound belongs"
+            ),
+            revisit_when=(
+                "the demo carries enough traffic that upload latency matters. "
+                "THE PROPERTY TO KNOW: one visitor's upload now triggers deletion "
+                "of somebody else's documents, so a slow or failing purge shows up "
+                "as latency on an unrelated person's request. Bounded at demo "
+                "traffic -- a purge is a manifest read plus a rebuild -- and not "
+                "bounded at real load. At that point it becomes a queue, or a "
+                "scheduled task with somewhere to report to"
+            ),
+            cost_if_wrong=(
+                "an uploader waits for someone else's cleanup. Also: on a quiet "
+                "day an expired session sits until the next upload arrives, which "
+                "is why the visitor-facing text states the property rather than "
+                "the schedule -- 'deleted when the next visitor uploads', not "
+                "'deleted after an hour'"
+            ),
+            orphans=(),
+            # No predicate: nothing in data/eval observes request latency or
+            # concurrent uploads. Left False and said so, rather than wired to a
+            # proxy that merely correlates.
+            expired=False,
+            evidence=(
+                "verified end to end at a 25s TTL: purged_documents "
+                "['zarnak-bulletin.pdf'], failed [], sessions_remaining 0. The "
+                "first run failed loudly -- remove_source called ingest() without "
+                "the owner argument D-18 made required -- which is the sweep "
+                "reporting what it could not do rather than retrying in silence"
+            ),
+        ),
+        Deferral(
             name="generation_tier_ci_gating",
             guide_module="M9",
             decision=(

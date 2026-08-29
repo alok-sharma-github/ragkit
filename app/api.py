@@ -499,11 +499,29 @@ def status(request: Request) -> dict[str, Any]:
             # would have re-enabled deletion in the same motion. Uploads are on;
             # deleting the shared corpus is still refused.
             "uploads_enabled": config.DEMO_ALLOW_UPLOADS,
+            # THE ONE CLAIM A VISITOR CANNOT CHECK.
+            #
+            # Every other promise this product makes is verifiable from the
+            # screen: click a citation and see whether the quote is really in the
+            # source. Nobody can click to confirm their document was deleted. So
+            # this sentence rests on trust alone, and it is the only one where
+            # being approximately right costs everything if someone looks.
+            #
+            # It read "deleted after 1 hours", which the deployment keeps only
+            # approximately: the sweep runs when the NEXT visitor uploads, so a
+            # quiet day leaves an expired session sitting. Stating the property
+            # rather than the schedule keeps it true without leaking the
+            # mechanism -- and the last clause is the strongest guarantee here,
+            # previously unstated: the container filesystem is ephemeral.
+            #
+            # Verified rather than assumed: a session's upload was unreachable
+            # from both the sidebar and retrieval after a redeploy.
             "upload_limits": (
                 f"PDF only, up to {config.MAX_UPLOAD_PAGES} pages and "
                 f"{config.MAX_UPLOAD_BYTES // (1024 * 1024)} MB. Your upload is "
-                f"visible only to you and is deleted after "
-                f"{config.UPLOAD_TTL_SECONDS // 3600} hours."
+                f"visible only to you. Uploads expire after "
+                f"{config.UPLOAD_TTL_SECONDS // 3600} hour and are deleted when "
+                f"the next visitor uploads. Nothing is kept beyond a redeploy."
             ) if config.DEMO_ALLOW_UPLOADS else "",
             "why": ("this deployment shares one free-tier Gemini key, so "
                     "re-ingest and delete are disabled" if config.DEMO_MODE else ""),
