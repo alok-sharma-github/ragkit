@@ -61,7 +61,7 @@ import numpy as np
 
 from .. import config
 from ..gemini import count_tokens
-from ..ingest.document import Chunk, ChunkRole, TextProvenance
+from ..ingest.document import Chunk, assert_owned, ChunkRole, TextProvenance
 
 Unit = Literal["child", "parent"]
 
@@ -96,6 +96,15 @@ class NumpyIndex:
                 "align mismatched lists -- that is the zip() truncation bug with a "
                 "different shape."
             )
+        # OWNERSHIP IS CHECKED HERE, at the one place every chunk must pass to
+        # become retrievable -- not in the upload handler.
+        #
+        # The guard audit caught this: assert_owned existed, was correct, and was
+        # called from nowhere. Wiring it to the upload path alone would have been
+        # the same defect one step along -- guarded on SOME of the traffic, which
+        # reports a pass while another path indexes unowned chunks. A constructor
+        # cannot be bypassed by a caller who forgets.
+        assert_owned(list(children))
         self.children = list(children)
         self.vectors = vectors.astype(np.float32, copy=False)
         self.parents = {p.chunk_id: p for p in parents}
