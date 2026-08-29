@@ -999,9 +999,30 @@ describes the same index, and `index_report_describes_this_index` says so
 explicitly so a null reads as "that file was about something else" rather than
 "not measured".
 
+**Then the same rule caught a third instance, one level in.** The completeness
+half of that invariant — added an hour later, after the Inspector's
+recall-vs-budget chart was found rendering *blank* — failed immediately. Cause:
+the CI gate runs `--no-sweep`, and the CLI wrote the primary artifact
+unconditionally, so **every CI invocation replaced a complete artifact with one
+whose budget sweep was empty**. The artifact stayed otherwise valid: right index,
+right budget, right cost basis, every other check green. Only the chart was gone,
+and only on the demo.
+
+That is the third door, found exactly where the argument above predicted one
+would be — and it says something about the first two checks. They asserted the
+artifact's *identity* and never its *completeness*, because identity was the
+property the two known incidents had violated. **A check written from the last
+bug tests the last bug.**
+
+A gate is a *read*: it compares a run against the stored baseline and has no
+business rewriting the headline. The CLI now writes the primary artifact only
+when it is producing the shipped measurement — never on `--gate`, `--no-sweep`,
+or `--limit`.
+
 The general form: **a measurement must not have side effects on the record of the
-thing it measures, and its provenance must be read from the subject rather than
-from whatever file is closest.**
+thing it measures; its provenance must be read from the subject rather than from
+whatever file is closest; and a record can be wrong by being incomplete, not only
+by being about something else.**
 
 ---
 

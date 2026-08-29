@@ -1,5 +1,5 @@
 {
-  "seconds": 1.1,
+  "seconds": 5.2,
   "regression_tests": {
     "What is the Precision@5 for the BM25_ONLY method in the Meridian Retri": {
       "passes_at_budget": 250,
@@ -23,7 +23,435 @@
     }
   },
   "token_budget": 1500,
-  "budget_sweep": {},
+  "budget_sweep": {
+    "250": {
+      "child_strict": {
+        "n": 92,
+        "hits": 38,
+        "rate": 0.413,
+        "sufficient": true,
+        "ci95": [
+          0.318,
+          0.515
+        ],
+        "label": "38/92 = 41%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 53,
+        "rate": 0.576,
+        "sufficient": true,
+        "ci95": [
+          0.474,
+          0.672
+        ],
+        "label": "53/92 = 58%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 27,
+        "rate": 0.293,
+        "sufficient": true,
+        "ci95": [
+          0.21,
+          0.393
+        ],
+        "label": "27/92 = 29%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 42,
+        "rate": 0.457,
+        "sufficient": true,
+        "ci95": [
+          0.359,
+          0.558
+        ],
+        "label": "42/92 = 46%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 69,
+        "rate": 0.75,
+        "sufficient": true,
+        "ci95": [
+          0.653,
+          0.827
+        ],
+        "label": "69/92 = 75%"
+      },
+      "mean_child_tokens": 135,
+      "mean_parent_tokens": 94,
+      "child_no_delivery": 21,
+      "parent_no_delivery": 39
+    },
+    "500": {
+      "child_strict": {
+        "n": 92,
+        "hits": 66,
+        "rate": 0.717,
+        "sufficient": true,
+        "ci95": [
+          0.618,
+          0.799
+        ],
+        "label": "66/92 = 72%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 80,
+        "rate": 0.87,
+        "sufficient": true,
+        "ci95": [
+          0.786,
+          0.924
+        ],
+        "label": "80/92 = 87%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 51,
+        "rate": 0.554,
+        "sufficient": true,
+        "ci95": [
+          0.453,
+          0.652
+        ],
+        "label": "51/92 = 55%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 63,
+        "rate": 0.685,
+        "sufficient": true,
+        "ci95": [
+          0.584,
+          0.771
+        ],
+        "label": "63/92 = 68%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 90,
+        "rate": 0.978,
+        "sufficient": true,
+        "ci95": [
+          0.924,
+          0.994
+        ],
+        "label": "90/92 = 98%"
+      },
+      "mean_child_tokens": 388,
+      "mean_parent_tokens": 226,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 22
+    },
+    "1000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 77,
+        "rate": 0.837,
+        "sufficient": true,
+        "ci95": [
+          0.748,
+          0.899
+        ],
+        "label": "77/92 = 84%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 85,
+        "rate": 0.924,
+        "sufficient": true,
+        "ci95": [
+          0.851,
+          0.963
+        ],
+        "label": "85/92 = 92%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 63,
+        "rate": 0.685,
+        "sufficient": true,
+        "ci95": [
+          0.584,
+          0.771
+        ],
+        "label": "63/92 = 68%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 75,
+        "rate": 0.815,
+        "sufficient": true,
+        "ci95": [
+          0.724,
+          0.881
+        ],
+        "label": "75/92 = 82%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "mean_child_tokens": 896,
+      "mean_parent_tokens": 621,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 9
+    },
+    "1500": {
+      "child_strict": {
+        "n": 92,
+        "hits": 82,
+        "rate": 0.891,
+        "sufficient": true,
+        "ci95": [
+          0.811,
+          0.94
+        ],
+        "label": "82/92 = 89%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 85,
+        "rate": 0.924,
+        "sufficient": true,
+        "ci95": [
+          0.851,
+          0.963
+        ],
+        "label": "85/92 = 92%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 75,
+        "rate": 0.815,
+        "sufficient": true,
+        "ci95": [
+          0.724,
+          0.881
+        ],
+        "label": "75/92 = 82%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 84,
+        "rate": 0.913,
+        "sufficient": true,
+        "ci95": [
+          0.838,
+          0.955
+        ],
+        "label": "84/92 = 91%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "mean_child_tokens": 1395,
+      "mean_parent_tokens": 1182,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 1
+    },
+    "3000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 87,
+        "rate": 0.946,
+        "sufficient": true,
+        "ci95": [
+          0.879,
+          0.977
+        ],
+        "label": "87/92 = 95%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 88,
+        "rate": 0.957,
+        "sufficient": true,
+        "ci95": [
+          0.893,
+          0.983
+        ],
+        "label": "88/92 = 96%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 84,
+        "rate": 0.913,
+        "sufficient": true,
+        "ci95": [
+          0.838,
+          0.955
+        ],
+        "label": "84/92 = 91%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 86,
+        "rate": 0.935,
+        "sufficient": true,
+        "ci95": [
+          0.865,
+          0.97
+        ],
+        "label": "86/92 = 93%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 2882,
+      "mean_parent_tokens": 2577,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 0
+    },
+    "6000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 91,
+        "rate": 0.989,
+        "sufficient": true,
+        "ci95": [
+          0.941,
+          0.998
+        ],
+        "label": "91/92 = 99%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 88,
+        "rate": 0.957,
+        "sufficient": true,
+        "ci95": [
+          0.893,
+          0.983
+        ],
+        "label": "88/92 = 96%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 88,
+        "rate": 0.957,
+        "sufficient": true,
+        "ci95": [
+          0.893,
+          0.983
+        ],
+        "label": "88/92 = 96%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 5875,
+      "mean_parent_tokens": 5632,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 0
+    },
+    "12000": {
+      "child_strict": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "child_partial": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "parent_strict": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "parent_partial": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "source_hit": {
+        "n": 92,
+        "hits": 92,
+        "rate": 1.0,
+        "sufficient": true,
+        "ci95": [
+          0.96,
+          1.0
+        ],
+        "label": "92/92 = 100%"
+      },
+      "mean_child_tokens": 11896,
+      "mean_parent_tokens": 11533,
+      "child_no_delivery": 0,
+      "parent_no_delivery": 0
+    }
+  },
   "golden_set": {
     "total": 101,
     "evaluable": 97,

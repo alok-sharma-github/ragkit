@@ -368,10 +368,20 @@ def main(argv: list[str] | None = None) -> int:
         except Exception:  # noqa: BLE001
             pass
 
-    # The CLI is the caller that speaks for the shipped system, so it is the one
-    # that names the primary artifact. Every other caller gets a payload and
-    # writes nothing.
-    payload = run(artifact=RESULTS,
+    # A GATE IS A READ. It compares this run against the stored baseline and has
+    # no business rewriting the headline artifact -- and it ran with --no-sweep,
+    # so every CI invocation replaced a complete artifact with one whose
+    # recall-vs-budget curve was empty. The Inspector renders that curve from
+    # this file, so running the gate blanked a chart on the demo, silently, and
+    # the artifact stayed otherwise valid: right index, right budget, right
+    # basis. The completeness invariant added an hour earlier is what caught it.
+    #
+    # So the rule from A-15 applies one level in: the CLI speaks for the shipped
+    # system only when it is producing the shipped measurement. A gate run, or
+    # any partial run, writes nowhere.
+    partial = args.no_sweep or args.limit is not None
+    writes_primary = not (args.gate or partial)
+    payload = run(artifact=RESULTS if writes_primary else None,
                   index_name=args.index, token_budget=args.budget, limit=args.limit,
                   sweep=not args.no_sweep)
     if args.json:
