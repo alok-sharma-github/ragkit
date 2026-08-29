@@ -1116,6 +1116,28 @@ assertion about correctness, it is an assertion about activity.** Pair every
 "nothing bad happened" invariant with a "something happened at all" control, or
 silence will pass as compliance.
 
+### A corollary, learned the embarrassing way
+
+**A check that reimplements what it checks is testing itself.**
+
+The first draft of the upload-reachability invariant copied `/api/asset`'s
+containment logic into the check, wrote the *corrected* version of it there, and
+reported HOLDS — while the endpoint it was supposedly guarding was broken in two
+directions and serving strangers' documents. It was a green check over a live
+vulnerability, and the greenness came from the check grading its own copy.
+
+That is this project's oldest failure — the survey script that imported a
+different parser than the pipeline and reported table counts differing 5× on
+identical bytes — arriving a year of lessons later **inside a security check
+written to catch a different instance of the same thing.** The pattern does not
+get easier to see with practice; it gets easier to see *if you look*.
+
+The fix is the only version that means anything: the containment lives in one
+named function, the endpoint and the check both call it, and reverting the fix
+makes the check fail. That last clause is the test of whether a check is
+load-bearing — not that it passes, but that a specific known break makes it stop
+passing.
+
 ---
 
 # Part 3 — Deliberately not decided

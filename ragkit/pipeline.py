@@ -30,7 +30,9 @@ infer from the corpus directory alone.
 
 from __future__ import annotations
 
+import contextlib
 import json
+import os
 import time
 from collections import Counter
 from dataclasses import dataclass, field
@@ -424,6 +426,61 @@ def ingest(
 # --------------------------------------------------------------------------
 
 
+@contextlib.contextmanager
+def _index_write_lock(index_name: str, *, timeout: float = 120.0):
+    """One writer at a time for an index directory. Cross-process, not a mutex.
+
+    WHY THIS IS NOT A THREADING LOCK. `ingest_upload` is read-modify-write over
+    files: load the index, append, save. Two concurrent uploads both read 814
+    chunks, each appends its own, and each writes 816 -- so the second save
+    silently discards the first visitor's document.
+
+    AND THE FAILURE IS INVISIBLE, WHICH IS WHY IT IS WORTH TWENTY MINUTES. The
+    visitor whose upload vanished asks their question and is told "that is not in
+    your documents" -- a sentence this system produces correctly, constantly, and
+    on purpose. Silent data loss wearing the costume of the abstention behaviour
+    the whole product is built to demonstrate. Of every failure mode reachable
+    from this path, that is the one that would take longest to notice.
+
+    An O_EXCL lockfile rather than `threading.Lock` because uvicorn may run more
+    than one worker, and a lock inside one process protects nothing from the
+    next. The lock is advisory and every writer here takes it.
+
+    STALE LOCKS ARE RECLAIMED, not waited on forever. A worker killed mid-ingest
+    would otherwise wedge uploads permanently, which converts a rare race into a
+    permanent outage -- a worse trade than the race.
+    """
+    lock = config.DATA_INDEX / f".{index_name}.write.lock"
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    deadline = time.time() + timeout
+    fd = None
+    while True:
+        try:
+            fd = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            break
+        except FileExistsError:
+            age = time.time() - lock.stat().st_mtime if lock.exists() else 0.0
+            if age > timeout:
+                # Older than any legitimate ingest: the holder is gone.
+                lock.unlink(missing_ok=True)
+                continue
+            if time.time() > deadline:
+                raise TimeoutError(
+                    f"another upload has held the {index_name} index for "
+                    f"{timeout:.0f}s. Nothing was written."
+                ) from None
+            time.sleep(0.15)
+    try:
+        os.write(fd, str(os.getpid()).encode())
+        os.close(fd)
+        fd = None
+        yield
+    finally:
+        if fd is not None:
+            os.close(fd)
+        lock.unlink(missing_ok=True)
+
+
 def ingest_upload(
     paths: Sequence[Path],
     *,
@@ -454,6 +511,9 @@ def ingest_upload(
     if not paths:
         return {"added": 0, "sources": []}
     config.ensure_dirs()
+    # Read once outside the lock only to VALIDATE the fingerprint -- cheap, and
+    # re-read inside the lock before appending, because anything read out here
+    # may be stale by the time the append happens.
     idx = NumpyIndex.load(index_name)
     # The fingerprint of the index being APPENDED TO, not a fresh one. A chunk
     # embedded under different settings than its neighbours is the mixed-index
@@ -507,13 +567,29 @@ def ingest_upload(
         kids = [c for c in new_chunks if c.role is ChunkRole.CHILD]
         vecs, _st = gemini.embed_texts([c.embed_text for c in kids], kind="document")
 
-    idx.children = list(idx.children) + kids
-    idx.vectors = np.vstack([idx.vectors, vecs])
-    for parent in (c for c in new_chunks if c.role is ChunkRole.PARENT):
-        idx.parents[parent.chunk_id] = parent
-    idx._owners = None                      # the ownership mask is memoised
-    idx.save(index_name)
-    manifest.save()
+    # THE ONLY SERIALISED SECTION, and it is deliberately the smallest one.
+    # Parsing, captioning, contextualising and embedding are the slow parts and
+    # they run concurrently; the lock covers re-read, append, save -- typically
+    # milliseconds. Holding it across the whole ingest would make two visitors
+    # queue behind each other's API calls for no safety benefit.
+    with _index_write_lock(index_name):
+        # RE-READ INSIDE THE LOCK. The copy loaded at the top of this function
+        # was for validation and may now be missing another visitor's upload.
+        # Appending to it would write 816 chunks over somebody else's 816 and
+        # silently drop their document.
+        idx = NumpyIndex.load(index_name)
+        idx.children = list(idx.children) + kids
+        idx.vectors = np.vstack([idx.vectors, vecs])
+        for parent in (c for c in new_chunks if c.role is ChunkRole.PARENT):
+            idx.parents[parent.chunk_id] = parent
+        idx._owners = None                  # the ownership mask is memoised
+        idx.save(index_name)
+        # The manifest is re-read inside the lock for the same reason.
+        fresh = Manifest()
+        for sid, rec in manifest.records.items():
+            if sid in sources:
+                fresh.records[sid] = rec
+        fresh.save()
     return {"added": len(kids), "sources": sources,
             "degradations": log.to_dicts()}
 
