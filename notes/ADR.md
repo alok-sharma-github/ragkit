@@ -1060,6 +1060,56 @@ thing it measures; its provenance must be read from the subject rather than from
 whatever file is closest; and a record can be wrong by being incomplete, not only
 by being about something else.**
 
+## A-17 · Isolation built for content does not cover metadata about content
+
+Three findings in one afternoon, all the same shape, all downstream of a
+guarantee that was genuinely enforced where it was tested.
+
+Chunk ownership decides what *retrieval* returns. It is enforced inside
+`_scores`, verified three ways, and it is correct. Every one of these went around
+it:
+
+| route | what leaked | why the ownership filter never saw it |
+|---|---|---|
+| the filesystem | the whole document, to the next `ragkit ingest` | uploads were written to the directory `corpus_files()` walks |
+| `/api/asset` | the whole document, over HTTP, to anyone | the endpoint serves by path and confinement is not ownership |
+| `/api/status` | the **filename**, title, page and chunk counts | the sidebar reads the manifest, not the index |
+
+The third is the subtlest and the one most likely to recur. It leaked no
+contents at all — and `Q3-redundancies.pdf` discloses its subject without a byte
+of its text. **"The content is protected" and "the document is private" are
+different claims, and only the first had been checked.**
+
+The pattern: a guarantee enforced in one store says nothing about a second store
+holding *facts about the same objects*. The index knows who owns a chunk; the
+manifest knows a document exists, its name, and its size. One guarantee, two
+stores, and only one of them enforcing it.
+
+**The test that would have caught all three, and now does:** ask what a second
+session can learn, not what it can retrieve. Retrieval was the only question
+being asked, because retrieval was where the work had gone.
+
+### And a fourth, found only because the third was fixed
+
+Wiring the sidebar filter surfaced that `purge_expired()` had exactly **one**
+caller — `POST /api/sessions/sweep` — which a demo refuses categorically. So on
+the one deployment where strangers upload, **expired sessions were never
+purged**, while `/api/status` told every visitor "your upload is deleted after 1
+hours".
+
+A stated guarantee with no enforcer is worse than an absent feature: the absence
+is visible and the broken promise is not. The sweep now runs at the start of an
+upload — the only event that makes the session set grow, and a request to
+attribute the deletion to, which is the reasoning the sweep endpoint was built on
+in the first place.
+
+Running it immediately failed, loudly and usefully: `remove_source` called
+`ingest()` without the `owner` argument that D-18 made required, so **every
+deletion that reindexes had been raising TypeError**. Invisible until something
+started calling it. The sweep reported the failure and kept the session for the
+next attempt rather than retrying silently — which is exactly why it reports what
+it could not do.
+
 
 ## A-16 · A check written from the last bug tests the last bug
 

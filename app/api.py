@@ -833,6 +833,24 @@ async def upload(request: Request,
     is slow and corpus-wide (it rebuilds the index). Fusing them would make a
     5-file upload run five full rebuilds.
     """
+    # THE TTL NEEDS SOMETHING TO RUN IT, and until now nothing did.
+    #
+    # `purge_expired()` had exactly one caller -- POST /api/sessions/sweep -- and
+    # that endpoint is refused on a demo, categorically. So on the deployment
+    # where strangers upload, expired sessions were never purged: uploads
+    # accumulated until the container was next replaced.
+    #
+    # Meanwhile /api/status tells every visitor, in as many words, "your upload
+    # is deleted after 1 hours". A stated guarantee with no enforcer is worse
+    # than an absent feature, because the absence is visible and the broken
+    # promise is not.
+    #
+    # Swept HERE rather than on a timer, which keeps the reasoning the sweep
+    # endpoint was built on: a deletion should have a request to attribute it to
+    # and a place for its failure to surface. An upload is the right trigger --
+    # it is the only event that makes the set of sessions grow, so the sweep runs
+    # exactly when there is something new to bound.
+    swept = sessions.purge_expired()
     session = sessions.STORE.get_or_create(session_owner(request))
     config.DATA_RAW.mkdir(parents=True, exist_ok=True)
     saved, rejected = [], []
@@ -921,6 +939,9 @@ async def upload(request: Request,
     body = {"saved": saved, "rejected": rejected,
             "session": session.to_json(),
             "indexed": ingested,
+            # Reported, not silent. A purge that fails needs somewhere to be
+            # seen, and this is the request it happened during.
+            "swept": swept,
             "next": ("ask a question -- your document is searchable in this session only"
                      if ingested.get("added") else
                      "your document was stored but could not be indexed")}

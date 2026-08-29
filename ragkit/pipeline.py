@@ -664,7 +664,21 @@ def remove_source(
         "tombstoned": True,
     }
     if reindex:
-        res = ingest(index_name=index_name, verbose=verbose)
+        # PUBLIC_OWNER, stated. `owner` was made required with no default so that
+        # "forgot to pass it" and "meant it to be public" stop being the same
+        # keystroke -- and this call site was missed, which made every deletion
+        # that reindexes raise TypeError.
+        #
+        # It was invisible until the session sweep started running, because the
+        # only other caller passes through the CLI. The sweep reported it rather
+        # than swallowing it -- `failed: [{source_id, error}]` -- and kept the
+        # session for the next attempt, which is the whole reason a purge reports
+        # what it could not do instead of retrying silently forever.
+        #
+        # PUBLIC_OWNER is correct here: this rebuilds THE CORPUS from data/raw,
+        # and a session's uploads no longer live there.
+        res = ingest(index_name=index_name, verbose=verbose,
+                     owner=PUBLIC_OWNER, origin="corpus")
         result["reindexed"] = {"children": res.n_children, "parents": res.n_parents}
     return result
 

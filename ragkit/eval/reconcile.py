@@ -482,6 +482,47 @@ def _upload_additivity_check(fp: list[str]) -> list[Check]:
     # different question from who may retrieve its text.
     from ..ingest.document import Manifest
 
+    # Does anything the demo permits actually run the TTL purge?
+    import inspect as _insp
+
+    from .. import sessions as _sess  # noqa: F401  (named for the reader)
+
+    ttl_callers = set()
+    try:
+        import app.api as _api
+        for name in ("upload",):
+            fn = getattr(_api, name, None)
+            if fn and "purge_expired" in _insp.getsource(fn):
+                ttl_callers.add(f"/api/documents ({name})")
+    except Exception:  # noqa: BLE001 -- no web layer installed is NOT_MEASURED-ish
+        ttl_callers = {"(web layer not importable)"}
+
+    # THE ROUND TRIP, asserted rather than remembered. Build a record with every
+    # field set to a distinguishable value, save, load, compare.
+    import dataclasses as _dc
+    import tempfile as _tmp
+
+    from ..ingest.document import DocType, Source, SourceRecord
+
+    rt_fields = [f.name for f in _dc.fields(SourceRecord) if f.name != "source"]
+    probe = SourceRecord(
+        source=Source(source_id="rt-probe", uri="rt.pdf", doc_type=DocType.PDF,
+                      content_hash="h", title="rt"),
+        chunk_ids=["c1"], parent_ids=["p1"], asset_paths=["a1"],
+        cache_keys=["k1"], n_uncontextualized=3, owner="rt-owner",
+    )
+    with _tmp.TemporaryDirectory() as td:
+        path = Path(td) / "m.json"
+        m = Manifest(path)
+        m.records["rt-probe"] = probe
+        m.save()
+        back = Manifest(path).records.get("rt-probe")
+    dropped = [] if back is None else [
+        f for f in rt_fields if getattr(probe, f) != getattr(back, f, None)
+    ]
+    if back is None:
+        dropped = ["<record did not survive at all>"]
+
     recs = Manifest().records
     n_upload = sum(1 for r in recs.values() if (getattr(r, "owner", "") or ""))
     n_public = len(recs) - n_upload
@@ -503,6 +544,32 @@ def _upload_additivity_check(fp: list[str]) -> list[Check]:
                    "ingest declares the rest of the corpus absent",
             why="the obvious one-line fix for the upload dead-end would have "
                 "purged every document in the index",
+        ),
+        Check(
+            name="The TTL promise has an enforcer",
+            rule="purge_expired() is reached from a route the demo permits",
+            observed=(f"called from {', '.join(sorted(ttl_callers))}" if ttl_callers
+                      else "purge_expired() is only reachable from a DENIED route"),
+            state="HOLDS" if ttl_callers else "FAILS",
+            n=len(ttl_callers), fingerprint=fp,
+            detail="/api/status tells every visitor their upload is deleted after "
+                   f"{config.UPLOAD_TTL_SECONDS // 3600}h; the only caller used to "
+                   "be POST /api/sessions/sweep, which a demo refuses outright",
+            why="a stated guarantee with no enforcer is worse than an absent "
+                "feature -- the absence is visible and the broken promise is not",
+        ),
+        Check(
+            name="Manifest round-trips every field",
+            rule="_load(save(x)) preserves every field of SourceRecord",
+            observed=(f"DROPPED on save/load: {sorted(dropped)}" if dropped
+                      else f"all {len(rt_fields)} fields survive"),
+            state="FAILS" if dropped else "HOLDS",
+            n=len(rt_fields), fingerprint=fp,
+            detail="save() and _load() are a hand-written pair, so a field added "
+                   "to the dataclass round-trips only if BOTH are edited",
+            why="`owner` was set correctly at ingest and silently dropped on save, "
+                "so the sidebar filter read \"\" for every record and showed every "
+                "visitor every upload -- while looking like a working filter",
         ),
         Check(
             name="Manifest records who may see a document",
