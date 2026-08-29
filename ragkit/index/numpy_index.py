@@ -204,7 +204,25 @@ class NumpyIndex:
 
     # -- search --------------------------------------------------------------
 
-    def _scores(self, query_vec: np.ndarray) -> np.ndarray:
+    def _scores(self, query_vec: np.ndarray, owner: str | None = None) -> np.ndarray:
+        """Cosine similarity, with ownership already applied.
+
+        THE FILTER LIVES HERE BECAUSE THIS IS THE ONE PLACE DISTANCES ARE
+        COMPUTED. It was in search_budget, which is not the serving path:
+        HybridIndex.retrieve goes through ranked_ids -> _dense_ids ->
+        search_k, and search_k had no filter at all. So the mechanism was
+        correct, the isolation test passed, and a session-B upload was
+        retrievable by session A through the endpoint the product actually uses.
+
+        The test asserted the property on a path the product does not take --
+        the same "correct on SOME of the traffic" failure, at its worst, because
+        here the untested path is the only one that serves users.
+
+        Putting it in _scores means every caller inherits it: search_k,
+        search_budget, and anything added later. A new retrieval method cannot
+        forget, because it cannot get scores without going through here.
+        """
+    
         q = np.asarray(query_vec, dtype=np.float32).ravel()
         if q.shape[0] != self.vectors.shape[1]:
             raise ValueError(
@@ -215,11 +233,16 @@ class NumpyIndex:
         n = float(np.linalg.norm(q))
         if n < 1e-6:
             raise ValueError("query vector is zero -- embedding failed, likely quota")
-        return self.vectors @ (q / n)
+        sims = self.vectors @ (q / n)
+        visible = self._visible_mask(owner)
+        # -inf, not a post-filter: an excluded chunk cannot survive
+        # argsort, so there is no unfiltered intermediate to forget.
+        return sims if visible is None else np.where(visible, sims, -np.inf)
 
-    def search_k(self, query_vec: np.ndarray, k: int = 10) -> list[Hit]:
+    def search_k(self, query_vec: np.ndarray, k: int = 10,
+                 *, owner: str | None = None) -> list[Hit]:
         """Exact top-k. Reported alongside the budget number, never instead of it."""
-        s = self._scores(query_vec)
+        s = self._scores(query_vec, owner)
         k = min(k, len(self.children))
         if k <= 0:
             return []
@@ -284,12 +307,9 @@ class NumpyIndex:
         customer arrives the predicate is renamed, not redesigned.
         """
         budget = token_budget or config.TOKENS_CONTEXT_BUDGET
-        s = self._scores(query_vec)
+        s = self._scores(query_vec, owner)
 
-        # -inf, not a post-filter. An excluded chunk cannot survive argsort.
-        visible = self._visible_mask(owner)
-        if visible is not None:
-            s = np.where(visible, s, -np.inf)
+        # The mask is applied inside _scores, so every scoring path inherits it.
 
         order = np.argsort(-s)[:max_items]
         # A -inf score means "not permitted to this caller"; it must never be

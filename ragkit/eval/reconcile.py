@@ -117,11 +117,20 @@ def _isolation_check(fp: str) -> list[Check]:
     """
     import numpy as np
 
-    from ..index.numpy_index import NumpyIndex
+    from ..index.hybrid import HybridIndex
     from ..ingest.document import Chunk, ChunkRole
 
     try:
-        ix = NumpyIndex.load()
+        # THE SERVING PATH, not NumpyIndex.search_budget.
+        #
+        # This test used to call search_budget directly and passed while
+        # HybridIndex.retrieve -- the method the API actually calls -- leaked,
+        # because retrieve goes through ranked_ids -> search_k and the filter was
+        # only on search_budget. A test that asserts the property on a path the
+        # product does not take is worse than no test: it reports the guarantee
+        # holding while the guarantee is absent where it matters.
+        hyb = HybridIndex.load()
+        ix = hyb.dense
     except Exception:  # noqa: BLE001 -- no index is NOT_MEASURED, not a failure
         return [Check(
             name="Upload isolation",
@@ -152,10 +161,22 @@ def _isolation_check(fp: str) -> list[Check]:
     ix.vectors = np.vstack([ix.vectors] + [probes[c.owner][None, :] for c in added])
     ix._owners = None
 
+    # Rebuild the sparse leg so it sees the probes too: filtering only the dense
+    # side would leave RRF and sparse-only mode leaking.
+    from ..index.bm25 import BM25Index
+
+    hyb.sparse = BM25Index(ix.children)
+    hyb._by_id = {c.chunk_id: c for c in ix.children}
+
     def seen(owner):
-        hits = ix.search_budget(probes["iso-session-B"], token_budget=4000,
-                                unit="child", owner=owner)
-        return {h.chunk.chunk_id for h in hits}
+        """What the SERVING path returns, in every retrieval mode."""
+        out: set[str] = set()
+        for mode in ("dense", "sparse", "rrf"):
+            r = hyb.retrieve("probe belonging to iso-session-B",
+                             probes["iso-session-B"], mode=mode,
+                             token_budget=4000, unit="child", owner=owner)
+            out |= {c.chunk_id for c in r.children}
+        return out
 
     cross = "iso-session-B-probe" in seen("iso-session-A")
     public = bool({"iso-session-A-probe", "iso-session-B-probe"} & seen(None))

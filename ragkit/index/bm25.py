@@ -160,7 +160,19 @@ class BM25Index:
             matched.append(term)
         return total, matched
 
-    def search_k(self, query: str, k: int = 10) -> list[BM25Hit]:
+    def search_k(self, query: str, k: int = 10,
+                 *, owner: str | None = None) -> list[BM25Hit]:
+        """Top-k by BM25, with ownership applied to the CANDIDATE SET.
+
+        The sparse leg needs its own filter. Fixing only the dense leg would
+        leave RRF and sparse-only mode leaking, which is the same partial
+        coverage in a second place -- and the fused result would have contained
+        another session's chunk while the dense half was provably clean.
+
+        Applied when building candidates, not to the results: an unowned document
+        is never scored, so there is no moment where it exists in a list that
+        something downstream must remember to trim.
+        """
         q_terms = tokenize(query)
         # Only documents that share at least one query term can score, so the
         # postings list bounds the work -- that is the whole point of an inverted
@@ -168,6 +180,15 @@ class BM25Index:
         candidates: set[int] = set()
         for t in set(q_terms):
             candidates.update(self.postings.get(t, ()))
+        if True:  # always: `owner=None` means public-only, not unfiltered
+            from ..ingest.document import PUBLIC_OWNER
+
+            allowed = {PUBLIC_OWNER} if owner is None else {PUBLIC_OWNER, owner}
+            candidates = {
+                i for i in candidates
+                if (getattr(self.children[i], "owner", PUBLIC_OWNER) or PUBLIC_OWNER)
+                in allowed
+            }
         scored = []
         for i in candidates:
             s, matched = self._score_doc(i, q_terms)

@@ -101,22 +101,30 @@ class HybridIndex:
 
     # -- ranked id lists per leg --------------------------------------------
 
-    def _dense_ids(self, query_vec: np.ndarray, pool: int) -> list[str]:
-        return [h.chunk.chunk_id for h in self.dense.search_k(query_vec, pool)]
+    def _dense_ids(self, query_vec: np.ndarray, pool: int,
+                   owner: str | None = None) -> list[str]:
+        return [h.chunk.chunk_id for h in
+                self.dense.search_k(query_vec, pool, owner=owner)]
 
-    def _sparse_ids(self, query: str, pool: int) -> list[str]:
-        return [h.chunk.chunk_id for h in self.sparse.search_k(query, pool)]
+    def _sparse_ids(self, query: str, pool: int,
+                    owner: str | None = None) -> list[str]:
+        return [h.chunk.chunk_id for h in
+                self.sparse.search_k(query, pool, owner=owner)]
 
     def ranked_ids(
-        self, query: str, query_vec: np.ndarray, *, mode: Mode, pool: int = LEG_POOL
+        self, query: str, query_vec: np.ndarray, *, mode: Mode,
+        pool: int = LEG_POOL, owner: str | None = None,
     ) -> tuple[list[str], list[FusedHit] | None, dict[str, Any] | None]:
+        # `owner` reaches BOTH legs. Filtering only the dense side would leave
+        # sparse-only and RRF leaking, and the fused result would carry another
+        # session's chunk while the dense half was provably clean.
         if mode == "dense":
-            return self._dense_ids(query_vec, pool), None, None
+            return self._dense_ids(query_vec, pool, owner), None, None
         if mode == "sparse":
-            return self._sparse_ids(query, pool), None, None
+            return self._sparse_ids(query, pool, owner), None, None
         legs = {
-            "dense": self._dense_ids(query_vec, pool),
-            "sparse": self._sparse_ids(query, pool),
+            "dense": self._dense_ids(query_vec, pool, owner),
+            "sparse": self._sparse_ids(query, pool, owner),
         }
         fused = rrf(
             legs,
@@ -136,6 +144,11 @@ class HybridIndex:
         token_budget: int | None = None,
         unit: Unit = "child",
         max_items: int = 200,
+        # WHO IS ASKING. None = the public corpus only. This is the
+        # serving path -- the filter was on search_budget, which this
+        # does not call, so retrieve() leaked while the isolation test
+        # passed against a path the product never takes.
+        owner: str | None = None,
     ) -> Retrieved:
         """Fill to the budget, strictly, in fused rank order.
 
@@ -144,7 +157,7 @@ class HybridIndex:
         granularity, not something to paper over by admitting one oversized item.
         """
         budget = token_budget or config.TOKENS_CONTEXT_BUDGET
-        ids, fused, legs = self.ranked_ids(query, query_vec, mode=mode)
+        ids, fused, legs = self.ranked_ids(query, query_vec, mode=mode, owner=owner)
 
         children: list[Chunk] = []
         parents: list[Chunk] = []
