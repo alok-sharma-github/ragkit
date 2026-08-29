@@ -797,8 +797,10 @@ one before it. Two runs can then be compared as though they measured the same
 index when they did not, which is the precise failure the stamp exists to prevent,
 in the stamp itself.
 
-Retrieval *is* deterministic — re-running immediately reproduced 79/92 exactly,
-which is what justifies gating it in CI. The non-determinism is not in the search;
+Retrieval *is* deterministic — re-running immediately reproduced that run's
+79/92 exactly, which is what justifies gating it in CI. (That figure is from the
+breadcrumb index under the old cost basis; the headline today is 82/92. The point
+is the reproduction, not the number.) The non-determinism is not in the search;
 it is in what "the index" refers to across a rebuild.
 
 **The fix is a content hash** of the serialised index alongside the pipeline
