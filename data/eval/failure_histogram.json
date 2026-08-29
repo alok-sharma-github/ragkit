@@ -1,0 +1,72 @@
+{
+  "stamp": {
+    "pipeline_fingerprint": "4d54ab24999d336e",
+    "parser_version": "pymupdf4llm@1.28+lines-detector@1+quadcorr-unset+cleanhdr@2+pagetextrepair@3+bboxflags@1",
+    "chunker_version": "header_aware_parent@3",
+    "token_budget": 1500
+  },
+  "n": 15,
+  "budget": 1500,
+  "points": [
+    {
+      "id": "FP1",
+      "name": "Missing Content",
+      "n": 0,
+      "share": 0.0,
+      "observable": "structurally unobservable \u2014 the golden set is generated from the corpus"
+    },
+    {
+      "id": "FP2",
+      "name": "Missed Top Ranked",
+      "n": 8,
+      "share": 0.533,
+      "observable": "measured"
+    },
+    {
+      "id": "FP3",
+      "name": "Not In Context",
+      "n": 7,
+      "share": 0.467,
+      "observable": "measured"
+    },
+    {
+      "id": "FP4",
+      "name": "Not Extracted",
+      "n": 0,
+      "share": 0.0,
+      "observable": "measured"
+    },
+    {
+      "id": "FP5",
+      "name": "Wrong Format",
+      "n": 0,
+      "share": 0.0,
+      "observable": "measured"
+    },
+    {
+      "id": "FP6",
+      "name": "Incorrect Specificity",
+      "n": 0,
+      "share": 0.0,
+      "observable": "not measured \u2014 needs a human judgement"
+    },
+    {
+      "id": "FP7",
+      "name": "Incomplete",
+      "n": 0,
+      "share": 0.0,
+      "observable": "not measured \u2014 needs a human judgement"
+    }
+  ],
+  "by_cause": {
+    "evidence_partial": 6,
+    "evidence_absent": 7,
+    "starved_by_budget": 1,
+    "retrieval_miss_answered": 1
+  },
+  "by_stratum": {
+    "table_or_image": 8,
+    "simple_factual": 5,
+    "exact_identifier": 2
+  }
+}

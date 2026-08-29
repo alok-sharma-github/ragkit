@@ -817,6 +817,19 @@ def inspector() -> dict[str, Any]:
         },
         "hybrid_comparison": hybrid_cmp,
         "goldenset_report": load("goldenset_report.json"),
+        # THE STRONGEST SINGLE RESULT, and it lived in a markdown file. All
+        # measured failures are FP2/FP3 -- the evidence exists and was not
+        # delivered -- and NONE are FP4, which rules out prompt engineering,
+        # context reordering and reader fine-tuning ON EVIDENCE, because each
+        # improves a step that is not failing. The Inspector is the screen built
+        # to show findings; it was not showing that one.
+        # READ, NOT RECOMPUTED. scripts/failure_histogram.py combines two
+        # stamped inputs and reconciles the classified count against the input
+        # count; a second implementation here read only one of them and
+        # under-counted by exactly the row the other contributed -- 14 against
+        # 15, silently, and plausible enough that neither number would be
+        # questioned. The script writes the artifact; this reads it.
+        "failures": load("failure_histogram.json"),
     }
 
 

@@ -198,6 +198,16 @@ export interface Check {
 }
 
 export interface InspectorResponse {
+  /** Measured failures by Barnett failure point, written by
+   *  scripts/failure_histogram.py and read here rather than recomputed. */
+  failures?: {
+    n: number;
+    budget: number;
+    thesis?: string;
+    points: { id: string; name: string; n: number; share: number; observable: string }[];
+    by_cause: Record<string, number>;
+    by_stratum: Record<string, number>;
+  } | null;
   reconciliation: {
     fingerprint: string[];
     pipeline_fingerprint: string | null;

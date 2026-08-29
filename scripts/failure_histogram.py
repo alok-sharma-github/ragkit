@@ -42,6 +42,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from ragkit import config  # noqa: E402
+# Imported, not copied: a second copy of the taxonomy agrees with the first
+# until it does not, and the disagreement is silent (A-16).
+from ragkit.eval.failure_points import (  # noqa: E402
+    CAUSE_TO_FP, FP_NAMES, FP_OBSERVABLE)
 
 OUT = ROOT / "notes" / "FAILURE_ANALYSIS.md"
 
@@ -94,37 +98,6 @@ def _require_comparable(stamps: dict[str, dict[str, Any]]) -> dict[str, Any]:
 # Cause -> (failure point, why). Stated explicitly rather than inferred, because a
 # taxonomy mapping guessed from a label is how a histogram comes to describe the
 # labels instead of the system.
-CAUSE_TO_FP = {
-    "evidence_absent": (
-        "FP2",
-        "the needle exists in the corpus and retrieval did not deliver it",
-    ),
-    "evidence_partial": (
-        "FP3",
-        "some needles arrived and the rest did not survive the budget fill -- "
-        "retrieved, then consolidated away",
-    ),
-    "starved_by_budget": (
-        "FP3",
-        "candidates ranked correctly and NONE fit the token budget, so nothing "
-        "reached the model",
-    ),
-    "no_candidates": ("FP2", "ranking returned nothing"),
-    "retrieval_miss_answered": (
-        "FP2",
-        "the golden needle was not retrieved at this budget AND the model answered "
-        "anyway -- from other context, so the answer may still be right; the "
-        "measurement cannot tell",
-    ),
-    "unsupported_answer": (
-        "FP4",
-        "context was delivered and the answer asserted something it does not support",
-    ),
-    "failed_verdict": (
-        "FP5",
-        "the judge could not produce a parseable verdict for this item",
-    ),
-}
 
 
 def main() -> int:
@@ -216,11 +189,7 @@ def main() -> int:
     # reports a smaller problem than it measured.
     assert sum(by_fp.values()) == total, "classified count != input count"
 
-    fp_names = {
-        "FP1": "Missing Content", "FP2": "Missed Top Ranked", "FP3": "Not In Context",
-        "FP4": "Not Extracted", "FP5": "Wrong Format",
-        "FP6": "Incorrect Specificity", "FP7": "Incomplete",
-    }
+    fp_names = FP_NAMES
 
     L: list[str] = []
     L.append("# Failure analysis")
@@ -327,6 +296,32 @@ def main() -> int:
     L.append("")
 
     OUT.write_text("\n".join(L), encoding="utf-8")
+
+    # AND AS AN ARTIFACT, so the Inspector can show this instead of it living
+    # only in a markdown file nobody opens mid-demo.
+    #
+    # Written HERE rather than recomputed in the API. This function combines TWO
+    # stamped inputs and asserts the classified count equals the input count; a
+    # second implementation reading only one of them under-counted by exactly
+    # the row the other contributed -- 14 against 15, silently, and plausibly
+    # enough that nobody would question either number. One computation, two
+    # readers.
+    (config.DATA_EVAL / "failure_histogram.json").write_text(
+        json.dumps({
+            "stamp": stamp,
+            "n": total,
+            "budget": budget,
+            "points": [
+                {"id": fp, "name": FP_NAMES[fp], "n": by_fp.get(fp, 0),
+                 "share": round(by_fp.get(fp, 0) / total, 3) if total else 0.0,
+                 "observable": FP_OBSERVABLE[fp]}
+                for fp in FP_NAMES
+            ],
+            "by_cause": dict(by_cause),
+            "by_stratum": dict(by_stratum),
+        }, indent=2),
+        encoding="utf-8",
+    )
     print(f"wrote {OUT.relative_to(ROOT)}  ({total} failures, budget {budget})")
     for fp in ("FP1", "FP2", "FP3", "FP4", "FP5", "FP6", "FP7"):
         print(f"  {fp} {fp_names[fp]:22s} {by_fp.get(fp, 0)}")
