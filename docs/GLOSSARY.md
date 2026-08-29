@@ -223,7 +223,13 @@ rebuilt index that differs in passage ordering carries the same fingerprint — 
 headline moved 78/92 to 79/92 between two runs whose fingerprints were identical.*
 
 **Invariant / reconcile** — a check that must hold before any score is trusted,
-executed rather than asserted. Currently 0 failing, 9 passing, 3 not measured.
+executed rather than asserted. Currently 0 failing, 17 passing, 3 not measured.
+→ *Qualifier: each was written after a specific thing went wrong, which is why
+they are good and also where they are blind — none tests a failure nobody has
+caused yet. A recent pass asked of each one "what would a useless version of this
+look like that still passes?", and five had an answer. The sharpest: "we never
+sent more text than allowed" is satisfied perfectly by sending nothing. Every such
+check now has a companion asserting that something happened at all.*
 
 **Deferral** — a decision *not* to build something, stored with the condition that
 reverses it, so it expires itself rather than being remembered. One has already

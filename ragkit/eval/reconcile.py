@@ -399,6 +399,51 @@ def _primary_artifact_check(fp: list[str]) -> list[Check]:
     ]
 
 
+def _refuse_vacuous_passes(checks: list[Check]) -> list[Check]:
+    """A check that passed over an empty population did not pass. It abstained.
+
+    THE PASS THAT PRODUCED THIS. Every invariant here was written from a specific
+    incident, and each therefore tests what that incident violated. The two
+    "headline artifact" checks asserted the artifact's IDENTITY -- right index,
+    right budget, right cost basis -- because identity was what the two known
+    incidents had corrupted. An artifact with an empty budget sweep satisfied all
+    of them, and the Inspector's recall chart rendered blank while every check
+    was green.
+
+    A check written from the last bug tests the last bug. So this is one pass
+    over the whole list asking a different question: *what would a valid-but-
+    useless version of this look like?* The answers were uncomfortable:
+
+      Index parity            0 indexed == 0 embedded, 0 dropped. An EMPTY INDEX
+                              passes perfectly.
+      Parent resolution       0 orphans, because there are no children.
+      Uniform provenance      one provenance among zero chunks is one provenance.
+      Scoring sanity          partial 0 >= strict 0. An eval that scored nothing.
+      Context budget          delivered 0 <= budget. **A retrieval system that
+                              returns nothing satisfies this at every budget.**
+
+    That last one is the isolation control case, one file over and not applied:
+    `Upload retrievability` exists precisely because a filter returning nothing
+    passes both isolation tests, and the same reasoning had never been pointed at
+    the budget invariant.
+
+    The fix is not to make these FAIL. An empty index is not a broken index, it
+    is an absent one, and NOT_MEASURED already means exactly that -- "an absent
+    value invites investigation, an invented one ends it". So a HOLDS over a
+    population of zero is downgraded, with the population named, and the
+    reconciler's summary stops counting it as evidence.
+    """
+    out: list[Check] = []
+    for c in checks:
+        if c.state == "HOLDS" and not c.n:
+            c.state = "NOT_MEASURED"
+            c.detail = (f"population is {c.n!r} -- this passed over nothing. "
+                        f"Downgraded from HOLDS: a check with no subjects "
+                        f"abstained, it did not hold. " + c.detail)
+        out.append(c)
+    return out
+
+
 def reconcile() -> dict[str, Any]:
     """Read the artifacts on disk and evaluate every invariant.
 
@@ -457,11 +502,17 @@ def reconcile() -> dict[str, Any]:
             name="Provenance propagation",
             rule="repaired>0 <=> labelled>0, and labelled >= repaired",
             observed=f"{total_rep} repaired blocks -> {total_lab} labelled children",
-            state="HOLDS" if not bad else "FAILS",
+            # NOT_MEASURED when the loader repaired nothing: a biconditional
+            # over two zeros is satisfied and has tested nothing. The label this
+            # exists to protect only exists when there is a repair to label.
+            state=("FAILS" if bad else "HOLDS" if total_rep else "NOT_MEASURED"),
             n=total_lab,
             fingerprint=fp,
             detail="; ".join(bad) if bad else
-                   "a repaired block may split into several children, so >= is the invariant, not ==",
+                   ("a repaired block may split into several children, so >= is the "
+                    "invariant, not ==" if total_rep else
+                    "nothing was repaired in this ingest, so there was no label to "
+                    "propagate and nothing to check"),
             why="the repaired text propagated and its label did not, on all 791 children",
         ))
         checks.append(Check(
@@ -494,22 +545,56 @@ def reconcile() -> dict[str, Any]:
             detail="partial is a superset of strict by construction",
             why="reported 97% < 100% because asset items set strict and not partial",
         ))
+        sweep = evalr.get("budget_sweep") or {}
         over = [
-            b for b, h in (evalr.get("budget_sweep") or {}).items()
+            b for b, h in sweep.items()
             if h["mean_child_tokens"] > int(b) or h["mean_parent_tokens"] > int(b)
         ]
         checks.append(Check(
             name="Context budget",
             rule="delivered <= budget, every unit, every budget",
             observed=(f"mean child {head['mean_child_tokens']}, parent "
-                      f"{head['mean_parent_tokens']}, budget {budget}"),
-            state="HOLDS" if not over else "FAILS",
-            n=head["child_strict"]["n"],
+                      f"{head['mean_parent_tokens']}, budget {budget}"
+                      + (f", over {len(sweep)} budgets" if sweep else
+                         " -- NO SWEEP TO CHECK")),
+            # An empty sweep is not a pass. The list comprehension above is empty
+            # when the sweep is, and `not over` was reading that as compliance --
+            # the same defect as the headline artifact rendering a blank chart
+            # while reporting green, in a different check, found in the same pass.
+            state=("FAILS" if over else "HOLDS" if sweep else "NOT_MEASURED"),
+            n=head["child_strict"]["n"] if sweep else 0,
             fingerprint=fp,
             detail=("over budget at: " + ", ".join(over)) if over else
-                   "a unit allowed to overshoot is simply given more text",
+                   ("a unit allowed to overshoot is simply given more text" if sweep
+                    else "the artifact carries no budget sweep, so nothing was checked"),
             why="an `and hits` clause gave the parent unit 378 tokens against a 250 budget",
         ))
+        # THE CONTROL CASE, and its absence was the sharper half of the finding.
+        #
+        # "delivered <= budget" is satisfied perfectly by delivering NOTHING, at
+        # every budget, forever. Exactly the reasoning behind `Upload
+        # retrievability` -- which exists because a filter returning nothing
+        # passes both isolation tests -- never pointed at this invariant.
+        #
+        # Strict fill legitimately returns nothing at a tight budget, so the
+        # control has to be stated where that is not a defence: at the LARGEST
+        # budget measured, both units must deliver something.
+        top = max(sweep, key=int) if sweep else None
+        if top:
+            th = sweep[top]
+            delivered = (th["mean_child_tokens"], th["mean_parent_tokens"])
+            checks.append(Check(
+                name="Context budget delivers something",
+                rule=f"at the largest measured budget ({top}), both units deliver > 0 tokens",
+                observed=f"child {delivered[0]}, parent {delivered[1]} tokens at {top}",
+                state="HOLDS" if all(d > 0 for d in delivered) else "FAILS",
+                n=int(top), fingerprint=fp,
+                detail="the control for the check above: a retriever that returns "
+                       "nothing never exceeds its budget, so 'delivered <= budget' "
+                       "alone cannot distinguish compliance from silence",
+                why="the same gap that made Upload retrievability necessary, "
+                    "unapplied here until a pass over every check went looking for it",
+            ))
         cov = evalr["metrics"]["stratum_coverage"]
         checks.append(Check(
             name="Stratum coverage",
@@ -556,6 +641,7 @@ def reconcile() -> dict[str, Any]:
     checks.extend(_isolation_check(fp))
     checks.extend(_contextual_prefix_check(fp))
     checks.extend(_primary_artifact_check(fp))
+    checks = _refuse_vacuous_passes(checks)
 
     n_fail = sum(1 for c in checks if c.state == "FAILS")
     n_hold = sum(1 for c in checks if c.state == "HOLDS")

@@ -1024,6 +1024,62 @@ thing it measures; its provenance must be read from the subject rather than from
 whatever file is closest; and a record can be wrong by being incomplete, not only
 by being about something else.**
 
+
+## A-16 · A check written from the last bug tests the last bug
+
+Every invariant in this project was written from an incident, which means each
+one tests what that incident violated. That is how they came to be good, and it
+is also a systematic blind spot: **no check tests a failure mode nothing has
+caused yet.**
+
+The completeness bug made the shape visible. The two "headline artifact" checks
+asserted the artifact's *identity* — right index, right budget, right cost basis
+— because identity was what both known incidents had corrupted. An artifact whose
+budget sweep was empty satisfied all of them, and the demo's recall chart
+rendered blank while the reconciler reported green.
+
+So rather than wait for instance four, one pass over all nineteen checks asking a
+different question: **what would a valid-but-useless version of this look like?**
+Five answers were uncomfortable:
+
+| check | passes perfectly when |
+|---|---|
+| Index parity | the index is **empty** — 0 indexed == 0 embedded, 0 dropped |
+| Parent resolution | there are **no children**, so no orphans |
+| Uniform provenance | one provenance among **zero** chunks is one provenance |
+| Scoring sanity | `partial 0 >= strict 0` — an eval that scored nothing |
+| Context budget | **the retriever returns nothing**, at every budget, forever |
+
+The last one is the sharpest, and it is a lesson this project had already learned
+and not carried across. `Upload retrievability` exists *precisely* because a
+filter that returns nothing passes both isolation tests — the control case was
+written for exactly this reasoning, in a file one directory away, and was never
+pointed at the budget invariant.
+
+**Two fixes, of different kinds.**
+
+A *generic* one: a HOLDS over a population of zero is downgraded to
+`NOT_MEASURED`, with the population named. Not to FAILS — an empty index is not a
+broken index, it is an absent one, and `NOT_MEASURED` already means exactly that.
+A check with no subjects abstained; it did not hold.
+
+And a *specific* one, because the budget case cannot be caught generically:
+strict fill legitimately returns nothing at a tight budget, so the control has to
+be stated where silence is not a defence. **At the largest measured budget, both
+units must deliver more than zero tokens.** Verified by simulation: with every
+delivery zeroed, `Context budget` still reports HOLDS — correctly, it is a true
+statement — and the new control reports FAILS.
+
+Same pass caught `Provenance propagation` satisfying a biconditional over two
+zeros, and `Context budget` reading an empty sweep as compliance — the
+completeness bug again, in a second check, found because the pass went looking
+rather than waiting.
+
+The general form: **an assertion that can only be violated by activity is not an
+assertion about correctness, it is an assertion about activity.** Pair every
+"nothing bad happened" invariant with a "something happened at all" control, or
+silence will pass as compliance.
+
 ---
 
 # Part 3 — Deliberately not decided
@@ -1115,7 +1171,7 @@ are not visible from the new number alone (D-6, A-13).
 | Abstention rate | 14/92 = **15%**; `table_or_image` **8/38 = 21%** | 18/92 = 20%; 11/38 = 29% |
 | Measured failures | 15 — FP2 8 · FP3 7 · **FP4 0** | 23 — FP2 14 · FP3 9 · FP4 0 |
 | Judge κ vs hand labels | **0.897** (raw 0.933, chance 0.353, n=30) | unchanged |
-| Invariants | 0 failing · 12 passing · 3 not measured | 0 · 9 · 3 |
+| Invariants | 0 failing · 17 passing · 3 not measured | 0 · 9 · 3 |
 | Guard coverage | 8 paid routes · 4 guarded · 4 exempt · 0 unguarded | unchanged |
 | Reachability | 0 unexplained · 3 explained by deferrals | 0 · 4 |
 | Container | 150 MiB / 512 · 22 s boot · ~7 s per answer | unchanged |
