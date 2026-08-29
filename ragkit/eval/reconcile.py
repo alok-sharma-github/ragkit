@@ -536,7 +536,11 @@ def _upload_reachability_check(fp: list[str]) -> list[Check]:
     # re-implemented the containment logic and passed against its own copy while
     # the endpoint was broken in two directions -- this project's oldest failure,
     # very nearly shipped inside a check written to catch another instance of it.
-    from app.api import resolve_asset
+    #
+    # Imported from `ragkit`, not from `app.api`: the first version of this line
+    # reached into the web layer and made the eval harness require FastAPI, which
+    # crashed reconcile in any environment installed without the server.
+    from ..corpus_paths import resolve_asset
 
     root = config.DATA_RAW.resolve()
 
