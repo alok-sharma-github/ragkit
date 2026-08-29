@@ -59,6 +59,7 @@ invented one ends it.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Literal
@@ -444,6 +445,150 @@ def _refuse_vacuous_passes(checks: list[Check]) -> list[Check]:
     return out
 
 
+def _upload_additivity_check(fp: list[str]) -> list[Check]:
+    """Can adding one session's file remove somebody else's? Answered by trying it.
+
+    WRITTEN BEFORE THE CODE IT GUARDS, because the failure mode was known in
+    advance and is catastrophic rather than degraded.
+
+    `ingest(files=[one_upload])` looks exactly like the right call and would
+    DELETE THE CORPUS. `Manifest.plan` computes removals as
+    `set(records) - present_ids`, so naming one file declares every other
+    document absent and purges it -- dense index, sparse index, parent store,
+    assets, caches. The convenience argument and the delete detector share one
+    notion of "what is present"; for a full corpus walk that is correct, and for
+    a subset it is a corpus-wiping bug in the shape of a filter.
+
+    So the invariant is not "ingest_upload works". It is that the destructive
+    path is **not reachable from it**: the function must never consult the
+    planner, and the corpus walker must never see the uploads directory.
+    """
+    import inspect
+
+    from .. import pipeline as PL
+    from ..ingest import loaders as L
+
+    src = inspect.getsource(PL.ingest_upload)
+    touches_planner = any(t in src for t in (".plan(", "purge_source", "deleted_sources"))
+
+    # The other half, and the reason it is a separate assertion: even a perfect
+    # ingest_upload does not help if a CORPUS ingest walks into the uploads
+    # directory, because that run DOES delete and DOES own everything publicly.
+    walked = L.corpus_files()
+    up = config.DATA_UPLOADS.resolve()
+    leaked = [str(f) for f in walked if str(f.resolve()).startswith(str(up))]
+
+    return [
+        Check(
+            name="Session ingest cannot delete",
+            rule="ingest_upload never reaches the manifest planner",
+            observed=("it references the planner" if touches_planner
+                      else "no plan(), purge_source() or deleted_sources() on this path"),
+            state="FAILS" if touches_planner else "HOLDS",
+            n=1, fingerprint=fp,
+            detail="Manifest.plan derives deletions from absence, so a subset "
+                   "ingest declares the rest of the corpus absent",
+            why="the obvious one-line fix for the upload dead-end would have "
+                "purged every document in the index",
+        ),
+        Check(
+            name="Corpus walker cannot see uploads",
+            rule="corpus_files() returns nothing under the uploads directory",
+            observed=(f"LEAKED {len(leaked)}: {leaked[:2]}" if leaked
+                      else f"{len(walked)} corpus files, none under {up.name}/"),
+            state="FAILS" if leaked else "HOLDS",
+            n=len(walked), fingerprint=fp,
+            detail="a corpus ingest deletes by absence and owns publicly, so a "
+                   "stranger's file inside its walk becomes public and permanent",
+        ),
+    ]
+
+
+def _upload_reachability_check(fp: list[str]) -> list[Check]:
+    """Can an uploaded file be read WITHOUT retrieval? Answered by trying it.
+
+    WRITTEN BEFORE THE FIX, and it failed on the first run -- which is the only
+    way to know a check is load-bearing rather than decorative.
+
+    THE GAP IT EXISTS FOR. Ownership was enforced where retrieval happens: the
+    `-inf` mask inside `_scores`, verified three ways by the isolation
+    invariants above. All three ask the same question -- can another session
+    RETRIEVE this? None asks whether another session can simply ASK FOR THE FILE.
+
+    Measured, before the fix: a visitor with no cookie, who had never uploaded
+    anything, fetched another session's PDF in full with
+    `GET /api/asset?path=data/raw/<name>` -- 200, every byte. The containment
+    check resolved a relative path against the PROCESS WORKING DIRECTORY rather
+    than against the corpus root, so it refused the app's own asset URLs
+    (`assets/x.png` -> 403) while admitting paths that happened to be relative to
+    the CWD. Wrong in both directions at once.
+
+    So the guarantee was real inside the index and absent at the door, and a day
+    of work on the index could not see that -- the same shape as an invariant
+    that passes on a path the product does not take, one layer further out.
+
+    Two things are asserted, and the second is the one that generalises:
+      1. the containment check accepts what the UI generates
+      2. NO PATH under the uploads directory is reachable through it at all --
+         because uploads no longer live where this endpoint can see them
+    """
+    # THE ENDPOINT'S OWN FUNCTION, imported. The first draft of this check
+    # re-implemented the containment logic and passed against its own copy while
+    # the endpoint was broken in two directions -- this project's oldest failure,
+    # very nearly shipped inside a check written to catch another instance of it.
+    from app.api import resolve_asset
+
+    root = config.DATA_RAW.resolve()
+
+    def reachable(raw: str) -> bool:
+        return resolve_asset(raw) is not None
+
+    ui_form = reachable("assets/hnsw_p2.png")
+    escapes = [r for r in ("../../.env", "../../../etc/passwd", "/etc/passwd")
+               if reachable(r)]
+    up = config.DATA_UPLOADS.resolve()
+    # The uploads directory must not be INSIDE the servable root. Containment
+    # then refuses it by construction rather than by a rule someone maintains --
+    # the same reasoning as putting the owner filter in _scores().
+    uploads_outside = not str(up).startswith(str(root) + os.sep) and up != root
+
+    return [
+        Check(
+            name="Asset endpoint serves what the UI asks for",
+            rule="a relative asset path resolves under the corpus root",
+            observed=("'assets/hnsw_p2.png' resolves inside the root" if ui_form
+                      else "the app's own asset URL is REFUSED by its own guard"),
+            state="HOLDS" if ui_form else "FAILS",
+            n=1, fingerprint=fp,
+            detail="it resolved relative paths against the process working "
+                   "directory, so it refused legitimate URLs and admitted "
+                   "whatever happened to sit under the CWD",
+        ),
+        Check(
+            name="Asset endpoint refuses traversal",
+            rule="no path escapes the corpus root",
+            observed=(f"ESCAPED: {escapes}" if escapes else
+                      "traversal attempts refused"),
+            state="FAILS" if escapes else "HOLDS",
+            n=3, fingerprint=fp,
+            detail="a path parameter that reaches the filesystem is untrusted input",
+        ),
+        Check(
+            name="Uploads are unreachable by file path",
+            rule="the uploads directory is not inside the servable corpus root",
+            observed=(f"uploads at {up.name}/, servable root is {root.name}/"
+                      if uploads_outside else
+                      "UPLOADS LIVE INSIDE THE SERVABLE ROOT"),
+            state="HOLDS" if uploads_outside else "FAILS",
+            n=1, fingerprint=fp,
+            detail="closing the route rather than filtering it: an endpoint that "
+                   "cannot address a directory needs no rule about who may read it",
+            why="a visitor with no cookie fetched another session's PDF in full "
+                "with GET /api/asset?path=data/raw/<name>",
+        ),
+    ]
+
+
 def reconcile() -> dict[str, Any]:
     """Read the artifacts on disk and evaluate every invariant.
 
@@ -641,6 +786,8 @@ def reconcile() -> dict[str, Any]:
     checks.extend(_isolation_check(fp))
     checks.extend(_contextual_prefix_check(fp))
     checks.extend(_primary_artifact_check(fp))
+    checks.extend(_upload_reachability_check(fp))
+    checks.extend(_upload_additivity_check(fp))
     checks = _refuse_vacuous_passes(checks)
 
     n_fail = sum(1 for c in checks if c.state == "FAILS")

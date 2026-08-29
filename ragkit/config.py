@@ -32,6 +32,25 @@ load_dotenv()
 ROOT = Path(__file__).resolve().parent.parent
 
 DATA_RAW = ROOT / "data" / "raw"          # the corpus
+
+# WHERE A VISITOR'S UPLOAD LANDS, and the whole point is that it is NOT DATA_RAW.
+#
+# Uploads used to be written straight into the corpus directory. Two consequences,
+# both live, neither visible from the index:
+#
+#   `corpus_files()` rglobs DATA_RAW, so the next operator-run `ragkit ingest`
+#   would index a stranger's document with owner=PUBLIC_OWNER -- around the
+#   ownership filter rather than through it.
+#
+#   `/api/asset` serves files confined to DATA_RAW, and confinement is not
+#   ownership. Measured: a visitor with no cookie fetched another session's PDF
+#   in full, 200 and every byte.
+#
+# A separate root closes both by construction. The corpus walker cannot see it
+# and the asset endpoint cannot address it -- no rule to maintain, nothing to
+# remember, which is the same reasoning as putting the owner filter inside
+# _scores() rather than filtering results afterwards.
+DATA_UPLOADS = ROOT / "data" / "uploads"  # session-scoped; never served, never walked
 DATA_INDEX = ROOT / "data" / "index"      # serialised indexes
 DATA_EVAL = ROOT / "data" / "eval"        # golden set + baselines
 CACHE_DIR = ROOT / ".cache"               # embedding cache, LLM response cache
@@ -604,7 +623,8 @@ def api_key() -> str:
 
 
 def ensure_dirs() -> None:
-    for p in (DATA_RAW, DATA_INDEX, DATA_EVAL, EMBED_CACHE, EXPERIMENTS_OUT, NOTES):
+    for p in (DATA_RAW, DATA_UPLOADS, DATA_INDEX, DATA_EVAL, EMBED_CACHE,
+              EXPERIMENTS_OUT, NOTES):
         p.mkdir(parents=True, exist_ok=True)
 
 

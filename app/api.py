@@ -726,19 +726,48 @@ def source(chunk_id: str, quote: str = Query(default="")) -> dict[str, Any]:
     }
 
 
-@app.get("/api/asset")
-def asset(path: str) -> FileResponse:
-    """Serve an extracted image, confined to the corpus directory.
+def resolve_asset(path: str) -> Path | None:
+    """Where an asset path lands, or None if it escapes. THE function, not a copy.
 
-    resolve() then check containment: without it, `path=../../.env` is a file
-    read. A path parameter that reaches the filesystem is untrusted input.
+    A SEPARATE FUNCTION SO THE INVARIANT CAN CALL IT. The first version of the
+    upload-reachability check re-implemented this logic and passed -- against
+    itself. That is this project's oldest failure and it very nearly shipped
+    inside the check written to catch a different instance of it. An invariant
+    that tests a reimplementation tests the reimplementation.
+
+    TWO BUGS FIXED HERE, and they were the same bug pointing opposite ways.
+    `Path(path).resolve()` resolves a RELATIVE path against the process working
+    directory, not against the corpus root. Measured consequences:
+
+      `assets/hnsw_p2.png`          the URL the UI itself generates -> 403
+      `data/raw/<upload>.pdf`       another session's private document -> 200
+
+    So it refused what it should serve and served what it should refuse. Joining
+    to the root first, then checking containment, is correct in both directions.
+
+    Containment is NOT ownership, and this function does not pretend otherwise.
+    Uploads are unreachable here because they live outside this root entirely --
+    a directory this function cannot address needs no rule about who may read it.
     """
     root = config.DATA_RAW.resolve()
-    p = (root / Path(path).name if Path(path).is_absolute() else Path(path)).resolve()
+    cand = Path(path)
+    # Join to the root FIRST. An absolute path keeps only its filename, a
+    # relative one is interpreted where the caller meant it -- inside the corpus.
+    target = (root / cand.name) if cand.is_absolute() else (root / cand)
     try:
-        p.relative_to(root)
+        resolved = target.resolve()
+        resolved.relative_to(root)
     except ValueError:
-        raise HTTPException(403, "outside the corpus directory") from None
+        return None
+    return resolved
+
+
+@app.get("/api/asset")
+def asset(path: str) -> FileResponse:
+    """Serve an extracted image, confined to the corpus directory."""
+    p = resolve_asset(path)
+    if p is None:
+        raise HTTPException(403, "outside the corpus directory")
     if not p.exists():
         raise HTTPException(404, str(path))
     return FileResponse(p, media_type=mimetypes.guess_type(p.name)[0] or "application/octet-stream")
@@ -868,7 +897,16 @@ async def upload(request: Request,
                     "pages": verdict.pages,
                 })
                 continue
-            dest = config.DATA_RAW / name
+            # SESSION-SCOPED DIRECTORY, not the corpus.
+            #
+            # This was `config.DATA_RAW / name`, and it put a stranger's file in
+            # the directory `corpus_files()` walks and `/api/asset` serves. Two
+            # live consequences: the next operator ingest would index it as
+            # PUBLIC, and a visitor with no cookie could download it in full.
+            # Ownership was enforced in the index and there were two routes
+            # around the index.
+            dest = config.DATA_UPLOADS / session.session_id / name
+            dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(data)
         finally:
             # The quarantine copy goes whether the file was admitted or refused.
@@ -886,9 +924,32 @@ async def upload(request: Request,
         for row in saved:
             sessions.STORE.note_document(session.session_id, row["source_id"])
 
+    # MADE SEARCHABLE HERE, not by a second call the visitor cannot make.
+    #
+    # The response used to say "POST /api/ingest to make these searchable", and
+    # /api/ingest is 403 on a demo -- correctly, it is a corpus-wide rebuild. So
+    # the upload succeeded and dead-ended: owned, stored, unaskable. Every piece
+    # worked; the sequence did not.
+    ingested: dict[str, Any] = {}
+    if saved:
+        try:
+            ingested = pipeline.ingest_upload(
+                [config.DATA_UPLOADS / session.session_id / r["name"] for r in saved],
+                owner=session.session_id,
+            )
+            _invalidate_index()
+        except Exception as exc:  # noqa: BLE001
+            # A failed ingest must not look like a successful upload. The file
+            # stays (the session owns it and the sweep will purge it); what the
+            # visitor is told is that it is not searchable, and why.
+            ingested = {"added": 0, "error": type(exc).__name__, "detail": str(exc)[:300]}
+
     body = {"saved": saved, "rejected": rejected,
             "session": session.to_json(),
-            "next": "POST /api/ingest to make these searchable"}
+            "indexed": ingested,
+            "next": ("ask a question -- your document is searchable in this session only"
+                     if ingested.get("added") else
+                     "your document was stored but could not be indexed")}
 
     resp = JSONResponse(content=body)
     # Issued on upload rather than on first visit: a visitor who only asks

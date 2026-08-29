@@ -82,3 +82,9 @@ data/index/citation_index.json
 
 # Untrusted uploads are inspected here before admission; never committed.
 data/quarantine/
+
+# A VISITOR'S UPLOADS. Session-scoped, TTL-purged, and never part of the repo --
+# they are somebody else'''s document. Kept out of data/raw for the same reason:
+# corpus_files() walks that directory and /api/asset serves it, and both were
+# routes around the ownership filter rather than through it.
+data/uploads/

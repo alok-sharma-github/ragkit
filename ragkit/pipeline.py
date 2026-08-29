@@ -37,6 +37,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Sequence
 
+import numpy as np
+
 from . import config, gemini, limits
 from .chunking import contextualize
 from .chunking import splitters as S
@@ -420,6 +422,100 @@ def ingest(
 # --------------------------------------------------------------------------
 # Removal
 # --------------------------------------------------------------------------
+
+
+def ingest_upload(
+    paths: Sequence[Path],
+    *,
+    owner: str,
+    index_name: str = "numpy_index",
+    caption_images: bool = True,
+) -> dict[str, Any]:
+    """Add ONE session's files to the live index. Additive, never destructive.
+
+    WHY NOT `ingest(files=[...])`, which looks like it does this. Because it
+    would delete the corpus. `Manifest.plan` computes removals as
+    `set(records) - present_ids`, so a run whose `files` argument names one
+    upload declares every other document ABSENT and purges it -- dense index,
+    sparse index, parent store, assets, caches. The convenience argument and the
+    delete detector share one notion of "what is present", and for a full corpus
+    walk that is correct. For a subset it is a corpus-wiping bug wearing the
+    shape of a filter.
+
+    So this path does not go near the planner. It loads, chunks under the
+    session's owner, embeds, and APPENDS. Nothing is compared against what was
+    there before, because nothing is supposed to be removed.
+
+    THE OWNER IS THE POINT. `build_chunks` requires it with no default, so every
+    chunk this produces is session-scoped by construction, and
+    `assert_owned()` in NumpyIndex.__init__ refuses the index outright if an
+    upload-sourced chunk ever carries the public sentinel.
+    """
+    if not paths:
+        return {"added": 0, "sources": []}
+    config.ensure_dirs()
+    idx = NumpyIndex.load(index_name)
+    # The fingerprint of the index being APPENDED TO, not a fresh one. A chunk
+    # embedded under different settings than its neighbours is the mixed-index
+    # defect, and here it would arrive one upload at a time.
+    fp = sorted({c.pipeline_fingerprint for c in idx.children})
+    if len(fp) != 1:
+        raise RuntimeError(
+            f"refusing to append to an index with {len(fp)} fingerprints: {fp}. "
+            "Appending to a mixed index makes the mixture permanent."
+        )
+    pipe = pipeline_version("header_aware_parent",
+                            contextual=config.CONTEXTUAL_PREFIXES)
+    if pipe.fingerprint() != fp[0]:
+        raise RuntimeError(
+            f"refusing to append chunks stamped {pipe.fingerprint()} to an index "
+            f"of {fp[0]}. Re-ingest the corpus, or the upload is measured under a "
+            "pipeline the rest of the index was not built with."
+        )
+
+    new_chunks: list[Chunk] = []
+    sources: list[str] = []
+    manifest = Manifest()
+    with limits.collect() as log:
+        for p in paths:
+            src, blocks, diag = L.load(p, caption_images=caption_images)
+            situate = None
+            if config.CONTEXTUAL_PREFIXES:
+                doc_text = "\n\n".join(b.text for b in blocks if b.text.strip())
+                syn = contextualize.synopsis(src.title or src.source_id, doc_text)
+
+                def situate(parent_text: str, body: str, _syn: str = syn) -> str:
+                    return contextualize.situate(doc_synopsis=_syn,
+                                                 parent_text=parent_text, body=body)
+            chunks = S.build_chunks(src, blocks, pipeline=pipe,
+                                    owner=owner, origin="upload",
+                                    contextualizer=situate)
+            new_chunks.extend(chunks)
+            src.pipeline_fingerprint = pipe.fingerprint()
+            kids = [c for c in chunks if c.role is ChunkRole.CHILD]
+            parents = [c for c in chunks if c.role is ChunkRole.PARENT]
+            manifest.record(SourceRecord(
+                source=src,
+                chunk_ids=[c.chunk_id for c in kids],
+                parent_ids=[c.chunk_id for c in parents],
+                asset_paths=[b.asset_path for b in blocks if b.asset_path],
+                cache_keys=[gemini.cache_key(c.embed_text) for c in kids],
+                n_pages=diag.get("n_pages", 0),
+            ))
+            sources.append(src.source_id)
+
+        kids = [c for c in new_chunks if c.role is ChunkRole.CHILD]
+        vecs, _st = gemini.embed_texts([c.embed_text for c in kids], kind="document")
+
+    idx.children = list(idx.children) + kids
+    idx.vectors = np.vstack([idx.vectors, vecs])
+    for parent in (c for c in new_chunks if c.role is ChunkRole.PARENT):
+        idx.parents[parent.chunk_id] = parent
+    idx._owners = None                      # the ownership mask is memoised
+    idx.save(index_name)
+    manifest.save()
+    return {"added": len(kids), "sources": sources,
+            "degradations": log.to_dicts()}
 
 
 def remove_source(
