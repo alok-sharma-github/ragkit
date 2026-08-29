@@ -478,6 +478,19 @@ def _upload_additivity_check(fp: list[str]) -> list[Check]:
     up = config.DATA_UPLOADS.resolve()
     leaked = [str(f) for f in walked if str(f.resolve()).startswith(str(up))]
 
+    # The manifest's own view of who may KNOW a document exists, which is a
+    # different question from who may retrieve its text.
+    from ..ingest.document import Manifest
+
+    recs = Manifest().records
+    n_upload = sum(1 for r in recs.values() if (getattr(r, "owner", "") or ""))
+    n_public = len(recs) - n_upload
+    mislabelled = [
+        sid for sid, r in recs.items()
+        if r.source.doc_type and not (getattr(r, "owner", "") or "")
+        and str(getattr(r.source, "uri", "")).replace("\\", "/").find("/uploads/") >= 0
+    ]
+
     return [
         Check(
             name="Session ingest cannot delete",
@@ -490,6 +503,22 @@ def _upload_additivity_check(fp: list[str]) -> list[Check]:
                    "ingest declares the rest of the corpus absent",
             why="the obvious one-line fix for the upload dead-end would have "
                 "purged every document in the index",
+        ),
+        Check(
+            name="Manifest records who may see a document",
+            rule="every upload-owned source record carries a non-public owner",
+            observed=(f"{len(mislabelled)} upload records with a public owner: "
+                      f"{mislabelled[:2]}" if mislabelled else
+                      f"{n_upload} upload record(s), all session-owned; "
+                      f"{n_public} public"),
+            state="FAILS" if mislabelled else "HOLDS",
+            n=n_upload + n_public, fingerprint=fp,
+            detail="the documents sidebar reads the manifest, not the index, so "
+                   "chunk-level ownership does not reach it -- a filename is "
+                   "content, and `Q3-redundancies.pdf` discloses its subject "
+                   "without a byte of its text",
+            why="every visitor saw the filename, title and chunk count of every "
+                "other visitor's upload",
         ),
         Check(
             name="Corpus walker cannot see uploads",

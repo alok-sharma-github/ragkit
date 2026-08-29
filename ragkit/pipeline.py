@@ -556,6 +556,7 @@ def ingest_upload(
             parents = [c for c in chunks if c.role is ChunkRole.PARENT]
             manifest.record(SourceRecord(
                 source=src,
+                owner=owner,
                 chunk_ids=[c.chunk_id for c in kids],
                 parent_ids=[c.chunk_id for c in parents],
                 asset_paths=[b.asset_path for b in blocks if b.asset_path],

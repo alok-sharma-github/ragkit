@@ -416,12 +416,21 @@ def _set_session_cookie(response: JSONResponse, session_id: str) -> None:
 
 
 @app.get("/api/status")
-def status() -> dict[str, Any]:
+def status(request: Request) -> dict[str, Any]:
     rep_path = config.DATA_EVAL / "index_report.json"
     rep = json.loads(rep_path.read_text("utf-8")) if rep_path.exists() else {}
     m = Manifest()
     docs = []
+    # WHOSE DOCUMENTS THIS VISITOR MAY SEE. The public corpus, plus their own
+    # uploads, and nothing else. Without this the sidebar disclosed the filename
+    # of every upload on the deployment to every visitor -- found by walking the
+    # live path, not by reading the code, because the code looked like a listing
+    # of "the corpus" and that is exactly what it was until uploads existed.
+    viewer = session_owner(request)
     for sid, rec in sorted(m.records.items()):
+        rec_owner = getattr(rec, "owner", "") or ""
+        if rec_owner and rec_owner != viewer:
+            continue
         docs.append({
             "source_id": sid,
             "title": rec.source.title,

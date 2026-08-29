@@ -466,6 +466,20 @@ class SourceRecord:
     cache_keys: list[str] = field(default_factory=list)  # embedding + LLM cache
     n_uncontextualized: int = 0  # the free-tier partial-ingest count
 
+    # WHO MAY KNOW THIS DOCUMENT EXISTS. "" is the public corpus.
+    #
+    # Separate from the per-chunk `owner`, and needed because the two answer
+    # different questions. Chunk ownership decides what RETRIEVAL returns, and it
+    # was verified three ways. The documents sidebar does not go through
+    # retrieval -- it reads this manifest -- so it listed every session's uploads
+    # to every visitor: filename, title, page count, chunk count.
+    #
+    # Not the contents. Just the name, which is frequently the sensitive part:
+    # `Q3-redundancies.pdf` discloses its subject without a byte of its text.
+    # "The content is protected" is not the same claim as "the document is
+    # private", and only the first had been checked.
+    owner: str = ""
+
     # Prevalence, recorded rather than printed. Two numbers, not one, because a
     # detector's own count is circular: it measures what the detector FINDS, not
     # what EXISTS. `n_tables_detected` is bounded below by the detector's blind
@@ -518,6 +532,9 @@ class Manifest:
                 asset_paths=r.get("asset_paths", []),
                 cache_keys=r.get("cache_keys", []),
                 n_uncontextualized=r.get("n_uncontextualized", 0),
+                # Defaults to "" so a manifest written before this field existed
+                # loads as public, which is what those records are.
+                owner=r.get("owner", ""),
             )
         self.tombstones = raw.get("tombstones", {})
 
@@ -532,6 +549,15 @@ class Manifest:
                     "asset_paths": r.asset_paths,
                     "cache_keys": r.cache_keys,
                     "n_uncontextualized": r.n_uncontextualized,
+                    # BOTH ENDS OR NEITHER. This dict and `_load` below are a
+                    # hand-written pair, so a field added to SourceRecord is
+                    # silently dropped on the round-trip unless both are edited.
+                    # `owner` was added, set correctly at ingest, and vanished on
+                    # save -- so the sidebar filter read "" for every record and
+                    # showed every visitor every upload. Exactly the shape of the
+                    # repaired-table bug: the value propagated and the label did
+                    # not, and the label is the half the guard reads.
+                    "owner": r.owner,
                 }
                 for sid, r in self.records.items()
             },
