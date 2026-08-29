@@ -219,6 +219,24 @@ class NumpyIndex:
         order = part[np.argsort(-s[part])]
         return [Hit(self.children[i], float(s[i]), r) for r, i in enumerate(order)]
 
+    def _visible_mask(self, owner: str | None) -> "np.ndarray | None":
+        """Boolean mask over children: which are retrievable by this caller.
+
+        Public chunks are visible to everyone; a session additionally sees its
+        own uploads. No caller can see another session's chunks, because the
+        mask is what the scores are multiplied through -- see search_budget.
+        """
+        from ..ingest.document import PUBLIC_OWNER
+
+        owners = getattr(self, "_owners", None)
+        if owners is None:
+            owners = np.array([getattr(c, "owner", PUBLIC_OWNER) or PUBLIC_OWNER
+                               for c in self.children])
+            self._owners = owners
+        if owner is None:
+            return owners == PUBLIC_OWNER
+        return (owners == PUBLIC_OWNER) | (owners == owner)
+
     def search_budget(
         self,
         query_vec: np.ndarray,
@@ -231,6 +249,9 @@ class NumpyIndex:
         # would have fit. Returned this way rather than by changing the return
         # type, so every existing call site keeps working unchanged.
         stats: dict | None = None,
+        # WHO IS ASKING. None means the public corpus only. A session id also
+        # admits that session's own uploads, and nothing else, ever.
+        owner: str | None = None,
     ) -> list[Hit]:
         """Retrieve by descending score until the TOKEN BUDGET fills.
 
@@ -239,10 +260,32 @@ class NumpyIndex:
                          deduplicating parents (two children of one parent cost
                          that parent once, which is a real advantage of the
                          parent-document design and should be visible as one).
+
+        OWNERSHIP IS APPLIED TO THE SCORES, NOT TO THE RESULTS. The mask below is
+        combined with the distances before anything is ranked, so a chunk another
+        session owns is never a candidate -- it is not retrieved and then
+        discarded, it is arithmetically unreachable.
+
+        That distinction is the whole point. "Search everything, then filter"
+        works right up until one code path forgets the second half, and the
+        failure is a leak rather than a miss. There is no such path here because
+        there is no unfiltered intermediate to forget about.
+
+        This is Phase 2's `WHERE tenant_id = $1` in numpy form. When a real
+        customer arrives the predicate is renamed, not redesigned.
         """
         budget = token_budget or config.TOKENS_CONTEXT_BUDGET
         s = self._scores(query_vec)
+
+        # -inf, not a post-filter. An excluded chunk cannot survive argsort.
+        visible = self._visible_mask(owner)
+        if visible is not None:
+            s = np.where(visible, s, -np.inf)
+
         order = np.argsort(-s)[:max_items]
+        # A -inf score means "not permitted to this caller"; it must never be
+        # delivered even if the budget would have room for it.
+        order = [i for i in order if np.isfinite(s[i])]
 
         hits: list[Hit] = []
         spent = 0

@@ -369,6 +369,27 @@ class Chunk:
     ingested_at: str = field(default_factory=_now)
     content_hash: str = ""         # of THIS chunk's text; dedup + cache keying
 
+    # WHO CAN RETRIEVE THIS. "" means the public corpus -- visible to everyone.
+    #
+    # THE EMPTY STRING IS THE DANGEROUS VALUE, and it is dangerous in one
+    # direction only. Every other field in this class fails toward a MISS: get it
+    # wrong and a chunk is unreachable, which is visible and annoying. Get this
+    # one wrong and an uploaded document becomes readable by every visitor, which
+    # is a LEAK, and leaks are silent.
+    #
+    # So `owner` is never merely "set at ingest". `assert_owned()` below refuses to
+    # build an index containing an upload-sourced chunk with a public owner, which
+    # makes the failure structural rather than a matter of remembering. Same
+    # reasoning as _make_parent hardcoding VERBATIM: a value you assert is a value
+    # that can drift.
+    #
+    # This is Phase 2's tenant filter, built early against a lower-stakes threat
+    # model. `session_id` becomes `tenant_id` and the mechanism is unchanged.
+    owner: str = ""
+    # Where the chunk came from. An upload can never be public; the public corpus
+    # can never be session-scoped. Both directions are checked.
+    origin: str = "corpus"          # "corpus" | "upload"
+
     @staticmethod
     def make_id(source_id: str, ordinal: int, text: str, role: ChunkRole) -> str:
         """Addition (3): stable across re-runs, unstable across content changes.
@@ -634,3 +655,43 @@ class Manifest:
                 "failed). A/B results over a mixed index are not interpretable."
             )
         return line
+
+
+PUBLIC_OWNER = ""
+"""Owner value meaning "the shared demo corpus, visible to everyone"."""
+
+
+class OwnershipViolation(RuntimeError):
+    """A chunk's owner and origin disagree in a way that would leak or hide it."""
+
+
+def assert_owned(chunks: "list[Chunk] | tuple[Chunk, ...]") -> None:
+    """Refuse a chunk set whose ownership could leak. Call before indexing.
+
+    TWO DIRECTIONS, because only one of them is obvious:
+
+      upload with a public owner   an uploaded document readable by every
+                                   visitor. A LEAK, and silent -- nothing in the
+                                   product looks wrong.
+      corpus with a session owner  the shared corpus invisible to everyone. A
+                                   miss, loud, and mostly harmless.
+
+    The first is why this function exists. It is deliberately a hard failure and
+    not a warning: a warning about a leak is a leak with a note attached.
+    """
+    bad_upload = [c for c in chunks
+                  if c.origin == "upload" and c.owner == PUBLIC_OWNER]
+    if bad_upload:
+        raise OwnershipViolation(
+            f"{len(bad_upload)} uploaded chunk(s) carry the PUBLIC owner "
+            f"(first: {bad_upload[0].chunk_id}). An upload with a public owner is "
+            "readable by every visitor. Refusing to index rather than leaking."
+        )
+    bad_corpus = [c for c in chunks
+                  if c.origin == "corpus" and c.owner != PUBLIC_OWNER]
+    if bad_corpus:
+        raise OwnershipViolation(
+            f"{len(bad_corpus)} corpus chunk(s) carry a session owner "
+            f"(first: {bad_corpus[0].chunk_id}). The shared corpus would be "
+            "invisible to everyone."
+        )

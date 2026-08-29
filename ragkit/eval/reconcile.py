@@ -95,6 +95,105 @@ def _load(path: Path) -> dict[str, Any] | None:
         return None
 
 
+def _isolation_check(fp: str) -> list[Check]:
+    """Can one session retrieve another's upload? Answered by TRYING it.
+
+    Not "we implemented ownership" -- an executed retrieval, scored, in the same
+    harness as every other invariant. The claim a customer needs is a number.
+
+    TWO CASES, because they fail differently:
+
+      cross-session   session A queries with session B's OWN vector -- the
+                      strongest possible pull toward B's chunk -- and must not
+                      receive it.
+      public visitor  a caller with NO uploads must not receive ANY upload. This
+                      catches the public-sentinel bug: an uploaded chunk carrying
+                      owner="" is visible to everyone, and a check comparing only
+                      sessions can be written so that reads as legitimate.
+
+    A CONTROL CASE is included deliberately: B must still retrieve its OWN chunk.
+    Without it a filter that returns nothing at all passes both isolation cases
+    perfectly, and "isolated" becomes indistinguishable from "broken".
+    """
+    import numpy as np
+
+    from ..index.numpy_index import NumpyIndex
+    from ..ingest.document import Chunk, ChunkRole
+
+    try:
+        ix = NumpyIndex.load()
+    except Exception:  # noqa: BLE001 -- no index is NOT_MEASURED, not a failure
+        return [Check(
+            name="Upload isolation",
+            rule="a session cannot retrieve another session's upload",
+            observed="no index available", state="NOT_MEASURED", n=None,
+            fingerprint=fp,
+            detail="isolation is a property of a live index; there is none to query",
+        )]
+
+    rng = np.random.default_rng(20260829)
+    dim = ix.vectors.shape[1]
+    probes: dict[str, "np.ndarray"] = {}
+    added: list[Chunk] = []
+    for owner in ("iso-session-A", "iso-session-B"):
+        v = rng.normal(size=dim).astype("float32")
+        v /= np.linalg.norm(v)
+        probes[owner] = v
+        added.append(Chunk(
+            chunk_id=f"{owner}-probe", source_id=f"{owner}.pdf", ordinal=0,
+            role=ChunkRole.CHILD, owner=owner, origin="upload",
+            embed_text=f"probe belonging to {owner}",
+            display_text=f"probe belonging to {owner}",
+        ))
+
+    # In-memory copy only. Nothing is written to disk, so running the reconciler
+    # cannot contaminate the index it is reporting on.
+    ix.children = list(ix.children) + added
+    ix.vectors = np.vstack([ix.vectors] + [probes[c.owner][None, :] for c in added])
+    ix._owners = None
+
+    def seen(owner):
+        hits = ix.search_budget(probes["iso-session-B"], token_budget=4000,
+                                unit="child", owner=owner)
+        return {h.chunk.chunk_id for h in hits}
+
+    cross = "iso-session-B-probe" in seen("iso-session-A")
+    public = bool({"iso-session-A-probe", "iso-session-B-probe"} & seen(None))
+    own = "iso-session-B-probe" in seen("iso-session-B")
+
+    return [
+        Check(
+            name="Upload isolation",
+            rule="a session cannot retrieve another session's upload",
+            observed=("A RETRIEVED B's chunk" if cross
+                      else "A queried B's own vector, received nothing of B's"),
+            state="FAILS" if cross else "HOLDS",
+            n=2, fingerprint=fp,
+            detail="the query used B's own embedding, the strongest possible pull",
+        ),
+        Check(
+            name="Upload isolation (public)",
+            rule="a caller with no uploads retrieves no upload at all",
+            observed=("a public visitor RETRIEVED an upload" if public
+                      else "public visitor received no uploaded chunk"),
+            state="FAILS" if public else "HOLDS",
+            n=2, fingerprint=fp,
+            detail='catches an upload carrying owner="" -- the one value whose bug '
+                   "is a leak rather than a miss",
+        ),
+        Check(
+            name="Upload retrievability",
+            rule="a session CAN retrieve its own upload",
+            observed=("B retrieved its own chunk" if own
+                      else "B could NOT retrieve its own chunk"),
+            state="HOLDS" if own else "FAILS",
+            n=1, fingerprint=fp,
+            detail="the control: without it, a filter returning nothing would pass "
+                   "both isolation checks and be useless",
+        ),
+    ]
+
+
 def reconcile() -> dict[str, Any]:
     """Read the artifacts on disk and evaluate every invariant.
 
@@ -246,6 +345,10 @@ def reconcile() -> dict[str, Any]:
                          ("Stratum coverage", "every declared stratum has items")):
             checks.append(Check(nm, rule, "no eval_results.json", "NOT_MEASURED",
                                 detail="run: python -m ragkit.eval.run"))
+
+    # Isolation is executed, not asserted: two probe uploads are added to an
+    # in-memory copy of the index and actually queried. Nothing is written to disk.
+    checks.extend(_isolation_check(fp))
 
     n_fail = sum(1 for c in checks if c.state == "FAILS")
     n_hold = sum(1 for c in checks if c.state == "HOLDS")
