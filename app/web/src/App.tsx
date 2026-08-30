@@ -570,7 +570,34 @@ export function App() {
         cid = (await api.createConversation()).id;
         setActiveConv(cid);
       }
-      const res = await api.askIn(cid, { question, budget, sources: 6, mode });
+      let res;
+      try {
+        res = await api.askIn(cid, { question, budget, sources: 6, mode });
+      } catch (e: any) {
+        // A CONVERSATION CAN VANISH UNDER A LIVE BROWSER, and when it does the
+        // question must still be answered.
+        //
+        // Conversations are files on the container, and the container is
+        // ephemeral: it restarts on every deploy, and it restarted on its own
+        // when a burst of work pushed a 512 MB host past its health check. The
+        // browser holds the conversation id in memory across all of that, so it
+        // keeps posting to an id the server no longer has -- 404, three times,
+        // which is exactly what a visitor reported.
+        //
+        // Losing the history is unavoidable. Losing the ANSWER is not: start a
+        // fresh conversation and ask again, once. The visitor sees a note
+        // saying the thread was lost, not an error code.
+        // MATCHED ON `status`, NOT ON THE MESSAGE. The first version tested
+        // the message for "404" -- and the server raises HTTPException(404,
+        // cid), so the message IS the conversation id and the digits never
+        // appear. It would have compiled, shipped, and never once fired.
+        if (e?.status !== 404) throw e;
+        const fresh = (await api.createConversation()).id;
+        setActiveConv(fresh);
+        setTurns([]);
+        setErr("That conversation expired on the server — starting a new one. Your question was still answered.");
+        res = await api.askIn(fresh, { question, budget, sources: 6, mode });
+      }
       setTurns((t) => [...t, res]);
       api.conversations().then((r) => setConvs(r.conversations));
     } catch (e: any) {
