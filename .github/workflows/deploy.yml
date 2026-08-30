@@ -137,6 +137,21 @@ jobs:
           KIND="${{ steps.target.outputs.kind }}"
           URL=$(aws lightsail get-container-services --service-name "$SERVICE" \
                   --query 'containerServices[0].url' --output text)
+          # THE SERVICE POWER IS NOT SET HERE, and that is worth knowing rather
+          # than discovering. `create-container-service-deployment` deploys a
+          # container; the host size is a property of the SERVICE, changed with
+          # `update-container-service --power`. So a deploy cannot resize the
+          # host and this workflow will happily push a heavier image onto a host
+          # that cannot run it.
+          #
+          # Currently `micro` (1 GB / 0.25 vCPU, ~$10/mo), raised from `nano`
+          # (0.5 GB) after the container was silently killed mid-session: steady
+          # state was 75.8% of 512 MB, and a burst to 80% memory / 92% CPU took
+          # it out, which lost a visitor's conversation. Micro doubles the RAM
+          # and leaves the CPU at 0.25 vCPU -- so the memory headroom is fixed
+          # and the CPU ceiling is not. `small` (0.5 vCPU, ~$15/mo) is the next
+          # step if CPU saturation recurs.
+          #
           # RAGKIT_DEMO_MODE is 1 for the public demo and 0 elsewhere. The IMAGE
           # defaults it to 1, so a deployment that forgot this variable would still
           # be read-only -- the safe direction.

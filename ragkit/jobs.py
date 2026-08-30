@@ -33,6 +33,7 @@ from __future__ import annotations
 import json
 import queue
 import threading
+import time
 import traceback
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -174,6 +175,21 @@ class JobStore:
             job.state = "running"
             job.started_at = _now()
             self._save(job)
+            # ONE LINE ON START, ONE ON FINISH, TO STDOUT.
+            #
+            # Job state lived only in memory and in data/index/jobs/, both of
+            # which die with the container -- so a background crash left NOTHING
+            # in the logs. That is exactly the situation where the logs are the
+            # only evidence there is: a visitor lost a conversation, the
+            # container had silently restarted at 92% CPU with no request in
+            # flight, and whatever burned that CPU was invisible because nothing
+            # it did was ever written where a log collector could see it.
+            #
+            # uvicorn's access lines already go to stdout, so these land in the
+            # same stream and interleave in the right order.
+            _t0 = time.time()
+            print(f"JOB {job.id} start kind={job.kind} "
+                  f"params={json.dumps(job.params, default=str)[:200]}", flush=True)
             try:
                 job.result = fn(job)
                 job.state = "done"
@@ -185,6 +201,18 @@ class JobStore:
             finally:
                 job.finished_at = _now()
                 self._save(job)
+                # The result SUMMARY, not the result. A log line that is
+                # sometimes enormous gets truncated by something downstream,
+                # and it truncates the part you needed.
+                _sum = ""
+                if job.state == "done" and isinstance(job.result, dict):
+                    _sum = " " + json.dumps(
+                        {k: v for k, v in job.result.items()
+                         if isinstance(v, (int, float, str, bool))}, default=str)[:200]
+                elif job.state == "failed":
+                    _sum = " " + (job.error or "").splitlines()[0][:200]
+                print(f"JOB {job.id} {job.state} kind={job.kind} "
+                      f"in={time.time() - _t0:.1f}s{_sum}", flush=True)
 
 
 STORE = JobStore()
